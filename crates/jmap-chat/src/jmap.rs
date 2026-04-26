@@ -25,7 +25,7 @@ impl Id {
     pub fn new(s: impl Into<String>) -> Result<Self, crate::error::ClientError> {
         let s = s.into();
         if s.is_empty() {
-            return Err(crate::error::ClientError::Parse(
+            return Err(crate::error::ClientError::InvalidArgument(
                 "Id may not be empty".into(),
             ));
         }
@@ -106,7 +106,7 @@ impl UTCDate {
     pub fn new(s: impl Into<String>) -> Result<Self, crate::error::ClientError> {
         let s = s.into();
         if s.is_empty() {
-            return Err(crate::error::ClientError::Parse(
+            return Err(crate::error::ClientError::InvalidArgument(
                 "UTCDate may not be empty".into(),
             ));
         }

@@ -28,7 +28,9 @@ pub struct NoneAuth;
 
 impl AuthProvider for NoneAuth {
     fn build_client(&self) -> Result<reqwest::Client, ClientError> {
-        Ok(reqwest::Client::new())
+        Ok(reqwest::ClientBuilder::new()
+            .connect_timeout(std::time::Duration::from_secs(10))
+            .build()?)
     }
 
     fn auth_header(&self) -> Option<(HeaderName, HeaderValue)> {
@@ -70,7 +72,9 @@ impl BearerAuth {
 
 impl AuthProvider for BearerAuth {
     fn build_client(&self) -> Result<reqwest::Client, ClientError> {
-        Ok(reqwest::Client::new())
+        Ok(reqwest::ClientBuilder::new()
+            .connect_timeout(std::time::Duration::from_secs(10))
+            .build()?)
     }
 
     fn auth_header(&self) -> Option<(HeaderName, HeaderValue)> {
@@ -114,7 +118,9 @@ impl BasicAuth {
 
 impl AuthProvider for BasicAuth {
     fn build_client(&self) -> Result<reqwest::Client, ClientError> {
-        Ok(reqwest::Client::new())
+        Ok(reqwest::ClientBuilder::new()
+            .connect_timeout(std::time::Duration::from_secs(10))
+            .build()?)
     }
 
     fn auth_header(&self) -> Option<(HeaderName, HeaderValue)> {
@@ -144,6 +150,7 @@ impl AuthProvider for CustomCaAuth {
     fn build_client(&self) -> Result<reqwest::Client, ClientError> {
         let cert = reqwest::Certificate::from_der(&self.der_cert)?;
         let client = reqwest::ClientBuilder::new()
+            .connect_timeout(std::time::Duration::from_secs(10))
             .add_root_certificate(cert)
             .build()?;
         Ok(client)

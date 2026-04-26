@@ -246,7 +246,32 @@ async fn message_query_rejects_invalid_filter() {
 }
 
 // ---------------------------------------------------------------------------
-// Test 6: GetResponse<T> type alias works for empty list
+// Test 6: message_get — empty ids guard
+// ---------------------------------------------------------------------------
+
+/// Oracle: JMAP Chat spec — fetching all messages is impractical; the client
+/// must pre-validate that `ids` is non-empty and return
+/// `ClientError::InvalidArgument` before making any network call.
+///
+/// No mock server is needed: the guard fires before any network call.
+#[tokio::test]
+async fn message_get_rejects_empty_ids() {
+    let client = JmapChatClient::new(jmap_chat::auth::NoneAuth, "http://127.0.0.1:1")
+        .expect("client construction must succeed");
+
+    let err = client
+        .message_get("http://127.0.0.1:1/api", "acct1", &[], None)
+        .await
+        .expect_err("empty ids must be rejected");
+
+    assert!(
+        matches!(&err, ClientError::InvalidArgument(msg) if msg.contains("ids")),
+        "expected InvalidArgument mentioning 'ids', got {err:?}"
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Test 7: GetResponse<T> type alias works for empty list
 // ---------------------------------------------------------------------------
 
 /// Oracle: RFC 8620 §5.1 — a /get response with an empty list and no notFound

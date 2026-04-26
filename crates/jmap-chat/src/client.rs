@@ -245,12 +245,12 @@ impl JmapChatClient {
 /// call_id exists. Returns [`ClientError::MethodError`] if the matched
 /// invocation is a JMAP `"error"` response.
 pub(crate) fn extract_response<T: serde::de::DeserializeOwned>(
-    resp: &JmapResponse,
+    resp: JmapResponse,
     call_id: &str,
 ) -> Result<T, ClientError> {
     let (method_name, args, _call_id_found) = resp
         .method_responses
-        .iter()
+        .into_iter()
         .find(|(_, _, id)| id == call_id)
         .ok_or_else(|| ClientError::MethodNotFound(call_id.to_string()))?;
 
@@ -271,7 +271,7 @@ pub(crate) fn extract_response<T: serde::de::DeserializeOwned>(
         });
     }
 
-    serde_json::from_value(args.clone()).map_err(|e| ClientError::Parse(e.to_string()))
+    serde_json::from_value(args).map_err(|e| ClientError::Parse(e.to_string()))
 }
 
 #[cfg(test)]
@@ -652,7 +652,7 @@ mod tests {
             created_ids: None,
         };
 
-        let val = super::extract_response::<serde_json::Value>(&resp, "r1");
+        let val = super::extract_response::<serde_json::Value>(resp, "r1");
         assert!(val.is_ok(), "extract_response must succeed: {val:?}");
     }
 
@@ -670,7 +670,7 @@ mod tests {
             created_ids: None,
         };
 
-        let err = super::extract_response::<serde_json::Value>(&resp, "r99")
+        let err = super::extract_response::<serde_json::Value>(resp, "r99")
             .expect_err("wrong call_id must fail");
         assert!(
             matches!(err, ClientError::MethodNotFound(_)),
@@ -693,7 +693,7 @@ mod tests {
             created_ids: None,
         };
 
-        let err = super::extract_response::<serde_json::Value>(&resp, "r1")
+        let err = super::extract_response::<serde_json::Value>(resp, "r1")
             .expect_err("error invocation must fail");
         assert!(
             matches!(
