@@ -164,7 +164,16 @@ impl AuthProvider for CustomCaAuth {
 // ---------------------------------------------------------------------------
 // Blanket impl for Box<dyn AuthProvider>
 // ---------------------------------------------------------------------------
-
+//
+// Allows `Box<dyn AuthProvider>` to satisfy `impl AuthProvider + 'static`, so
+// factory functions (e.g. `config::Config::auth_provider`) can return a boxed
+// trait object and pass it directly to `JmapChatClient::new`.
+//
+// Maintenance cost: every method added to `AuthProvider` must be mirrored here.
+// The alternative — a concrete wrapper enum — avoids this coupling but requires
+// the enum to live in the same crate as all variants, complicating external
+// AuthProvider implementations. The blanket impl is accepted as the simpler
+// tradeoff for this project's scope.
 impl AuthProvider for Box<dyn AuthProvider> {
     fn build_client(&self) -> Result<reqwest::Client, ClientError> {
         (**self).build_client()

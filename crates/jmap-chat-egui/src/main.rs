@@ -1,9 +1,8 @@
 use eframe::egui;
-use jmap_chat::types::ChatKind;
 use jmap_chat_egui::{
     app::AppState,
     client_task,
-    event::{AppCommand, AppEvent},
+    event::{AppCommand, AppEvent, ConnectionStatus},
 };
 
 fn main() -> eframe::Result<()> {
@@ -20,7 +19,11 @@ fn main() -> eframe::Result<()> {
             std::process::exit(1);
         });
 
-    let (task_tx, ui_rx) = std::sync::mpsc::sync_channel::<AppEvent>(256);
+    // Unbounded channel from background task to UI: events are never dropped
+    // due to backpressure (no channel-full condition; receiver is always draining).
+    let (task_tx, ui_rx) = tokio::sync::mpsc::unbounded_channel::<AppEvent>();
+    // Bounded channel from UI to background task: 256 cap; UI send() is in the
+    // sync egui update() and blocking briefly is acceptable here.
     let (ui_tx, task_rx) = std::sync::mpsc::sync_channel::<AppCommand>(256);
 
     eframe::run_native(
@@ -41,29 +44,51 @@ fn main() -> eframe::Result<()> {
 struct App {
     state: AppState,
     tx: std::sync::mpsc::SyncSender<AppCommand>,
-    rx: std::sync::mpsc::Receiver<AppEvent>,
+    rx: tokio::sync::mpsc::UnboundedReceiver<AppEvent>,
 }
 
 impl App {
     pub fn new(
         state: AppState,
         tx: std::sync::mpsc::SyncSender<AppCommand>,
-        rx: std::sync::mpsc::Receiver<AppEvent>,
+        rx: tokio::sync::mpsc::UnboundedReceiver<AppEvent>,
     ) -> Self {
         Self { state, tx, rx }
     }
 }
 
-/// Strip control characters from a string, preserving newlines.
-fn strip_control_chars(s: &str) -> String {
-    s.chars()
-        .filter(|&c| !c.is_control() || c == '\n')
-        .collect()
+impl App {
+    fn show_chat_list(&mut self, ui: &mut egui::Ui) {
+        ui.heading("Chats");
+        ui.separator();
+        // Collect the clicked ID outside the scroll loop to avoid holding a borrow
+        // on chat_display while we mutate selected_chat and handle the send result.
+        let mut clicked_id: Option<String> = None;
+        egui::ScrollArea::vertical().show(ui, |ui| {
+            for entry in &self.state.chat_display {
+                let is_selected = self.state.selected_chat.as_deref() == Some(entry.id.as_str());
+                if ui.selectable_label(is_selected, &entry.label).clicked() {
+                    clicked_id = Some(entry.id.clone());
+                }
+            }
+        });
+        if let Some(id) = clicked_id {
+            if self.tx.send(AppCommand::SelectChat(id.clone())).is_err() {
+                // Background task is gone — show Disconnected rather than silently
+                // swallowing the user action.
+                self.state
+                    .apply_event(AppEvent::StatusChanged(ConnectionStatus::Disconnected));
+            } else {
+                self.state.selected_chat = Some(id);
+                self.state.message_entries.clear();
+            }
+        }
+    }
 }
 
 impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        // --- 1. DRAIN EVENTS (cap at 100 per frame) ---
+        // --- 1. DRAIN EVENTS (cap at 100 per frame to bound render latency) ---
         let mut count = 0;
         while count < 100 {
             match self.rx.try_recv() {
@@ -71,30 +96,23 @@ impl eframe::App for App {
                     self.state.apply_event(ev);
                     count += 1;
                 }
-                Err(_) => break,
+                Err(tokio::sync::mpsc::error::TryRecvError::Empty) => break,
+                Err(tokio::sync::mpsc::error::TryRecvError::Disconnected) => {
+                    // Background task dropped its sender — died without sending a
+                    // StatusChanged(Disconnected) event (e.g. unexpected panic). Synthesize
+                    // the status so the UI does not stay frozen on "Connecting…".
+                    self.state
+                        .apply_event(AppEvent::StatusChanged(ConnectionStatus::Disconnected));
+                    break;
+                }
             }
         }
         self.state.tick_error_timeout();
 
-        // --- Check for Enter key to send (before panels so state is consistent) ---
-        let enter_pressed = ctx.input(|i| i.key_pressed(egui::Key::Enter) && !i.modifiers.shift);
-        if enter_pressed {
-            if let Some(chat_id) = &self.state.selected_chat.clone() {
-                let body = self.state.compose_text.trim().to_string();
-                if !body.is_empty() {
-                    let _ = self.tx.send(AppCommand::SendMessage {
-                        chat_id: chat_id.clone(),
-                        body,
-                    });
-                    self.state.compose_text.clear();
-                }
-            }
-        }
-
         // --- 2. STATUS BAR (TopBottomPanel::top) ---
         egui::TopBottomPanel::top("status_bar").show(ctx, |ui| {
             ui.horizontal(|ui| {
-                ui.label(self.state.status.to_string());
+                ui.label(self.state.status.as_str());
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                     if !self.state.account_id.is_empty() {
                         ui.label(&self.state.account_id);
@@ -111,22 +129,34 @@ impl eframe::App for App {
                     let text_edit = egui::TextEdit::multiline(&mut self.state.compose_text)
                         .hint_text("Type a message\u{2026}")
                         .desired_rows(2);
-                    ui.add_sized(
+                    let te_resp = ui.add_sized(
                         [ui.available_width() - 70.0, ui.available_height()],
                         text_edit,
                     );
+                    // Enter sends only when the compose TextEdit has focus;
+                    // guards against accidental sends while navigating the chat list.
+                    let enter_pressed = te_resp.has_focus()
+                        && ctx.input(|i| i.key_pressed(egui::Key::Enter) && !i.modifiers.shift);
                     let send_clicked = ui
                         .add_sized([60.0, ui.available_height()], egui::Button::new("Send"))
                         .clicked();
-                    if send_clicked {
-                        if let Some(chat_id) = &self.state.selected_chat.clone() {
+                    if enter_pressed || send_clicked {
+                        if let Some(chat_id) = self.state.selected_chat.clone()
+                        {
                             let body = self.state.compose_text.trim().to_string();
                             if !body.is_empty() {
-                                let _ = self.tx.send(AppCommand::SendMessage {
-                                    chat_id: chat_id.clone(),
-                                    body,
-                                });
-                                self.state.compose_text.clear();
+                                if self
+                                    .tx
+                                    .send(AppCommand::SendMessage { chat_id, body })
+                                    .is_err()
+                                {
+                                    // Background task is gone — show Disconnected.
+                                    self.state.apply_event(AppEvent::StatusChanged(
+                                        ConnectionStatus::Disconnected,
+                                    ));
+                                } else {
+                                    self.state.compose_text.clear();
+                                }
                             }
                         }
                     }
@@ -137,44 +167,19 @@ impl eframe::App for App {
         egui::SidePanel::left("chat_list")
             .default_width(220.0)
             .show(ctx, |ui| {
-                ui.heading("Chats");
-                ui.separator();
-                egui::ScrollArea::vertical().show(ui, |ui| {
-                    // Collect chat data to avoid borrow conflict during click handling
-                    let chat_entries: Vec<(String, String, bool)> = self
-                        .state
-                        .chats
-                        .iter()
-                        .map(|chat| {
-                            let display_name = match chat.kind {
-                                ChatKind::Direct => {
-                                    chat.contact_id.as_deref().unwrap_or("Direct").to_string()
-                                }
-                                _ => chat.name.as_deref().unwrap_or("(unnamed)").to_string(),
-                            };
-                            let label = if chat.unread_count > 0 {
-                                format!("{} ({})", display_name, chat.unread_count)
-                            } else {
-                                display_name
-                            };
-                            let is_selected =
-                                self.state.selected_chat.as_deref() == Some(chat.id.as_ref());
-                            (chat.id.to_string(), label, is_selected)
-                        })
-                        .collect();
-
-                    for (chat_id, label, is_selected) in chat_entries {
-                        if ui.selectable_label(is_selected, &label).clicked() {
-                            let _ = self.tx.send(AppCommand::SelectChat(chat_id.clone()));
-                            self.state.selected_chat = Some(chat_id);
-                            self.state.messages.clear();
-                        }
-                    }
-                });
+                self.show_chat_list(ui);
             });
 
         // --- 5. MESSAGE PANEL (CentralPanel — must be last) ---
         egui::CentralPanel::default().show(ctx, |ui| {
+            // Error banner always visible — errors from bootstrap (auth failure,
+            // no chats loaded) fire before any chat is selected, so they must
+            // render in the no-selection branch too.
+            if let Some(err) = &self.state.error {
+                ui.label(egui::RichText::new(err.as_str()).color(egui::Color32::RED));
+                ui.separator();
+            }
+
             if self.state.selected_chat.is_none() {
                 ui.centered_and_justified(|ui| {
                     ui.label("Select a chat to start messaging");
@@ -183,34 +188,26 @@ impl eframe::App for App {
                 egui::ScrollArea::vertical()
                     .stick_to_bottom(true)
                     .show(ui, |ui| {
-                        for msg in &self.state.messages {
-                            // Sender line: bold sender_id · timestamp
+                        // message_entries are precomputed in apply_event;
+                        // no per-frame stripping or formatting.
+                        for entry in &self.state.message_entries {
                             ui.horizontal(|ui| {
-                                ui.strong(&msg.sender_id);
+                                ui.strong(&entry.message.sender_id);
                                 ui.label(" \u{00b7} ");
-                                ui.label(msg.sent_at.to_string());
+                                ui.label(&entry.timestamp);
                             });
 
-                            // Body line (strip control chars)
-                            let body = strip_control_chars(&msg.body);
-                            ui.label(&body);
+                            ui.label(&entry.body);
 
-                            // Edited annotation
-                            if msg.edited_at.is_some() {
+                            if entry.message.edited_at.is_some() {
                                 ui.small("[edited]");
                             }
 
-                            // Deleted annotation
-                            if msg.deleted_at.is_some() {
+                            if entry.message.deleted_at.is_some() {
                                 ui.label(egui::RichText::new("[deleted]").italics());
                             }
 
                             ui.add_space(4.0);
-                        }
-
-                        // Error label at bottom of panel
-                        if let Some(err) = &self.state.error {
-                            ui.label(egui::RichText::new(err.as_str()).color(egui::Color32::RED));
                         }
                     });
             }

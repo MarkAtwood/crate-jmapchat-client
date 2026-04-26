@@ -35,6 +35,8 @@ impl Config {
     /// - [`ClientError::InvalidArgument`] if `--bearer-token` and `--basic-user`/`--basic-pass`
     ///   are both supplied (mutually exclusive).
     /// - [`ClientError::InvalidArgument`] if only one of `--basic-user` / `--basic-pass` is set.
+    /// - [`ClientError::InvalidArgument`] if any auth method is combined with `--ca-cert`
+    ///   (unsupported combination: `CustomCaAuth` owns the TLS client and cannot inject headers).
     /// - [`ClientError::InvalidArgument`] if `--ca-cert` is provided but the file cannot be read.
     /// - Propagates [`ClientError`] from the underlying auth constructors
     ///   (e.g. empty or invalid token, colon in username).
@@ -42,7 +44,9 @@ impl Config {
         let has_bearer = self.bearer_token.is_some();
         let has_basic_user = self.basic_user.is_some();
         let has_basic_pass = self.basic_pass.is_some();
+        let has_ca_cert = self.ca_cert.is_some();
 
+        // Validate all flag combinations before touching the filesystem.
         if has_bearer && (has_basic_user || has_basic_pass) {
             return Err(ClientError::InvalidArgument(
                 "--bearer-token and --basic-user/--basic-pass are mutually exclusive".into(),
@@ -55,50 +59,31 @@ impl Config {
             ));
         }
 
-        let ca_cert_bytes: Option<Vec<u8>> = match &self.ca_cert {
-            None => None,
-            Some(path) => {
-                let bytes = std::fs::read(path).map_err(|e| {
-                    ClientError::InvalidArgument(format!(
-                        "cannot read CA certificate '{}': {}",
-                        path.display(),
-                        e
-                    ))
-                })?;
-                Some(bytes)
-            }
-        };
+        if has_ca_cert && (has_bearer || has_basic_user) {
+            return Err(ClientError::InvalidArgument(
+                "--ca-cert cannot be combined with --bearer-token or --basic-user/--basic-pass; \
+                 CustomCaAuth owns the TLS client and does not support header injection"
+                    .into(),
+            ));
+        }
 
+        // Flags are valid; now read the CA cert file if requested.
         if let Some(token) = &self.bearer_token {
-            let auth = BearerAuth::new(token)?;
-            if let Some(der) = ca_cert_bytes {
-                // Bearer + custom CA: not a supported combination in the current auth model.
-                // CustomCaAuth owns the client; BearerAuth injects a header.
-                // For now, reject this combination with a clear message.
-                let _ = der;
-                return Err(ClientError::InvalidArgument(
-                    "--bearer-token and --ca-cert cannot be used together; \
-                     CustomCaAuth does not support injecting an Authorization header"
-                        .into(),
-                ));
-            }
-            return Ok(Box::new(auth));
+            return Ok(Box::new(BearerAuth::new(token)?));
         }
 
         if let (Some(user), Some(pass)) = (&self.basic_user, &self.basic_pass) {
-            let auth = BasicAuth::new(user, pass)?;
-            if let Some(der) = ca_cert_bytes {
-                let _ = der;
-                return Err(ClientError::InvalidArgument(
-                    "--basic-user/--basic-pass and --ca-cert cannot be used together; \
-                     CustomCaAuth does not support injecting an Authorization header"
-                        .into(),
-                ));
-            }
-            return Ok(Box::new(auth));
+            return Ok(Box::new(BasicAuth::new(user, pass)?));
         }
 
-        if let Some(der) = ca_cert_bytes {
+        if let Some(path) = &self.ca_cert {
+            let der = std::fs::read(path).map_err(|e| {
+                ClientError::InvalidArgument(format!(
+                    "cannot read CA certificate '{}': {}",
+                    path.display(),
+                    e
+                ))
+            })?;
             return Ok(Box::new(CustomCaAuth::new(der)));
         }
 

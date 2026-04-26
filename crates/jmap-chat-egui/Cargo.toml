@@ -17,6 +17,7 @@ path = "src/main.rs"
 jmap-chat = { path = "../jmap-chat" }
 tokio.workspace = true
 futures.workspace = true
+chrono.workspace = true
 ulid.workspace = true
 clap = { version = "4", features = ["derive"] }
 eframe = "0.28"

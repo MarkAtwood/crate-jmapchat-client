@@ -4485,6 +4485,7 @@ dependencies = [
 name = "jmap-chat-egui"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "clap",
  "eframe",
  "futures",

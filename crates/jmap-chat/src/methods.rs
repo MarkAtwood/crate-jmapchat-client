@@ -191,6 +191,12 @@ impl crate::client::JmapChatClient {
     ///
     /// Per spec, either `chat_id` or `has_mention: Some(true)` must be provided.
     /// Servers MUST return `unsupportedFilter` if neither condition holds.
+    ///
+    /// Results are sorted by `sentAt` descending (RFC 8620 §5.5 Comparator).
+    /// Descending order ensures that `position:0, limit:N` returns the N most
+    /// recent message IDs. Callers that display messages chronologically must
+    /// reverse or re-sort ascending after fetching. Without an explicit sort,
+    /// result order is undefined by the spec.
     #[allow(clippy::too_many_arguments)]
     pub async fn message_query(
         &self,
@@ -225,6 +231,7 @@ impl crate::client::JmapChatClient {
         let args = serde_json::json!({
             "accountId": account_id,
             "filter": filter_val,
+            "sort": [{"property": "sentAt", "isAscending": false}],
             "position": position,
             "limit": limit,
         });
