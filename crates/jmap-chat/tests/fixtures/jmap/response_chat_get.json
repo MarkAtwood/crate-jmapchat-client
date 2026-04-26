@@ -1,0 +1,25 @@
+{
+  "methodResponses": [
+    [
+      "Chat/get",
+      {
+        "accountId": "account1",
+        "state": "state-abc123",
+        "list": [],
+        "notFound": []
+      },
+      "r1"
+    ],
+    [
+      "Message/get",
+      {
+        "accountId": "account1",
+        "state": "state-def456",
+        "list": [],
+        "notFound": []
+      },
+      "r2"
+    ]
+  ],
+  "sessionState": "session-xyz789"
+}

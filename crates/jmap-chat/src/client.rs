@@ -1,0 +1,658 @@
+// JmapChatClient: fetch_session, call, subscribe_events (Steps 5-7)
+
+use crate::auth::AuthProvider;
+use crate::error::ClientError;
+use crate::jmap::{JmapRequest, JmapResponse, Session};
+use crate::sse::{parse_sse_block, SseEvent};
+use futures::StreamExt;
+
+/// Auth-agnostic JMAP Chat HTTP client.
+///
+/// Construct with [`JmapChatClient::new`], then call [`fetch_session`] to
+/// obtain a [`Session`] before issuing any JMAP method calls.
+///
+/// [`fetch_session`]: JmapChatClient::fetch_session
+pub struct JmapChatClient {
+    base_url: String,
+    auth: Box<dyn AuthProvider>,
+    http: reqwest::Client,
+}
+
+impl JmapChatClient {
+    /// Create a new client.
+    ///
+    /// `auth` provides both the HTTP client configuration (trust roots, client
+    /// certificates) and per-request header injection. `base_url` must be the
+    /// server origin without a trailing slash or path component, e.g.
+    /// `"https://100.64.1.1:8008"`.
+    pub fn new(auth: impl AuthProvider + 'static, base_url: &str) -> Result<Self, ClientError> {
+        let http = auth.build_client()?;
+        Ok(Self {
+            base_url: base_url.to_string(),
+            auth: Box::new(auth),
+            http,
+        })
+    }
+
+    /// Fetch the JMAP Session object from `{base_url}/.well-known/jmap`.
+    ///
+    /// Returns `ClientError::AuthFailed` on HTTP 401 or 403 so the caller can
+    /// distinguish auth failures (which will not resolve on retry) from
+    /// transient errors.
+    pub async fn fetch_session(&self) -> Result<Session, ClientError> {
+        let url = format!("{}/.well-known/jmap", self.base_url.trim_end_matches('/'));
+
+        let mut req = self.http.get(&url);
+        if let Some((name, value)) = self.auth.auth_header() {
+            req = req.header(name, value);
+        }
+
+        let resp = req.send().await.map_err(ClientError::Http)?;
+
+        let status = resp.status();
+        if status == 401 || status == 403 {
+            return Err(ClientError::AuthFailed(status.as_u16()));
+        }
+
+        let resp = resp.error_for_status().map_err(ClientError::Http)?;
+
+        let session: Session = resp
+            .json()
+            .await
+            .map_err(|e| ClientError::Parse(e.to_string()))?;
+
+        if session.api_url.is_empty() {
+            return Err(ClientError::InvalidSession("apiUrl is empty"));
+        }
+        if session.event_source_url.is_empty() {
+            return Err(ClientError::InvalidSession("eventSourceUrl is empty"));
+        }
+
+        Ok(session)
+    }
+
+    /// POST a [`JmapRequest`] to `api_url` and return the parsed [`JmapResponse`].
+    ///
+    /// `api_url` is taken as an explicit parameter (not from `self`) because the
+    /// caller has a [`Session`] and selects the correct URL from it.
+    ///
+    /// Returns [`ClientError::AuthFailed`] on HTTP 401 or 403 so the caller can
+    /// distinguish auth failures from transient errors.
+    pub async fn call(
+        &self,
+        api_url: &str,
+        req: &JmapRequest,
+    ) -> Result<JmapResponse, ClientError> {
+        let mut builder = self.http.post(api_url).json(req);
+
+        if let Some((name, value)) = self.auth.auth_header() {
+            builder = builder.header(name, value);
+        }
+
+        builder = builder.timeout(std::time::Duration::from_secs(30));
+
+        let resp = builder.send().await.map_err(ClientError::Http)?;
+
+        let status = resp.status();
+        if status == 401 || status == 403 {
+            return Err(ClientError::AuthFailed(status.as_u16()));
+        }
+
+        let resp = resp.error_for_status().map_err(ClientError::Http)?;
+
+        let jmap_resp: JmapResponse = resp
+            .json()
+            .await
+            .map_err(|e| ClientError::Parse(e.to_string()))?;
+
+        Ok(jmap_resp)
+    }
+
+    /// Open an SSE connection to `event_source_url` and return an async stream
+    /// of parsed events.
+    ///
+    /// The returned stream ends when the server closes the connection. Callers
+    /// are responsible for reconnection with exponential backoff.
+    ///
+    /// If `last_event_id` is `Some`, sends a `Last-Event-ID` header so the
+    /// server can resume from where the previous stream left off (RFC 8620 §7.3).
+    ///
+    /// Returns [`ClientError::AuthFailed`] on HTTP 401 or 403 before the stream
+    /// starts; callers must not retry on auth failures.
+    ///
+    /// Buffer growth is capped at 1 MiB per frame. If a single SSE frame
+    /// exceeds this limit the stream yields [`ClientError::SseFrameTooLarge`]
+    /// and terminates.
+    pub async fn subscribe_events(
+        &self,
+        event_source_url: &str,
+        last_event_id: Option<&str>,
+    ) -> Result<impl futures::Stream<Item = Result<SseEvent, ClientError>>, ClientError> {
+        let mut req = self
+            .http
+            .get(event_source_url)
+            .header("Accept", "text/event-stream");
+
+        if let Some(id) = last_event_id {
+            req = req.header("Last-Event-ID", id);
+        }
+        if let Some((name, value)) = self.auth.auth_header() {
+            req = req.header(name, value);
+        }
+
+        let resp = req.send().await.map_err(ClientError::Http)?;
+
+        let status = resp.status();
+        if status == 401 || status == 403 {
+            return Err(ClientError::AuthFailed(status.as_u16()));
+        }
+
+        let resp = resp.error_for_status().map_err(ClientError::Http)?;
+
+        let byte_stream = resp.bytes_stream();
+
+        Ok(futures::stream::unfold(
+            (byte_stream, String::new()),
+            |(mut stream, mut buf)| async move {
+                loop {
+                    // Drain complete blocks from buf before fetching more bytes.
+                    if let Some(pos) = buf.find("\n\n") {
+                        let block = buf[..pos].to_string();
+                        buf.drain(..pos + 2);
+                        let (event, _id) = parse_sse_block(&block);
+                        return Some((Ok(event), (stream, buf)));
+                    }
+                    // Need more data from the network.
+                    match stream.next().await {
+                        None => return None,
+                        Some(Err(e)) => {
+                            return Some((Err(ClientError::Http(e)), (stream, buf)));
+                        }
+                        Some(Ok(bytes)) => {
+                            let text = String::from_utf8_lossy(&bytes);
+                            buf.push_str(&text);
+                            // Normalize line endings in the full buffer so that
+                            // CRLF split across chunk boundaries is handled correctly.
+                            let normalized = buf.replace("\r\n", "\n").replace('\r', "\n");
+                            buf = normalized;
+                            // Guard against unbounded buffer growth.
+                            if buf.len() > 1024 * 1024 {
+                                return Some((Err(ClientError::SseFrameTooLarge), (stream, buf)));
+                            }
+                        }
+                    }
+                }
+            },
+        ))
+    }
+}
+
+/// Find the method response matching `call_id` in `resp` and deserialize its
+/// arguments into `T`.
+///
+/// Returns [`ClientError::MethodNotFound`] if no invocation with the given
+/// call_id exists. Returns [`ClientError::MethodError`] if the matched
+/// invocation is a JMAP `"error"` response.
+pub fn extract_response<T: serde::de::DeserializeOwned>(
+    resp: &JmapResponse,
+    call_id: &str,
+) -> Result<T, ClientError> {
+    let inv = resp
+        .method_responses
+        .iter()
+        .find(|(_, _, id)| id == call_id)
+        .ok_or_else(|| ClientError::MethodNotFound(call_id.to_string()))?;
+
+    if inv.0 == "error" {
+        let err_type = inv
+            .1
+            .get("type")
+            .and_then(|v| v.as_str())
+            .unwrap_or("serverError")
+            .to_string();
+        let description = inv
+            .1
+            .get("description")
+            .and_then(|v| v.as_str())
+            .unwrap_or("unknown")
+            .to_string();
+        return Err(ClientError::MethodError {
+            error_type: err_type,
+            description,
+        });
+    }
+
+    serde_json::from_value(inv.1.clone()).map_err(|e| ClientError::Parse(e.to_string()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use wiremock::matchers::{method, path};
+    use wiremock::{Mock, MockServer, ResponseTemplate};
+
+    fn session_fixture() -> serde_json::Value {
+        let text = std::fs::read_to_string(
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("tests/fixtures/jmap/session.json"),
+        )
+        .expect("cannot read session.json fixture");
+        serde_json::from_str(&text).expect("session.json is not valid JSON")
+    }
+
+    /// Oracle: RFC 8620 §2 — fetch_session returns a Session with the fields
+    /// from the hand-written fixture.
+    #[tokio::test]
+    async fn fetch_session_success() {
+        let server = MockServer::start().await;
+
+        Mock::given(method("GET"))
+            .and(path("/.well-known/jmap"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(session_fixture()))
+            .mount(&server)
+            .await;
+
+        let client = JmapChatClient::new(crate::auth::NoneAuth, &server.uri())
+            .expect("client construction must succeed");
+
+        let session = client
+            .fetch_session()
+            .await
+            .expect("fetch_session must succeed");
+
+        assert_eq!(session.username, "alice@example.com");
+        assert_eq!(session.api_url, "https://jmap.example.com/api");
+        assert_eq!(
+            session.event_source_url,
+            "https://jmap.example.com/eventsource/"
+        );
+        assert_eq!(session.state, "session-abc123");
+        assert!(session.accounts.contains_key("account1"));
+    }
+
+    /// Oracle: RFC 8620 §2 — chat_account_id() returns the primary account for
+    /// "urn:ietf:params:jmap:chat" from the fixture's primaryAccounts map.
+    #[tokio::test]
+    async fn fetch_session_chat_account_id() {
+        let server = MockServer::start().await;
+
+        Mock::given(method("GET"))
+            .and(path("/.well-known/jmap"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(session_fixture()))
+            .mount(&server)
+            .await;
+
+        let client = JmapChatClient::new(crate::auth::NoneAuth, &server.uri())
+            .expect("client construction must succeed");
+
+        let session = client
+            .fetch_session()
+            .await
+            .expect("fetch_session must succeed");
+
+        assert_eq!(session.chat_account_id(), Some("account1"));
+    }
+
+    /// Oracle: RFC 8620 §2 — HTTP 401 must surface as ClientError::AuthFailed(401).
+    #[tokio::test]
+    async fn fetch_session_401_returns_auth_failed() {
+        let server = MockServer::start().await;
+
+        Mock::given(method("GET"))
+            .and(path("/.well-known/jmap"))
+            .respond_with(ResponseTemplate::new(401))
+            .mount(&server)
+            .await;
+
+        let client = JmapChatClient::new(crate::auth::NoneAuth, &server.uri())
+            .expect("client construction must succeed");
+
+        let err = client.fetch_session().await.expect_err("401 must fail");
+        assert!(
+            matches!(err, ClientError::AuthFailed(401)),
+            "expected AuthFailed(401), got {err:?}"
+        );
+    }
+
+    /// Oracle: RFC 8620 §2 — HTTP 403 must surface as ClientError::AuthFailed(403).
+    #[tokio::test]
+    async fn fetch_session_403_returns_auth_failed() {
+        let server = MockServer::start().await;
+
+        Mock::given(method("GET"))
+            .and(path("/.well-known/jmap"))
+            .respond_with(ResponseTemplate::new(403))
+            .mount(&server)
+            .await;
+
+        let client = JmapChatClient::new(crate::auth::NoneAuth, &server.uri())
+            .expect("client construction must succeed");
+
+        let err = client.fetch_session().await.expect_err("403 must fail");
+        assert!(
+            matches!(err, ClientError::AuthFailed(403)),
+            "expected AuthFailed(403), got {err:?}"
+        );
+    }
+
+    /// Oracle: RFC 8620 §2 — HTTP 500 must surface as ClientError::Http (not AuthFailed).
+    #[tokio::test]
+    async fn fetch_session_500_returns_http_error() {
+        let server = MockServer::start().await;
+
+        Mock::given(method("GET"))
+            .and(path("/.well-known/jmap"))
+            .respond_with(ResponseTemplate::new(500))
+            .mount(&server)
+            .await;
+
+        let client = JmapChatClient::new(crate::auth::NoneAuth, &server.uri())
+            .expect("client construction must succeed");
+
+        let err = client.fetch_session().await.expect_err("500 must fail");
+        assert!(
+            matches!(err, ClientError::Http(_)),
+            "expected Http error, got {err:?}"
+        );
+    }
+
+    /// Oracle: RFC 8620 §2 — a response body that is not valid JSON must surface
+    /// as ClientError::Parse.
+    #[tokio::test]
+    async fn fetch_session_invalid_json_returns_parse_error() {
+        let server = MockServer::start().await;
+
+        Mock::given(method("GET"))
+            .and(path("/.well-known/jmap"))
+            .respond_with(ResponseTemplate::new(200).set_body_string("not json"))
+            .mount(&server)
+            .await;
+
+        let client = JmapChatClient::new(crate::auth::NoneAuth, &server.uri())
+            .expect("client construction must succeed");
+
+        let err = client
+            .fetch_session()
+            .await
+            .expect_err("bad JSON must fail");
+        assert!(
+            matches!(err, ClientError::Parse(_)),
+            "expected Parse error, got {err:?}"
+        );
+    }
+
+    /// Oracle: validation requirement — a Session with empty apiUrl must return
+    /// ClientError::InvalidSession.
+    #[tokio::test]
+    async fn fetch_session_empty_api_url_returns_invalid_session() {
+        let server = MockServer::start().await;
+
+        let mut body = session_fixture();
+        body["apiUrl"] = serde_json::Value::String(String::new());
+
+        Mock::given(method("GET"))
+            .and(path("/.well-known/jmap"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(body))
+            .mount(&server)
+            .await;
+
+        let client = JmapChatClient::new(crate::auth::NoneAuth, &server.uri())
+            .expect("client construction must succeed");
+
+        let err = client
+            .fetch_session()
+            .await
+            .expect_err("empty apiUrl must fail");
+        assert!(
+            matches!(err, ClientError::InvalidSession(_)),
+            "expected InvalidSession, got {err:?}"
+        );
+    }
+
+    /// Oracle: validation requirement — a Session with empty eventSourceUrl must
+    /// return ClientError::InvalidSession.
+    #[tokio::test]
+    async fn fetch_session_empty_event_source_url_returns_invalid_session() {
+        let server = MockServer::start().await;
+
+        let mut body = session_fixture();
+        body["eventSourceUrl"] = serde_json::Value::String(String::new());
+
+        Mock::given(method("GET"))
+            .and(path("/.well-known/jmap"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(body))
+            .mount(&server)
+            .await;
+
+        let client = JmapChatClient::new(crate::auth::NoneAuth, &server.uri())
+            .expect("client construction must succeed");
+
+        let err = client
+            .fetch_session()
+            .await
+            .expect_err("empty eventSourceUrl must fail");
+        assert!(
+            matches!(err, ClientError::InvalidSession(_)),
+            "expected InvalidSession, got {err:?}"
+        );
+    }
+
+    fn call_response_fixture() -> serde_json::Value {
+        let text = std::fs::read_to_string(
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("tests/fixtures/jmap/call_response.json"),
+        )
+        .expect("cannot read call_response.json fixture");
+        serde_json::from_str(&text).expect("call_response.json is not valid JSON")
+    }
+
+    fn minimal_request() -> crate::jmap::JmapRequest {
+        crate::jmap::JmapRequest {
+            using: vec![
+                "urn:ietf:params:jmap:core".to_string(),
+                "urn:ietf:params:jmap:chat".to_string(),
+            ],
+            method_calls: vec![(
+                "Chat/get".to_string(),
+                serde_json::json!({"accountId": "account1", "ids": null}),
+                "r1".to_string(),
+            )],
+        }
+    }
+
+    /// Oracle: RFC 8620 §3.3/§3.4 — a successful POST to apiUrl returns a
+    /// JmapResponse parsed from the hand-written call_response.json fixture.
+    #[tokio::test]
+    async fn call_success() {
+        let server = MockServer::start().await;
+
+        Mock::given(method("POST"))
+            .and(path("/api"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(call_response_fixture()))
+            .mount(&server)
+            .await;
+
+        let client = JmapChatClient::new(crate::auth::NoneAuth, &server.uri())
+            .expect("client construction must succeed");
+
+        let api_url = format!("{}/api", server.uri());
+        let resp = client
+            .call(&api_url, &minimal_request())
+            .await
+            .expect("call must succeed");
+
+        assert_eq!(resp.method_responses[0].0, "Chat/get");
+        assert_eq!(resp.session_state, "sess1");
+    }
+
+    /// Oracle: RFC 8620 §3.3 — HTTP 401 from apiUrl must surface as
+    /// ClientError::AuthFailed(401).
+    #[tokio::test]
+    async fn call_401_returns_auth_failed() {
+        let server = MockServer::start().await;
+
+        Mock::given(method("POST"))
+            .and(path("/api"))
+            .respond_with(ResponseTemplate::new(401))
+            .mount(&server)
+            .await;
+
+        let client = JmapChatClient::new(crate::auth::NoneAuth, &server.uri())
+            .expect("client construction must succeed");
+
+        let api_url = format!("{}/api", server.uri());
+        let err = client
+            .call(&api_url, &minimal_request())
+            .await
+            .expect_err("401 must fail");
+        assert!(
+            matches!(err, ClientError::AuthFailed(401)),
+            "expected AuthFailed(401), got {err:?}"
+        );
+    }
+
+    /// Oracle: RFC 8620 §3.3 — HTTP 403 from apiUrl must surface as
+    /// ClientError::AuthFailed(403).
+    #[tokio::test]
+    async fn call_403_returns_auth_failed() {
+        let server = MockServer::start().await;
+
+        Mock::given(method("POST"))
+            .and(path("/api"))
+            .respond_with(ResponseTemplate::new(403))
+            .mount(&server)
+            .await;
+
+        let client = JmapChatClient::new(crate::auth::NoneAuth, &server.uri())
+            .expect("client construction must succeed");
+
+        let api_url = format!("{}/api", server.uri());
+        let err = client
+            .call(&api_url, &minimal_request())
+            .await
+            .expect_err("403 must fail");
+        assert!(
+            matches!(err, ClientError::AuthFailed(403)),
+            "expected AuthFailed(403), got {err:?}"
+        );
+    }
+
+    /// Oracle: RFC 8620 §3.3 — HTTP 500 from apiUrl must surface as
+    /// ClientError::Http (not AuthFailed).
+    #[tokio::test]
+    async fn call_500_returns_http_error() {
+        let server = MockServer::start().await;
+
+        Mock::given(method("POST"))
+            .and(path("/api"))
+            .respond_with(ResponseTemplate::new(500))
+            .mount(&server)
+            .await;
+
+        let client = JmapChatClient::new(crate::auth::NoneAuth, &server.uri())
+            .expect("client construction must succeed");
+
+        let api_url = format!("{}/api", server.uri());
+        let err = client
+            .call(&api_url, &minimal_request())
+            .await
+            .expect_err("500 must fail");
+        assert!(
+            matches!(err, ClientError::Http(_)),
+            "expected Http error, got {err:?}"
+        );
+    }
+
+    /// Oracle: RFC 8620 §3.4 — a response body that is not valid JSON must
+    /// surface as ClientError::Parse.
+    #[tokio::test]
+    async fn call_bad_json_returns_parse_error() {
+        let server = MockServer::start().await;
+
+        Mock::given(method("POST"))
+            .and(path("/api"))
+            .respond_with(ResponseTemplate::new(200).set_body_string("bad json"))
+            .mount(&server)
+            .await;
+
+        let client = JmapChatClient::new(crate::auth::NoneAuth, &server.uri())
+            .expect("client construction must succeed");
+
+        let api_url = format!("{}/api", server.uri());
+        let err = client
+            .call(&api_url, &minimal_request())
+            .await
+            .expect_err("bad JSON must fail");
+        assert!(
+            matches!(err, ClientError::Parse(_)),
+            "expected Parse error, got {err:?}"
+        );
+    }
+
+    /// Oracle: RFC 8620 §3.4 — extract_response finds the matching invocation
+    /// by call_id and deserializes its arguments into the requested type.
+    #[test]
+    fn extract_response_success() {
+        let resp = crate::jmap::JmapResponse {
+            method_responses: vec![(
+                "Chat/get".to_string(),
+                serde_json::json!({"accountId": "account1", "state": "s1", "list": [], "notFound": []}),
+                "r1".to_string(),
+            )],
+            session_state: "sess1".to_string(),
+            created_ids: None,
+        };
+
+        let val = super::extract_response::<serde_json::Value>(&resp, "r1");
+        assert!(val.is_ok(), "extract_response must succeed: {val:?}");
+    }
+
+    /// Oracle: RFC 8620 §3.4 — extract_response returns ClientError::MethodNotFound
+    /// when no invocation with the given call_id exists in method_responses.
+    #[test]
+    fn extract_response_method_not_found() {
+        let resp = crate::jmap::JmapResponse {
+            method_responses: vec![(
+                "Chat/get".to_string(),
+                serde_json::json!({}),
+                "r1".to_string(),
+            )],
+            session_state: "sess1".to_string(),
+            created_ids: None,
+        };
+
+        let err = super::extract_response::<serde_json::Value>(&resp, "r99")
+            .expect_err("wrong call_id must fail");
+        assert!(
+            matches!(err, ClientError::MethodNotFound(_)),
+            "expected MethodNotFound, got {err:?}"
+        );
+    }
+
+    /// Oracle: RFC 8620 §3.6.1 — when an invocation has method name "error",
+    /// extract_response returns ClientError::MethodError with the type and
+    /// description from the error arguments.
+    #[test]
+    fn extract_response_method_error() {
+        let resp = crate::jmap::JmapResponse {
+            method_responses: vec![(
+                "error".to_string(),
+                serde_json::json!({"type": "serverFail", "description": "oops"}),
+                "r1".to_string(),
+            )],
+            session_state: "sess1".to_string(),
+            created_ids: None,
+        };
+
+        let err = super::extract_response::<serde_json::Value>(&resp, "r1")
+            .expect_err("error invocation must fail");
+        assert!(
+            matches!(
+                &err,
+                ClientError::MethodError { error_type, description }
+                    if error_type == "serverFail" && description == "oops"
+            ),
+            "expected MethodError{{serverFail, oops}}, got {err:?}"
+        );
+    }
+}

@@ -1,0 +1,24 @@
+{
+  "using": [
+    "urn:ietf:params:jmap:core",
+    "urn:ietf:params:jmap:chat"
+  ],
+  "methodCalls": [
+    [
+      "Chat/get",
+      {
+        "accountId": "account1",
+        "ids": null
+      },
+      "r1"
+    ],
+    [
+      "Message/get",
+      {
+        "accountId": "account1",
+        "ids": ["msg1", "msg2"]
+      },
+      "r2"
+    ]
+  ]
+}

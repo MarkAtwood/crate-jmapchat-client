@@ -1,0 +1,24 @@
+{
+  "id": "01HV5Z6QKWJ7N3P8R2X4YTMD3G",
+  "kind": "group",
+  "name": "Engineering Team",
+  "description": "Internal engineering discussion",
+  "members": [
+    {
+      "id": "user:alice@example.com",
+      "role": "admin",
+      "joinedAt": "2024-01-15T09:00:00Z"
+    },
+    {
+      "id": "user:bob@example.com",
+      "role": "member",
+      "joinedAt": "2024-01-15T09:05:00Z",
+      "invitedBy": "user:alice@example.com"
+    }
+  ],
+  "createdAt": "2024-01-15T09:00:00Z",
+  "lastMessageAt": "2024-03-20T14:32:00Z",
+  "unreadCount": 3,
+  "pinnedMessageIds": [],
+  "muted": false
+}

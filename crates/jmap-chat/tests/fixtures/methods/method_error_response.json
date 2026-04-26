@@ -1,0 +1,13 @@
+{
+  "methodResponses": [
+    [
+      "error",
+      {
+        "type": "unknownMethod",
+        "description": "The server does not support Chat/get"
+      },
+      "r1"
+    ]
+  ],
+  "sessionState": "sess-abc"
+}

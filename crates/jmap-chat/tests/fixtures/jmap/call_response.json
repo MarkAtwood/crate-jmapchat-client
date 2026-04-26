@@ -1,0 +1,4 @@
+{
+  "methodResponses": [["Chat/get", {"accountId": "account1", "state": "s1", "list": [], "notFound": []}, "r1"]],
+  "sessionState": "sess1"
+}

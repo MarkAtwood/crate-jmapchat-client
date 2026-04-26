@@ -1,0 +1,25 @@
+{
+  "methodResponses": [
+    [
+      "Chat/get",
+      {
+        "accountId": "account1",
+        "state": "state-chat-001",
+        "list": [
+          {
+            "id": "01HV5Z6QKWJ7N3P8R2X4YTMD3G",
+            "kind": "group",
+            "name": "Engineering Team",
+            "createdAt": "2024-01-01T00:00:00Z",
+            "unreadCount": 3,
+            "pinnedMessageIds": [],
+            "muted": false
+          }
+        ],
+        "notFound": []
+      },
+      "r1"
+    ]
+  ],
+  "sessionState": "sess-abc"
+}
