@@ -48,8 +48,8 @@ fn apply_chats_loaded() {
     let mut state = AppState::default();
     state.apply_event(AppEvent::ChatsLoaded(vec![chat.clone()]));
 
-    assert_eq!(state.chats.len(), 1);
-    assert_eq!(state.chats[0], chat);
+    assert_eq!(state.chats().len(), 1);
+    assert_eq!(state.chats()[0], chat);
 }
 
 #[test]
@@ -83,8 +83,11 @@ fn apply_messages_for_selected_chat() {
         messages: vec![msg.clone()],
     });
 
-    assert_eq!(state.messages.len(), 1);
-    assert_eq!(state.messages[0], msg);
+    assert_eq!(state.message_entries.len(), 1);
+    assert_eq!(state.message_entries[0].message, msg);
+    // Verify the derived render fields are populated.
+    assert_eq!(state.message_entries[0].body, "hello");
+    assert!(!state.message_entries[0].timestamp.is_empty());
 }
 
 #[test]
@@ -101,7 +104,7 @@ fn apply_messages_for_wrong_chat() {
     });
 
     assert!(
-        state.messages.is_empty(),
+        state.message_entries.is_empty(),
         "messages for a different chat must be ignored"
     );
 }
