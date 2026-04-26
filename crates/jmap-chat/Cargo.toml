@@ -8,14 +8,12 @@ description = "JMAP Chat protocol types and HTTP client (auth-agnostic)"
 
 [dependencies]
 base64.workspace = true
-chrono.workspace = true
 futures.workspace = true
 reqwest.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
 tokio.workspace = true
-ulid.workspace = true
 
 [dev-dependencies]
 tokio-test.workspace = true

@@ -225,6 +225,11 @@ impl JmapChatClient {
                             // Append raw bytes; normalization happens at frame extraction time.
                             buf.push_str(&text);
                             scan_from = old_len.saturating_sub(3);
+                            // Walk backward to a char boundary so that
+                            // buf[scan_from..] never panics on multibyte UTF-8.
+                            while scan_from > 0 && !buf.is_char_boundary(scan_from) {
+                                scan_from -= 1;
+                            }
                             // Guard against unbounded buffer growth. Yield the error and
                             // terminate the stream (state = None) so no further items follow.
                             if buf.len() > 1024 * 1024 {
@@ -676,6 +681,40 @@ mod tests {
             matches!(err, ClientError::MethodNotFound(_)),
             "expected MethodNotFound, got {err:?}"
         );
+    }
+
+    /// Oracle: char-boundary invariant — when a 4-byte UTF-8 character is split
+    /// across two chunks such that old_len.saturating_sub(3) lands inside the
+    /// character, buf[scan_from..] would panic without the fix.
+    ///
+    /// "a😀" is bytes [0x61, 0xF0, 0x9F, 0x98, 0x80].  With old_len=5,
+    /// saturating_sub(3)==2, which is byte 0x9F — not a char boundary.
+    /// The fix must walk backward to byte 1 (the emoji start) so the slice is safe.
+    #[test]
+    fn sse_scan_from_char_boundary_fix() {
+        // "a😀": 1 ASCII byte + 4-byte emoji = 5 bytes total.
+        let mut buf = String::from("a");
+        buf.push('😀');
+        // Simulate: the previous chunk ended at byte 5 (inside the emoji).
+        let old_len = 5usize;
+        let naive = old_len.saturating_sub(3); // 2 — inside the emoji, not a boundary
+        assert!(
+            !buf.is_char_boundary(naive),
+            "test setup: byte {naive} must not be a char boundary (confirms bug triggers)"
+        );
+        // Apply the fix (mirrors the production code exactly).
+        let mut scan_from = naive;
+        while scan_from > 0 && !buf.is_char_boundary(scan_from) {
+            scan_from -= 1;
+        }
+        assert!(
+            buf.is_char_boundary(scan_from),
+            "after fix, scan_from={scan_from} must be a char boundary"
+        );
+        // Must not panic.
+        let _slice = &buf[scan_from..];
+        // The fix must land on byte 1 — the start of the emoji.
+        assert_eq!(scan_from, 1, "fix must land on the emoji's start byte");
     }
 
     /// Oracle: RFC 8620 §3.6.1 — when an invocation has method name "error",
