@@ -3,7 +3,7 @@
 use crate::auth::AuthProvider;
 use crate::error::ClientError;
 use crate::jmap::{JmapRequest, JmapResponse, Session};
-use crate::sse::{parse_sse_block, SseEvent};
+use crate::sse::{parse_sse_block, SseFrame};
 use futures::StreamExt;
 
 /// Auth-agnostic JMAP Chat HTTP client.
@@ -42,7 +42,10 @@ impl JmapChatClient {
     pub async fn fetch_session(&self) -> Result<Session, ClientError> {
         let url = format!("{}/.well-known/jmap", self.base_url.trim_end_matches('/'));
 
-        let mut req = self.http.get(&url);
+        let mut req = self
+            .http
+            .get(&url)
+            .timeout(std::time::Duration::from_secs(30));
         if let Some((name, value)) = self.auth.auth_header() {
             req = req.header(name, value);
         }
@@ -109,7 +112,12 @@ impl JmapChatClient {
     }
 
     /// Open an SSE connection to `event_source_url` and return an async stream
-    /// of parsed events.
+    /// of parsed frames.
+    ///
+    /// Each stream item is an [`SseFrame`] carrying the parsed event and the
+    /// `id:` field value (if any). Callers should track the last non-None
+    /// `SseFrame::id` and send it as `Last-Event-ID` on reconnect per RFC 8620
+    /// §7.3.
     ///
     /// The returned stream ends when the server closes the connection. Callers
     /// are responsible for reconnection with exponential backoff.
@@ -127,7 +135,7 @@ impl JmapChatClient {
         &self,
         event_source_url: &str,
         last_event_id: Option<&str>,
-    ) -> Result<impl futures::Stream<Item = Result<SseEvent, ClientError>>, ClientError> {
+    ) -> Result<impl futures::Stream<Item = Result<SseFrame, ClientError>>, ClientError> {
         let mut req = self
             .http
             .get(event_source_url)
@@ -152,32 +160,57 @@ impl JmapChatClient {
         let byte_stream = resp.bytes_stream();
 
         Ok(futures::stream::unfold(
-            (byte_stream, String::new()),
-            |(mut stream, mut buf)| async move {
+            Some((byte_stream, String::new())),
+            |state| async move {
+                let (mut stream, mut buf) = state?;
                 loop {
-                    // Drain complete blocks from buf before fetching more bytes.
-                    if let Some(pos) = buf.find("\n\n") {
-                        let block = buf[..pos].to_string();
-                        buf.drain(..pos + 2);
-                        let (event, _id) = parse_sse_block(&block);
-                        return Some((Ok(event), (stream, buf)));
+                    // Search for any double-newline delimiter (LF/CRLF/CR variants).
+                    // Find the earliest occurrence and record its byte length so we
+                    // drain exactly the right number of bytes.
+                    let frame_end = [
+                        buf.find("\r\n\r\n").map(|p| (p, 4usize)),
+                        buf.find("\n\n").map(|p| (p, 2usize)),
+                        buf.find("\r\r").map(|p| (p, 2usize)),
+                    ]
+                    .into_iter()
+                    .flatten()
+                    .min_by_key(|&(pos, _)| pos);
+
+                    if let Some((pos, delim_len)) = frame_end {
+                        let raw_frame = buf[..pos].to_string();
+                        buf.drain(..pos + delim_len);
+                        // Normalize line endings only in the extracted frame, not the
+                        // whole buffer, so cost is O(frame) not O(total buffer).
+                        let frame = raw_frame.replace("\r\n", "\n").replace('\r', "\n");
+                        let sse_frame = parse_sse_block(&frame);
+                        return Some((Ok(sse_frame), Some((stream, buf))));
                     }
+
                     // Need more data from the network.
                     match stream.next().await {
                         None => return None,
                         Some(Err(e)) => {
-                            return Some((Err(ClientError::Http(e)), (stream, buf)));
+                            return Some((Err(ClientError::Http(e)), Some((stream, buf))));
                         }
                         Some(Ok(bytes)) => {
-                            let text = String::from_utf8_lossy(&bytes);
+                            // Reject invalid UTF-8 rather than silently replacing with U+FFFD.
+                            let text = match String::from_utf8(bytes.to_vec()) {
+                                Ok(s) => s,
+                                Err(_) => {
+                                    return Some((
+                                        Err(ClientError::Parse(
+                                            "invalid UTF-8 in SSE stream".into(),
+                                        )),
+                                        None,
+                                    ));
+                                }
+                            };
+                            // Append raw bytes; normalization happens at frame extraction time.
                             buf.push_str(&text);
-                            // Normalize line endings in the full buffer so that
-                            // CRLF split across chunk boundaries is handled correctly.
-                            let normalized = buf.replace("\r\n", "\n").replace('\r', "\n");
-                            buf = normalized;
-                            // Guard against unbounded buffer growth.
+                            // Guard against unbounded buffer growth. Yield the error and
+                            // terminate the stream (state = None) so no further items follow.
                             if buf.len() > 1024 * 1024 {
-                                return Some((Err(ClientError::SseFrameTooLarge), (stream, buf)));
+                                return Some((Err(ClientError::SseFrameTooLarge), None));
                             }
                         }
                     }
@@ -193,7 +226,7 @@ impl JmapChatClient {
 /// Returns [`ClientError::MethodNotFound`] if no invocation with the given
 /// call_id exists. Returns [`ClientError::MethodError`] if the matched
 /// invocation is a JMAP `"error"` response.
-pub fn extract_response<T: serde::de::DeserializeOwned>(
+pub(crate) fn extract_response<T: serde::de::DeserializeOwned>(
     resp: &JmapResponse,
     call_id: &str,
 ) -> Result<T, ClientError> {

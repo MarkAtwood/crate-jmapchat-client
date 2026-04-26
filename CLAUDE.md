@@ -38,7 +38,7 @@ jmap-chat-ui/
 Auth-agnostic JMAP Chat client. Key modules:
 - `types::` — all JMAP Chat data types from the spec (Chat, Message, Space, etc.)
 - `jmap::` — JMAP core wire types (JmapRequest, JmapResponse, Invocation, Id, UTCDate)
-- `auth::` — `AuthProvider` trait + NoneAuth / BearerAuth / BasicAuth / CustomCaAuth / ClientCertAuth
+- `auth::` — `AuthProvider` trait + NoneAuth / BearerAuth / BasicAuth / CustomCaAuth
 - `client::` — `JmapChatClient`: fetch_session, call (POST), subscribe_events (SSE)
 - `methods::` — typed wrappers for each JMAP Chat method (Chat/get, Message/set, etc.)
 - `error::` — `ClientError` enum

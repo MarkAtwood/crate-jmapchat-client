@@ -77,12 +77,6 @@ pub struct SetError {
 }
 
 // ---------------------------------------------------------------------------
-// JMAP capability URIs used in every Chat request
-// ---------------------------------------------------------------------------
-
-const CHAT_USING: &[&str] = &["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:chat"];
-
-// ---------------------------------------------------------------------------
 // Method implementations on JmapChatClient
 // ---------------------------------------------------------------------------
 
@@ -203,6 +197,11 @@ impl crate::client::JmapChatClient {
         position: Option<u64>,
         limit: Option<u64>,
     ) -> Result<QueryResponse, crate::error::ClientError> {
+        if chat_id.is_none() && has_mention.is_none() {
+            return Err(crate::error::ClientError::Parse(
+                "message_query: at least one of chat_id or has_mention must be provided".into(),
+            ));
+        }
         let mut filter = serde_json::Map::new();
         if let Some(id) = chat_id {
             filter.insert("chatId".into(), id.into());
@@ -370,9 +369,22 @@ impl crate::client::JmapChatClient {
 // Internal helper
 // ---------------------------------------------------------------------------
 
+// Each request contains exactly one method call, identified by call-id "r1".
+// extract_response() relies on this. Do not add multi-call batching here
+// without updating extract_response() to accept a call-id parameter.
 fn build_request(method_name: &str, args: serde_json::Value) -> crate::jmap::JmapRequest {
     crate::jmap::JmapRequest {
-        using: CHAT_USING.iter().map(|s| s.to_string()).collect(),
+        using: chat_using().clone(),
         method_calls: vec![(method_name.to_string(), args, "r1".to_string())],
     }
+}
+
+fn chat_using() -> &'static Vec<String> {
+    static CHAT_USING_VEC: std::sync::OnceLock<Vec<String>> = std::sync::OnceLock::new();
+    CHAT_USING_VEC.get_or_init(|| {
+        vec![
+            "urn:ietf:params:jmap:core".to_string(),
+            "urn:ietf:params:jmap:chat".to_string(),
+        ]
+    })
 }

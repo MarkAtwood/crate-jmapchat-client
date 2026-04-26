@@ -4,6 +4,13 @@
 
 use std::collections::HashMap;
 
+/// A parsed SSE frame: the event and the `id:` line value (if any).
+#[derive(Debug)]
+pub struct SseFrame {
+    pub event: SseEvent,
+    pub id: Option<String>,
+}
+
 /// A parsed SSE event from the JMAP Chat event source.
 ///
 /// Spec: draft-atwood-jmap-chat-00 §7 (Push Notifications)
@@ -37,16 +44,17 @@ pub enum SseEvent {
     Unknown,
 }
 
-/// Parse a single SSE block (the text between two blank lines) into an [`SseEvent`].
+/// Parse a single SSE block (the text between two blank lines) into an [`SseFrame`].
 ///
-/// Returns `(SseEvent::Unknown, None)` for empty blocks, keepalives, or
-/// unrecognized event types. Never panics. Malformed `data:` JSON is silently
-/// ignored and returns `Unknown` rather than propagating an error.
+/// Returns an [`SseFrame`] with `event = SseEvent::Unknown` for empty blocks,
+/// keepalives, or unrecognized event types. Never panics. Malformed `data:`
+/// JSON is silently ignored and returns `Unknown` rather than propagating an
+/// error.
 ///
-/// The second element of the tuple is the value of the `id:` line, if present.
-/// Callers should track this and send it as `Last-Event-ID` on reconnect per
-/// RFC 8620 §7.3.
-pub fn parse_sse_block(block: &str) -> (SseEvent, Option<String>) {
+/// `SseFrame::id` carries the value of the `id:` line, if present. Callers
+/// should track this and send it as `Last-Event-ID` on reconnect per RFC 8620
+/// §7.3.
+pub fn parse_sse_block(block: &str) -> SseFrame {
     let mut event_type: Option<&str> = None;
     let mut data_lines: Vec<&str> = Vec::new();
     let mut id: Option<String> = None;
@@ -71,7 +79,7 @@ pub fn parse_sse_block(block: &str) -> (SseEvent, Option<String>) {
         _ => SseEvent::Unknown,
     };
 
-    (event, id)
+    SseFrame { event, id }
 }
 
 /// Parse the data payload of a "state" event.
@@ -93,61 +101,51 @@ fn parse_state_data(data: &str) -> SseEvent {
     SseEvent::StateChange { changed }
 }
 
+#[derive(serde::Deserialize)]
+struct TypingPayload {
+    #[serde(rename = "chatId")]
+    chat_id: String,
+    #[serde(rename = "senderId")]
+    sender_id: String,
+    typing: bool,
+}
+
+#[derive(serde::Deserialize)]
+struct PresencePayload {
+    #[serde(rename = "contactId")]
+    contact_id: String,
+    presence: String,
+    #[serde(rename = "lastActiveAt")]
+    last_active_at: Option<String>,
+    #[serde(rename = "statusText")]
+    status_text: Option<String>,
+    #[serde(rename = "statusEmoji")]
+    status_emoji: Option<String>,
+}
+
 /// Parse the data payload of a "typing" event.
 fn parse_typing_data(data: &str) -> SseEvent {
-    let Ok(v) = serde_json::from_str::<serde_json::Value>(data) else {
+    let Ok(p) = serde_json::from_str::<TypingPayload>(data) else {
         return SseEvent::Unknown;
     };
-    let chat_id = match v.get("chatId").and_then(|x| x.as_str()) {
-        Some(s) => s.to_owned(),
-        None => return SseEvent::Unknown,
-    };
-    let sender_id = match v.get("senderId").and_then(|x| x.as_str()) {
-        Some(s) => s.to_owned(),
-        None => return SseEvent::Unknown,
-    };
-    let typing = match v.get("typing").and_then(|x| x.as_bool()) {
-        Some(b) => b,
-        None => return SseEvent::Unknown,
-    };
     SseEvent::Typing {
-        chat_id,
-        sender_id,
-        typing,
+        chat_id: p.chat_id,
+        sender_id: p.sender_id,
+        typing: p.typing,
     }
 }
 
 /// Parse the data payload of a "presence" event.
 fn parse_presence_data(data: &str) -> SseEvent {
-    let Ok(v) = serde_json::from_str::<serde_json::Value>(data) else {
+    let Ok(p) = serde_json::from_str::<PresencePayload>(data) else {
         return SseEvent::Unknown;
     };
-    let contact_id = match v.get("contactId").and_then(|x| x.as_str()) {
-        Some(s) => s.to_owned(),
-        None => return SseEvent::Unknown,
-    };
-    let presence = match v.get("presence").and_then(|x| x.as_str()) {
-        Some(s) => s.to_owned(),
-        None => return SseEvent::Unknown,
-    };
-    let last_active_at = v
-        .get("lastActiveAt")
-        .and_then(|x| x.as_str())
-        .map(str::to_owned);
-    let status_text = v
-        .get("statusText")
-        .and_then(|x| x.as_str())
-        .map(str::to_owned);
-    let status_emoji = v
-        .get("statusEmoji")
-        .and_then(|x| x.as_str())
-        .map(str::to_owned);
     SseEvent::Presence {
-        contact_id,
-        presence,
-        last_active_at,
-        status_text,
-        status_emoji,
+        contact_id: p.contact_id,
+        presence: p.presence,
+        last_active_at: p.last_active_at,
+        status_text: p.status_text,
+        status_emoji: p.status_emoji,
     }
 }
 
@@ -159,7 +157,7 @@ mod tests {
     #[test]
     fn parse_state_event() {
         let block = "event: state\ndata: {\"changed\":{\"acc1\":{\"Message\":\"s42\"}}}";
-        let (event, _id) = parse_sse_block(block);
+        let SseFrame { event, .. } = parse_sse_block(block);
         match event {
             SseEvent::StateChange { changed } => {
                 assert_eq!(
@@ -180,7 +178,7 @@ mod tests {
     #[test]
     fn parse_state_event_with_type_field() {
         let block = "event: state\ndata: {\"@type\":\"StateChange\",\"changed\":{\"acc1\":{\"Message\":\"s42\"}}}";
-        let (event, _id) = parse_sse_block(block);
+        let SseFrame { event, .. } = parse_sse_block(block);
         match event {
             SseEvent::StateChange { changed } => {
                 assert_eq!(
@@ -200,7 +198,7 @@ mod tests {
     #[test]
     fn parse_typing_event() {
         let block = "event: typing\ndata: {\"chatId\":\"c1\",\"senderId\":\"u1\",\"typing\":true}";
-        let (event, _id) = parse_sse_block(block);
+        let SseFrame { event, .. } = parse_sse_block(block);
         match event {
             SseEvent::Typing {
                 chat_id,
@@ -224,7 +222,7 @@ mod tests {
             "\"lastActiveAt\":\"2024-01-01T00:00:00Z\",",
             "\"statusText\":\"in a meeting\",\"statusEmoji\":\"busy\"}"
         );
-        let (event, _id) = parse_sse_block(block);
+        let SseFrame { event, .. } = parse_sse_block(block);
         match event {
             SseEvent::Presence {
                 contact_id,
@@ -247,7 +245,7 @@ mod tests {
     #[test]
     fn parse_unknown_event() {
         let block = "event: ping\ndata: {}";
-        let (event, _id) = parse_sse_block(block);
+        let SseFrame { event, .. } = parse_sse_block(block);
         assert!(
             matches!(event, SseEvent::Unknown),
             "unrecognized event type must yield Unknown"
@@ -257,7 +255,7 @@ mod tests {
     /// Oracle: RFC 8895 §9 — empty block (keepalive) must yield Unknown.
     #[test]
     fn parse_empty_block() {
-        let (event, id) = parse_sse_block("");
+        let SseFrame { event, id } = parse_sse_block("");
         assert!(
             matches!(event, SseEvent::Unknown),
             "empty block must yield Unknown"
@@ -270,19 +268,18 @@ mod tests {
     #[test]
     fn parse_malformed_data_json() {
         let block = "event: state\ndata: not-json";
-        let (event, _id) = parse_sse_block(block);
+        let SseFrame { event, .. } = parse_sse_block(block);
         assert!(
             matches!(event, SseEvent::Unknown),
             "malformed JSON must yield Unknown, not panic or error"
         );
     }
 
-    /// Oracle: RFC 8895 §9 — `id:` line value must be returned as the second
-    /// tuple element.
+    /// Oracle: RFC 8895 §9 — `id:` line value must be returned in `SseFrame::id`.
     #[test]
     fn parse_id_line() {
         let block = "id: evt-42\nevent: state\ndata: {\"changed\":{}}";
-        let (event, id) = parse_sse_block(block);
+        let SseFrame { event, id } = parse_sse_block(block);
         assert_eq!(id.as_deref(), Some("evt-42"), "id must be evt-42");
         assert!(
             matches!(event, SseEvent::StateChange { .. }),
@@ -307,7 +304,7 @@ mod tests {
             "data: {\"chatId\":\"c3\",\"senderId\":\"u3\",\"typing\":true}\n",
             "data: extra"
         );
-        let (event, _id) = parse_sse_block(block);
+        let SseFrame { event, .. } = parse_sse_block(block);
         assert!(
             matches!(event, SseEvent::Unknown),
             "both data: lines must be joined: first-line-valid JSON + second line = Unknown"

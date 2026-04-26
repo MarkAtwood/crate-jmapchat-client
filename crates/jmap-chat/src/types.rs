@@ -2,11 +2,7 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-/// Opaque string identifier (ULID or auth-layer userId).
-pub type Id = String;
-
-/// RFC 3339 UTC date-time string.
-pub type UTCDate = String;
+pub use crate::jmap::{Id, UTCDate};
 
 // ---------------------------------------------------------------------------
 // Attachment
@@ -237,6 +233,13 @@ pub enum ChannelPermissionTargetType {
 // Chat
 // ---------------------------------------------------------------------------
 
+/// A JMAP Chat object (JMAP Chat §4.1).
+///
+/// This type is **deserialization-only**: it is populated from server responses.
+/// Field applicability by `kind` is enforced by the server, not by this struct.
+/// Constructing a `Chat` in application code is not supported — use the
+/// `Chat/get` method instead.
+///
 /// A conversation between two or more participants.
 /// Spec: draft-atwood-jmap-chat-00 §4.9
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

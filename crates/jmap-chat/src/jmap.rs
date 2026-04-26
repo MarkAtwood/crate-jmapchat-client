@@ -4,11 +4,137 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-/// Opaque, non-empty ASCII string identifier, max 255 chars (RFC 8620 §1.2).
-pub type Id = String;
+/// An opaque server-assigned identifier string (RFC 8620 §1.2).
+/// Guaranteed non-empty. Serializes/deserializes transparently as a JSON string.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+#[serde(transparent)]
+pub struct Id(String);
 
-/// RFC 3339 date-time string with mandatory Z suffix (RFC 8620 §1.4).
-pub type UTCDate = String;
+impl Id {
+    /// Create an Id from a string, returning Err if the string is empty.
+    pub fn new(s: impl Into<String>) -> Result<Self, crate::error::ClientError> {
+        let s = s.into();
+        if s.is_empty() {
+            return Err(crate::error::ClientError::Parse(
+                "Id may not be empty".into(),
+            ));
+        }
+        Ok(Self(s))
+    }
+
+    /// Create an Id without validation. For use in tests and deserialization
+    /// contexts where the source is trusted (e.g. server-assigned IDs).
+    pub fn from_trusted(s: impl Into<String>) -> Self {
+        Self(s.into())
+    }
+
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+impl std::fmt::Display for Id {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
+impl AsRef<str> for Id {
+    fn as_ref(&self) -> &str {
+        &self.0
+    }
+}
+
+impl std::ops::Deref for Id {
+    type Target = str;
+    fn deref(&self) -> &str {
+        &self.0
+    }
+}
+
+impl PartialEq<str> for Id {
+    fn eq(&self, other: &str) -> bool {
+        self.0 == other
+    }
+}
+
+impl PartialEq<&str> for Id {
+    fn eq(&self, other: &&str) -> bool {
+        self.0 == *other
+    }
+}
+
+impl PartialEq<Id> for &str {
+    fn eq(&self, other: &Id) -> bool {
+        *self == other.0
+    }
+}
+
+/// An RFC 3339 UTC timestamp string (JMAP UTCDate, RFC 8620 §1.4).
+/// Guaranteed non-empty. Serializes/deserializes transparently as a JSON string.
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(transparent)]
+pub struct UTCDate(String);
+
+impl UTCDate {
+    /// Create a UTCDate from a string, returning Err if the string is empty.
+    pub fn new(s: impl Into<String>) -> Result<Self, crate::error::ClientError> {
+        let s = s.into();
+        if s.is_empty() {
+            return Err(crate::error::ClientError::Parse(
+                "UTCDate may not be empty".into(),
+            ));
+        }
+        Ok(Self(s))
+    }
+
+    /// Create a UTCDate without validation. For use in tests and deserialization
+    /// contexts where the source is trusted.
+    pub fn from_trusted(s: impl Into<String>) -> Self {
+        Self(s.into())
+    }
+
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+impl std::fmt::Display for UTCDate {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
+impl AsRef<str> for UTCDate {
+    fn as_ref(&self) -> &str {
+        &self.0
+    }
+}
+
+impl std::ops::Deref for UTCDate {
+    type Target = str;
+    fn deref(&self) -> &str {
+        &self.0
+    }
+}
+
+impl PartialEq<str> for UTCDate {
+    fn eq(&self, other: &str) -> bool {
+        self.0 == other
+    }
+}
+
+impl PartialEq<&str> for UTCDate {
+    fn eq(&self, other: &&str) -> bool {
+        self.0 == *other
+    }
+}
+
+impl PartialEq<UTCDate> for &str {
+    fn eq(&self, other: &UTCDate) -> bool {
+        *self == other.0
+    }
+}
 
 /// A single method call or response: `[methodName, arguments, callId]` (RFC 8620 §3.2).
 pub type Invocation = (String, serde_json::Value, String);
@@ -86,13 +212,31 @@ impl Session {
             .map(String::as_str)
     }
 
-    /// Returns the parsed `ChatCapability` for the given account, if present.
-    pub fn chat_capability(&self, account_id: &str) -> Option<ChatCapability> {
-        let account = self.accounts.get(account_id)?;
-        let raw = account
+    /// Returns the parsed `ChatCapability` for the given account.
+    ///
+    /// - `Ok(None)` — the account exists but has no chat capability key.
+    /// - `Ok(Some(...))` — the capability is present and valid.
+    /// - `Err(ClientError::Parse(...))` — the key is present but malformed.
+    pub fn chat_capability(
+        &self,
+        account_id: &str,
+    ) -> Result<Option<ChatCapability>, crate::error::ClientError> {
+        let account = match self.accounts.get(account_id) {
+            Some(a) => a,
+            None => return Ok(None),
+        };
+        let raw = match account
             .account_capabilities
-            .get("urn:ietf:params:jmap:chat")?;
-        serde_json::from_value(raw.clone()).ok()
+            .get("urn:ietf:params:jmap:chat")
+        {
+            Some(r) => r,
+            None => return Ok(None),
+        };
+        serde_json::from_value::<ChatCapability>(raw.clone())
+            .map(Some)
+            .map_err(|e| {
+                crate::error::ClientError::Parse(format!("malformed chat capability: {e}"))
+            })
     }
 }
 
@@ -284,6 +428,7 @@ mod tests {
 
         let cap = session
             .chat_capability("account1")
+            .expect("chat_capability must not return Err")
             .expect("account1 must have chat capability");
 
         assert_eq!(cap.max_body_bytes, 65536);
@@ -299,6 +444,50 @@ mod tests {
             vec!["text/plain", "text/markdown"]
         );
         assert!(cap.supports_threads);
+    }
+
+    // Oracle: draft-atwood-jmap-chat-00 §3 — chat_capability() returns Ok(None)
+    // when the account exists but lacks the chat capability key.
+    #[test]
+    fn session_chat_capability_absent_key_returns_ok_none() {
+        let val = fixture("session.json");
+        let mut session: Session =
+            serde_json::from_value(val).expect("session.json must deserialize");
+
+        session
+            .accounts
+            .get_mut("account1")
+            .unwrap()
+            .account_capabilities
+            .remove("urn:ietf:params:jmap:chat");
+
+        let result = session.chat_capability("account1");
+        assert!(
+            matches!(result, Ok(None)),
+            "expected Ok(None), got {result:?}"
+        );
+    }
+
+    // Oracle: session_malformed_chat_cap.json — hand-written fixture with
+    // maxBodyBytes set to a string instead of a u64, derived from the spec
+    // field type (draft-atwood-jmap-chat-00 §3); NOT produced by the code
+    // under test.
+    #[test]
+    fn session_chat_capability_malformed_returns_err() {
+        let val = fixture("session_malformed_chat_cap.json");
+        let session: Session =
+            serde_json::from_value(val).expect("fixture must deserialize as Session");
+
+        let result = session.chat_capability("account1");
+        match result {
+            Err(crate::error::ClientError::Parse(msg)) => {
+                assert!(
+                    msg.contains("malformed chat capability"),
+                    "error message should mention 'malformed chat capability', got: {msg}"
+                );
+            }
+            other => panic!("expected Err(ClientError::Parse(...)), got {other:?}"),
+        }
     }
 
     // Oracle: RFC 8620 §2 — chat_account_id() returns None when the capability

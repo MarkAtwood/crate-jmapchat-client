@@ -27,6 +27,6 @@ pub enum ClientError {
     #[error("serialization error: {0}")]
     Serialize(#[from] serde_json::Error),
 
-    #[error("SSE frame too large")]
+    #[error("SSE frame too large (limit: 1 MiB)")]
     SseFrameTooLarge,
 }
