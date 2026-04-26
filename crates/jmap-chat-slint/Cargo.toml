@@ -1,0 +1,13 @@
+[package]
+name = "jmap-chat-slint"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "jmap-chat-slint"
+path = "src/main.rs"
+
+[dependencies]
+slint = "1"

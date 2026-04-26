@@ -1,6 +1,10 @@
 [workspace]
 members = [
     "crates/jmap-chat",
+    "crates/jmap-chat-egui",
+    "crates/jmap-chat-iced",
+    "crates/jmap-chat-slint",
+    "crates/jmap-chat-tauri",
 ]
 resolver = "2"
 
