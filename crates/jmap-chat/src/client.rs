@@ -160,37 +160,51 @@ impl JmapChatClient {
         let byte_stream = resp.bytes_stream();
 
         Ok(futures::stream::unfold(
-            Some((byte_stream, String::new())),
+            Some((byte_stream, String::new(), 0usize)),
             |state| async move {
-                let (mut stream, mut buf) = state?;
+                let (mut stream, mut buf, mut scan_from) = state?;
                 loop {
                     // Search for any double-newline delimiter (LF/CRLF/CR variants).
+                    // scan_from is set to old_len.saturating_sub(3) after each append
+                    // so we only re-scan the overlap region rather than the whole buffer.
                     // Find the earliest occurrence and record its byte length so we
-                    // drain exactly the right number of bytes.
+                    // extract exactly the right number of bytes.
                     let frame_end = [
-                        buf.find("\r\n\r\n").map(|p| (p, 4usize)),
-                        buf.find("\n\n").map(|p| (p, 2usize)),
-                        buf.find("\r\r").map(|p| (p, 2usize)),
+                        buf[scan_from..]
+                            .find("\r\n\r\n")
+                            .map(|p| (scan_from + p, 4usize)),
+                        buf[scan_from..]
+                            .find("\n\n")
+                            .map(|p| (scan_from + p, 2usize)),
+                        buf[scan_from..]
+                            .find("\r\r")
+                            .map(|p| (scan_from + p, 2usize)),
                     ]
                     .into_iter()
                     .flatten()
                     .min_by_key(|&(pos, _)| pos);
 
                     if let Some((pos, delim_len)) = frame_end {
+                        // Extract frame as O(frame) copy, then split off remainder in O(1).
                         let raw_frame = buf[..pos].to_string();
-                        buf.drain(..pos + delim_len);
+                        let suffix = buf.split_off(pos + delim_len);
+                        buf = suffix;
+                        scan_from = 0;
                         // Normalize line endings only in the extracted frame, not the
                         // whole buffer, so cost is O(frame) not O(total buffer).
                         let frame = raw_frame.replace("\r\n", "\n").replace('\r', "\n");
                         let sse_frame = parse_sse_block(&frame);
-                        return Some((Ok(sse_frame), Some((stream, buf))));
+                        return Some((Ok(sse_frame), Some((stream, buf, scan_from))));
                     }
 
                     // Need more data from the network.
                     match stream.next().await {
                         None => return None,
                         Some(Err(e)) => {
-                            return Some((Err(ClientError::Http(e)), Some((stream, buf))));
+                            return Some((
+                                Err(ClientError::Http(e)),
+                                Some((stream, buf, scan_from)),
+                            ));
                         }
                         Some(Ok(bytes)) => {
                             // Reject invalid UTF-8 rather than silently replacing with U+FFFD.
@@ -205,8 +219,12 @@ impl JmapChatClient {
                                     ));
                                 }
                             };
+                            // Advance scan_from to 3 bytes before the new data so we catch
+                            // delimiters that span the old/new boundary.
+                            let old_len = buf.len();
                             // Append raw bytes; normalization happens at frame extraction time.
                             buf.push_str(&text);
+                            scan_from = old_len.saturating_sub(3);
                             // Guard against unbounded buffer growth. Yield the error and
                             // terminate the stream (state = None) so no further items follow.
                             if buf.len() > 1024 * 1024 {
@@ -230,21 +248,19 @@ pub(crate) fn extract_response<T: serde::de::DeserializeOwned>(
     resp: &JmapResponse,
     call_id: &str,
 ) -> Result<T, ClientError> {
-    let inv = resp
+    let (method_name, args, _call_id_found) = resp
         .method_responses
         .iter()
         .find(|(_, _, id)| id == call_id)
         .ok_or_else(|| ClientError::MethodNotFound(call_id.to_string()))?;
 
-    if inv.0 == "error" {
-        let err_type = inv
-            .1
+    if method_name == "error" {
+        let err_type = args
             .get("type")
             .and_then(|v| v.as_str())
             .unwrap_or("serverError")
             .to_string();
-        let description = inv
-            .1
+        let description = args
             .get("description")
             .and_then(|v| v.as_str())
             .unwrap_or("unknown")
@@ -255,7 +271,7 @@ pub(crate) fn extract_response<T: serde::de::DeserializeOwned>(
         });
     }
 
-    serde_json::from_value(inv.1.clone()).map_err(|e| ClientError::Parse(e.to_string()))
+    serde_json::from_value(args.clone()).map_err(|e| ClientError::Parse(e.to_string()))
 }
 
 #[cfg(test)]

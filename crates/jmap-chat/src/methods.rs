@@ -99,7 +99,7 @@ impl crate::client::JmapChatClient {
         });
         let req = build_request("Chat/get", args);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(&resp, "r1")
+        crate::client::extract_response(&resp, CALL_ID)
     }
 
     /// Query Chat IDs with optional filter (RFC 8620 §5.5 / JMAP Chat §5 Chat/query).
@@ -137,7 +137,7 @@ impl crate::client::JmapChatClient {
         });
         let req = build_request("Chat/query", args);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(&resp, "r1")
+        crate::client::extract_response(&resp, CALL_ID)
     }
 
     /// Fetch changes to Chat objects since `since_state` (RFC 8620 §5.2 / Chat/changes).
@@ -158,7 +158,7 @@ impl crate::client::JmapChatClient {
         });
         let req = build_request("Chat/changes", args);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(&resp, "r1")
+        crate::client::extract_response(&resp, CALL_ID)
     }
 
     /// Fetch Message objects by IDs (RFC 8620 §5.1 / JMAP Chat §5 Message/get).
@@ -179,7 +179,7 @@ impl crate::client::JmapChatClient {
         });
         let req = build_request("Message/get", args);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(&resp, "r1")
+        crate::client::extract_response(&resp, CALL_ID)
     }
 
     /// Query Message IDs within a Chat (RFC 8620 §5.5 / JMAP Chat §5 Message/query).
@@ -197,9 +197,9 @@ impl crate::client::JmapChatClient {
         position: Option<u64>,
         limit: Option<u64>,
     ) -> Result<QueryResponse, crate::error::ClientError> {
-        if chat_id.is_none() && has_mention.is_none() {
-            return Err(crate::error::ClientError::Parse(
-                "message_query: at least one of chat_id or has_mention must be provided".into(),
+        if chat_id.is_none() && has_mention != Some(true) {
+            return Err(crate::error::ClientError::InvalidArgument(
+                "message_query: chat_id or has_mention=true must be provided".into(),
             ));
         }
         let mut filter = serde_json::Map::new();
@@ -225,7 +225,7 @@ impl crate::client::JmapChatClient {
         });
         let req = build_request("Message/query", args);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(&resp, "r1")
+        crate::client::extract_response(&resp, CALL_ID)
     }
 
     /// Fetch changes to Message objects since `since_state` (RFC 8620 §5.2 / Message/changes).
@@ -243,7 +243,7 @@ impl crate::client::JmapChatClient {
         });
         let req = build_request("Message/changes", args);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(&resp, "r1")
+        crate::client::extract_response(&resp, CALL_ID)
     }
 
     /// Create (send) a new Message (RFC 8620 §5.3 / JMAP Chat §5 Message/set).
@@ -278,7 +278,7 @@ impl crate::client::JmapChatClient {
         });
         let req = build_request("Message/set", args);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(&resp, "r1")
+        crate::client::extract_response(&resp, CALL_ID)
     }
 
     /// Fetch ChatContact objects by IDs (JMAP Chat §5 ChatContact/get).
@@ -298,7 +298,7 @@ impl crate::client::JmapChatClient {
         });
         let req = build_request("ChatContact/get", args);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(&resp, "r1")
+        crate::client::extract_response(&resp, CALL_ID)
     }
 
     /// Fetch ReadPosition objects by IDs (JMAP Chat §5 ReadPosition/get).
@@ -317,7 +317,7 @@ impl crate::client::JmapChatClient {
         });
         let req = build_request("ReadPosition/get", args);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(&resp, "r1")
+        crate::client::extract_response(&resp, CALL_ID)
     }
 
     /// Update the read position for a Chat (JMAP Chat §5 ReadPosition/set).
@@ -343,7 +343,7 @@ impl crate::client::JmapChatClient {
         });
         let req = build_request("ReadPosition/set", args);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(&resp, "r1")
+        crate::client::extract_response(&resp, CALL_ID)
     }
 
     /// Fetch the singleton PresenceStatus record (JMAP Chat §5 PresenceStatus/get).
@@ -361,7 +361,7 @@ impl crate::client::JmapChatClient {
         });
         let req = build_request("PresenceStatus/get", args);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(&resp, "r1")
+        crate::client::extract_response(&resp, CALL_ID)
     }
 }
 
@@ -369,17 +369,21 @@ impl crate::client::JmapChatClient {
 // Internal helper
 // ---------------------------------------------------------------------------
 
-// Each request contains exactly one method call, identified by call-id "r1".
+/// The call-id used in every single-method JMAP request built by this module.
+/// `extract_response` searches for this id. Do not change without updating both.
+const CALL_ID: &str = "r1";
+
+// Each request contains exactly one method call, identified by CALL_ID.
 // extract_response() relies on this. Do not add multi-call batching here
 // without updating extract_response() to accept a call-id parameter.
 fn build_request(method_name: &str, args: serde_json::Value) -> crate::jmap::JmapRequest {
     crate::jmap::JmapRequest {
-        using: chat_using().clone(),
-        method_calls: vec![(method_name.to_string(), args, "r1".to_string())],
+        using: chat_using().to_vec(),
+        method_calls: vec![(method_name.to_string(), args, CALL_ID.to_string())],
     }
 }
 
-fn chat_using() -> &'static Vec<String> {
+fn chat_using() -> &'static [String] {
     static CHAT_USING_VEC: std::sync::OnceLock<Vec<String>> = std::sync::OnceLock::new();
     CHAT_USING_VEC.get_or_init(|| {
         vec![

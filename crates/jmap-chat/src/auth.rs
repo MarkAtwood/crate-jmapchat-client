@@ -42,16 +42,27 @@ impl AuthProvider for NoneAuth {
 
 /// Bearer-token authentication (`Authorization: Bearer <token>`).
 pub struct BearerAuth {
+    // Pre-computed at construction: avoids per-request allocation and ensures
+    // that invalid credentials fail at construction, not at the first request.
     header_value: HeaderValue,
 }
 
 impl BearerAuth {
     /// Construct a `BearerAuth` from a Bearer token string.
     ///
-    /// Returns `Err` if the token contains characters that are not valid in an
-    /// HTTP header value (i.e. non-visible-ASCII or non-whitespace octets).
     /// Validation happens here so that `auth_header` can never fail silently.
+    ///
+    /// # Errors
+    ///
+    /// - [`ClientError::InvalidArgument`] if `token` is empty or whitespace-only.
+    /// - [`ClientError::InvalidHeaderValue`] if `token` contains characters that
+    ///   are not valid in an HTTP header value (non-visible-ASCII octets).
     pub fn new(token: &str) -> Result<Self, ClientError> {
+        if token.trim().is_empty() {
+            return Err(ClientError::InvalidArgument(
+                "BearerAuth token may not be empty or whitespace-only".into(),
+            ));
+        }
         let header_value = HeaderValue::from_str(&format!("Bearer {token}"))?;
         Ok(Self { header_value })
     }
@@ -75,18 +86,23 @@ impl AuthProvider for BearerAuth {
 ///
 /// Credentials are encoded per RFC 7617: `base64(username ":" password)`.
 pub struct BasicAuth {
+    // Pre-computed at construction: avoids per-request allocation and ensures
+    // that invalid credentials fail at construction, not at the first request.
     header_value: HeaderValue,
 }
 
 impl BasicAuth {
     /// Construct a `BasicAuth` from a username and password.
     ///
-    /// Returns `Err` if:
-    /// - `username` contains a colon (`:`) — forbidden by RFC 7617 §2.
-    /// - The resulting header value contains characters invalid in an HTTP header.
+    /// # Errors
+    ///
+    /// - [`ClientError::InvalidArgument`] if `username` contains a colon (`:`),
+    ///   which is forbidden by RFC 7617 §2.
+    /// - [`ClientError::InvalidHeaderValue`] if the resulting header value
+    ///   contains characters that are not valid in an HTTP header value.
     pub fn new(username: &str, password: &str) -> Result<Self, ClientError> {
         if username.contains(':') {
-            return Err(ClientError::Parse(
+            return Err(ClientError::InvalidArgument(
                 "BasicAuth username may not contain ':'".into(),
             ));
         }
@@ -114,7 +130,14 @@ impl AuthProvider for BasicAuth {
 ///
 /// Used when the server presents a certificate signed by a private CA (e.g. kith).
 pub struct CustomCaAuth {
-    pub der_cert: Vec<u8>,
+    der_cert: Vec<u8>,
+}
+
+impl CustomCaAuth {
+    /// Construct a `CustomCaAuth` from a DER-encoded CA certificate.
+    pub fn new(der_cert: Vec<u8>) -> Self {
+        Self { der_cert }
+    }
 }
 
 impl AuthProvider for CustomCaAuth {
@@ -209,8 +232,42 @@ mod tests {
     /// Oracle: CustomCaAuth injects no auth header — no server identity is involved.
     #[test]
     fn custom_ca_auth_no_header() {
-        let auth = CustomCaAuth { der_cert: vec![] };
+        let auth = CustomCaAuth::new(vec![]);
         assert!(auth.auth_header().is_none());
+    }
+
+    /// Oracle: BearerAuth constructor rejects an empty token string.
+    /// An empty token would produce "Bearer " which is a malformed credential.
+    #[test]
+    fn bearer_auth_empty_token_rejected() {
+        let result = BearerAuth::new("");
+        match result {
+            Ok(_) => panic!("empty token must be rejected by constructor"),
+            Err(ClientError::InvalidArgument(msg)) => {
+                assert!(
+                    msg.contains("empty"),
+                    "error message should mention 'empty', got: {msg}"
+                );
+            }
+            Err(e) => panic!("expected InvalidArgument, got: {e}"),
+        }
+    }
+
+    /// Oracle: BearerAuth constructor rejects a whitespace-only token string.
+    /// A whitespace-only token would produce "Bearer   " which is a malformed credential.
+    #[test]
+    fn bearer_auth_whitespace_only_token_rejected() {
+        let result = BearerAuth::new("   ");
+        match result {
+            Ok(_) => panic!("whitespace-only token must be rejected by constructor"),
+            Err(ClientError::InvalidArgument(msg)) => {
+                assert!(
+                    msg.contains("whitespace"),
+                    "error message should mention 'whitespace', got: {msg}"
+                );
+            }
+            Err(e) => panic!("expected InvalidArgument, got: {e}"),
+        }
     }
 
     /// Oracle: NoneAuth uses the default reqwest::Client which always builds successfully.

@@ -6,6 +6,7 @@ use std::collections::HashMap;
 
 /// A parsed SSE frame: the event and the `id:` line value (if any).
 #[derive(Debug)]
+#[non_exhaustive]
 pub struct SseFrame {
     pub event: SseEvent,
     pub id: Option<String>,
@@ -101,6 +102,7 @@ fn parse_state_data(data: &str) -> SseEvent {
     SseEvent::StateChange { changed }
 }
 
+// Wire format defined by JMAP Chat spec §5, ChatMessage/typing event.
 #[derive(serde::Deserialize)]
 struct TypingPayload {
     #[serde(rename = "chatId")]
@@ -110,6 +112,7 @@ struct TypingPayload {
     typing: bool,
 }
 
+// Wire format defined by JMAP Chat spec §5, ChatContact/presence event.
 #[derive(serde::Deserialize)]
 struct PresencePayload {
     #[serde(rename = "contactId")]

@@ -193,7 +193,60 @@ async fn chat_get_method_error_returns_client_error() {
 }
 
 // ---------------------------------------------------------------------------
-// Test 5: GetResponse<T> type alias works for empty list
+// Test 5: message_query — invalid filter guard
+// ---------------------------------------------------------------------------
+
+/// Oracle: JMAP Chat spec — servers MUST return `unsupportedFilter` when
+/// neither `chatId` is provided nor `hasMention: true`. The client must
+/// pre-validate and return `ClientError::InvalidArgument` for:
+///   (a) both chat_id and has_mention are None
+///   (b) chat_id is None and has_mention=Some(false) — false is not an anchor
+///
+/// No mock server is needed: the guard fires before any network call.
+#[tokio::test]
+async fn message_query_rejects_invalid_filter() {
+    let client = JmapChatClient::new(jmap_chat::auth::NoneAuth, "http://127.0.0.1:1")
+        .expect("client construction must succeed");
+
+    // (a) both None
+    let err_none = client
+        .message_query(
+            "http://127.0.0.1:1/api",
+            "acct1",
+            None,
+            None,
+            None,
+            None,
+            None,
+        )
+        .await
+        .expect_err("no filter must be rejected");
+    assert!(
+        matches!(&err_none, ClientError::InvalidArgument(msg) if msg.contains("chat_id or has_mention=true")),
+        "expected InvalidArgument, got {err_none:?}"
+    );
+
+    // (b) has_mention=Some(false) — not a valid anchor
+    let err_false = client
+        .message_query(
+            "http://127.0.0.1:1/api",
+            "acct1",
+            None,
+            Some(false),
+            None,
+            None,
+            None,
+        )
+        .await
+        .expect_err("has_mention=false without chat_id must be rejected");
+    assert!(
+        matches!(&err_false, ClientError::InvalidArgument(msg) if msg.contains("chat_id or has_mention=true")),
+        "expected InvalidArgument, got {err_false:?}"
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Test 6: GetResponse<T> type alias works for empty list
 // ---------------------------------------------------------------------------
 
 /// Oracle: RFC 8620 §5.1 — a /get response with an empty list and no notFound

@@ -6,9 +6,19 @@ use serde::{Deserialize, Serialize};
 
 /// An opaque server-assigned identifier string (RFC 8620 §1.2).
 /// Guaranteed non-empty. Serializes/deserializes transparently as a JSON string.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Serialize)]
 #[serde(transparent)]
 pub struct Id(String);
+
+impl<'de> serde::Deserialize<'de> for Id {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        let s = String::deserialize(d)?;
+        if s.is_empty() {
+            return Err(serde::de::Error::custom("Id may not be empty"));
+        }
+        Ok(Id(s))
+    }
+}
 
 impl Id {
     /// Create an Id from a string, returning Err if the string is empty.
@@ -22,10 +32,15 @@ impl Id {
         Ok(Self(s))
     }
 
-    /// Create an Id without validation. For use in tests and deserialization
-    /// contexts where the source is trusted (e.g. server-assigned IDs).
+    /// Create an `Id` from a string, bypassing the non-empty validation.
+    ///
+    /// **Only use for server-assigned identifiers and test fixtures.**
+    /// Do not pass user-controlled input — call [`Id::new`] instead.
+    /// Panics in debug builds if `s` is empty.
     pub fn from_trusted(s: impl Into<String>) -> Self {
-        Self(s.into())
+        let s = s.into();
+        debug_assert!(!s.is_empty(), "from_trusted called with empty string");
+        Self(s)
     }
 
     pub fn as_str(&self) -> &str {
@@ -72,9 +87,19 @@ impl PartialEq<Id> for &str {
 
 /// An RFC 3339 UTC timestamp string (JMAP UTCDate, RFC 8620 §1.4).
 /// Guaranteed non-empty. Serializes/deserializes transparently as a JSON string.
-#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
 #[serde(transparent)]
 pub struct UTCDate(String);
+
+impl<'de> serde::Deserialize<'de> for UTCDate {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        let s = String::deserialize(d)?;
+        if s.is_empty() {
+            return Err(serde::de::Error::custom("UTCDate may not be empty"));
+        }
+        Ok(UTCDate(s))
+    }
+}
 
 impl UTCDate {
     /// Create a UTCDate from a string, returning Err if the string is empty.
@@ -88,10 +113,15 @@ impl UTCDate {
         Ok(Self(s))
     }
 
-    /// Create a UTCDate without validation. For use in tests and deserialization
-    /// contexts where the source is trusted.
+    /// Create a `UTCDate` from a string, bypassing the non-empty validation.
+    ///
+    /// **Only use for server-assigned identifiers and test fixtures.**
+    /// Do not pass user-controlled input — call [`UTCDate::new`] instead.
+    /// Panics in debug builds if `s` is empty.
     pub fn from_trusted(s: impl Into<String>) -> Self {
-        Self(s.into())
+        let s = s.into();
+        debug_assert!(!s.is_empty(), "from_trusted called with empty string");
+        Self(s)
     }
 
     pub fn as_str(&self) -> &str {

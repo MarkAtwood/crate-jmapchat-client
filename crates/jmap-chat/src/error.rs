@@ -12,6 +12,11 @@ pub enum ClientError {
     #[error("parse error: {0}")]
     Parse(String),
 
+    /// A caller-supplied argument violates a precondition (e.g. empty token,
+    /// colon in BasicAuth username, missing required filter field).
+    #[error("invalid argument: {0}")]
+    InvalidArgument(String),
+
     #[error("invalid session: {0}")]
     InvalidSession(&'static str),
 
