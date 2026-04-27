@@ -53,14 +53,19 @@ pub struct ChangesResponse {
 /// Used for both create (`message_create`) and update (`read_position_set`)
 /// operations. Only the fields relevant to those two operations are modelled
 /// here; `destroy` is deferred to Phase 4.
+///
+/// The type parameter `T` is the shape of each created/updated object.
+/// Defaults to `serde_json::Value` so callers that don't need typed objects
+/// can use `SetResponse` without a type argument.
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct SetResponse {
+#[serde(bound(deserialize = "T: serde::de::DeserializeOwned"))]
+pub struct SetResponse<T = serde_json::Value> {
     pub account_id: String,
     pub old_state: Option<String>,
     pub new_state: String,
-    pub created: Option<HashMap<String, serde_json::Value>>,
-    pub updated: Option<HashMap<String, serde_json::Value>>,
+    pub created: Option<HashMap<String, T>>,
+    pub updated: Option<HashMap<String, T>>,
     pub destroyed: Option<Vec<String>>,
     pub not_created: Option<HashMap<String, SetError>>,
     pub not_updated: Option<HashMap<String, SetError>>,
@@ -104,7 +109,7 @@ impl crate::client::JmapChatClient {
 
     /// Query Chat IDs with optional filter (RFC 8620 §5.5 / JMAP Chat §5 Chat/query).
     ///
-    /// `filter_kind`: `Some("direct")`, `Some("group")`, `Some("channel")`, or `None`.
+    /// `filter_kind`: `Some(ChatKind::Direct)`, `Some(ChatKind::Group)`, etc., or `None`.
     /// `filter_muted`: filter by mute state when `Some`.
     /// Only keys that are `Some` are included in the filter object; an empty
     /// filter object is sent as JSON `null`.
@@ -112,14 +117,16 @@ impl crate::client::JmapChatClient {
         &self,
         api_url: &str,
         account_id: &str,
-        filter_kind: Option<&str>,
+        filter_kind: Option<crate::types::ChatKind>,
         filter_muted: Option<bool>,
         position: Option<u64>,
         limit: Option<u64>,
     ) -> Result<QueryResponse, crate::error::ClientError> {
         let mut filter = serde_json::Map::new();
         if let Some(k) = filter_kind {
-            filter.insert("kind".into(), k.into());
+            let kind_str = serde_json::to_value(&k)
+                .map_err(crate::error::ClientError::Serialize)?;
+            filter.insert("kind".into(), kind_str);
         }
         if let Some(m) = filter_muted {
             filter.insert("muted".into(), m.into());
