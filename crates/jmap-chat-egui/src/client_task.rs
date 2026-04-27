@@ -408,7 +408,7 @@ pub async fn run(
                             .message_create(
                                 &session,
                                 &MessageCreateInput {
-                                    client_id: &client_id,
+                                    client_id: Some(client_id.as_str()),
                                     chat_id: &chat_id,
                                     body: &body,
                                     body_type: "text/plain",

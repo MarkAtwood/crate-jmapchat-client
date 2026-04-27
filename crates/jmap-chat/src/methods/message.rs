@@ -1,5 +1,5 @@
 use super::{
-    ChangesResponse, GetResponse, MessageCreateInput, MessageQueryInput, MessageUpdateInput,
+    ChangesResponse, GetResponse, MessageCreateInput, MessagePatch, MessageQueryInput,
     QueryChangesResponse, QueryResponse, ReactionChange, SetResponse,
 };
 
@@ -124,16 +124,17 @@ impl crate::client::JmapChatClient {
 
     /// Create (send) a new Message (RFC 8620 §5.3 / JMAP Chat §5 Message/set).
     ///
-    /// `client_id` is a caller-supplied ULID used as the creation key. The server
-    /// maps it to the server-assigned Message id in `SetResponse.created`.
-    /// For update and destroy operations see [`Self::message_set_update`] and
-    /// [`Self::message_set_destroy`].
+    /// When `input.client_id` is `None`, a ULID is generated automatically.
+    /// The server maps the creation key to the server-assigned Message id in
+    /// `SetResponse.created`.
     pub async fn message_create(
         &self,
         session: &crate::jmap::Session,
         input: &MessageCreateInput<'_>,
     ) -> Result<SetResponse, crate::error::ClientError> {
         let (api_url, account_id) = Self::session_parts(session)?;
+        let mut buf = String::new();
+        let client_id = super::resolve_client_id(input.client_id, &mut buf);
         let mut create_obj = serde_json::json!({
             "chatId": input.chat_id,
             "body": input.body,
@@ -145,13 +146,13 @@ impl crate::client::JmapChatClient {
         }
         let args = serde_json::json!({
             "accountId": account_id,
-            "create": { input.client_id: create_obj },
+            "create": { client_id: create_obj },
         });
         let (call_id, req) = super::build_request("Message/set", args);
         let resp = self.call(api_url, &req).await?;
         let set_resp: SetResponse = crate::client::extract_response(resp, call_id)?;
         if let Some(not_created) = &set_resp.not_created {
-            if let Some(err) = not_created.get(input.client_id) {
+            if let Some(err) = not_created.get(client_id) {
                 if err.error_type == "rateLimited" {
                     let retry_after = err.server_retry_after.clone().ok_or_else(|| {
                         crate::error::ClientError::Parse(
@@ -167,50 +168,51 @@ impl crate::client::JmapChatClient {
 
     /// Update Message properties (RFC 8620 §5.3 / JMAP Chat §4.5 Message/set).
     ///
-    /// Issues an `update` operation patching only the fields present in
-    /// `input`. Supports body edits (author-only), reaction changes (JSON
-    /// Pointer patch on `reactions` map), read-receipt updates (`readAt`),
-    /// and chat-level deletion (`deletedAt` / `deletedForAll`).
+    /// Issues an `update` operation patching only the fields present in `patch`.
+    /// Supports body edits (author-only), reaction changes (JSON Pointer patch on
+    /// `reactions` map), read-receipt updates (`readAt`), and chat-level deletion
+    /// (`deletedAt` / `deletedForAll`).
     ///
-    /// If all optional fields are `None` and `reaction_changes` is empty, an
-    /// empty patch object is sent. RFC 8620 §5.3 permits this; the server
-    /// treats it as a no-op but still returns the object in `updated`.
-    pub async fn message_set_update(
+    /// If all optional fields are `None`, an empty patch object is sent. RFC 8620
+    /// §5.3 permits this; the server treats it as a no-op but still returns the
+    /// object in `updated`.
+    pub async fn message_update(
         &self,
         session: &crate::jmap::Session,
-        input: &MessageUpdateInput<'_>,
+        id: &str,
+        patch: &MessagePatch<'_>,
     ) -> Result<SetResponse, crate::error::ClientError> {
         let (api_url, account_id) = Self::session_parts(session)?;
-        let mut patch = serde_json::Map::new();
-        if let Some(b) = input.body {
-            patch.insert("body".into(), b.into());
+        let mut patch_map = serde_json::Map::new();
+        if let Some(b) = patch.body {
+            patch_map.insert("body".into(), b.into());
         }
-        if let Some(bt) = input.body_type {
-            patch.insert("bodyType".into(), bt.into());
+        if let Some(bt) = patch.body_type {
+            patch_map.insert("bodyType".into(), bt.into());
         }
-        if let Some(ra) = input.read_at {
-            patch.insert("readAt".into(), ra.as_str().into());
+        if let Some(ra) = patch.read_at {
+            patch_map.insert("readAt".into(), ra.as_str().into());
         }
-        if let Some(da) = input.deleted_at {
-            patch.insert("deletedAt".into(), da.as_str().into());
+        if let Some(da) = patch.deleted_at {
+            patch_map.insert("deletedAt".into(), da.as_str().into());
         }
-        if let Some(dfa) = input.deleted_for_all {
-            patch.insert("deletedForAll".into(), dfa.into());
+        if let Some(dfa) = patch.deleted_for_all {
+            patch_map.insert("deletedForAll".into(), dfa.into());
         }
-        for change in input.reaction_changes {
+        for change in patch.reaction_changes.unwrap_or(&[]) {
             match change {
                 ReactionChange::Add {
                     sender_reaction_id,
                     emoji,
                     sent_at,
                 } => {
-                    patch.insert(
+                    patch_map.insert(
                         format!("reactions/{sender_reaction_id}"),
                         serde_json::json!({"emoji": emoji, "sentAt": sent_at.as_str()}),
                     );
                 }
                 ReactionChange::Remove { sender_reaction_id } => {
-                    patch.insert(
+                    patch_map.insert(
                         format!("reactions/{sender_reaction_id}"),
                         serde_json::Value::Null,
                     );
@@ -219,7 +221,7 @@ impl crate::client::JmapChatClient {
         }
         let args = serde_json::json!({
             "accountId": account_id,
-            "update": { input.id: serde_json::Value::Object(patch) },
+            "update": { id: serde_json::Value::Object(patch_map) },
         });
         let (call_id, req) = super::build_request("Message/set", args);
         let resp = self.call(api_url, &req).await?;
@@ -230,14 +232,14 @@ impl crate::client::JmapChatClient {
     ///
     /// Permanently removes the listed message IDs from the account.
     /// `ids` must be non-empty; the guard fires before any network call.
-    pub async fn message_set_destroy(
+    pub async fn message_destroy(
         &self,
         session: &crate::jmap::Session,
         ids: &[&str],
     ) -> Result<SetResponse, crate::error::ClientError> {
         if ids.is_empty() {
             return Err(crate::error::ClientError::InvalidArgument(
-                "message_set_destroy: ids may not be empty".into(),
+                "message_destroy: ids may not be empty".into(),
             ));
         }
         let (api_url, account_id) = Self::session_parts(session)?;

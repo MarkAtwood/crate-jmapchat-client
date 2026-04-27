@@ -1,4 +1,7 @@
-use super::{GetResponse, PushSubscriptionCreateInput, PushSubscriptionSetResponse, SetResponse};
+use super::{
+    GetResponse, PresenceStatusPatch, PushSubscriptionCreateInput, PushSubscriptionSetResponse,
+    SetResponse,
+};
 
 impl crate::client::JmapChatClient {
     /// Fetch ReadPosition objects by IDs (JMAP Chat §5 ReadPosition/get).
@@ -89,48 +92,49 @@ impl crate::client::JmapChatClient {
     /// Update the PresenceStatus record (JMAP Chat §5 PresenceStatus/set).
     ///
     /// Only `update` is issued; `create` and `destroy` are forbidden by the spec.
-    /// Fields absent from `input` are omitted from the patch and left unchanged
-    /// server-side.
+    /// Fields absent from `patch` (i.e. `Patch::Keep` or `None`) are omitted from
+    /// the patch and left unchanged server-side.
     pub async fn presence_status_set(
         &self,
         session: &crate::jmap::Session,
-        input: &super::PresenceStatusSetInput<'_>,
+        id: &str,
+        patch: &PresenceStatusPatch<'_>,
     ) -> Result<SetResponse, crate::error::ClientError> {
         let (api_url, account_id) = Self::session_parts(session)?;
-        let mut patch = serde_json::Map::new();
-        if let Some(p) = &input.presence {
-            patch.insert(
+        let mut patch_map = serde_json::Map::new();
+        if let Some(p) = &patch.presence {
+            patch_map.insert(
                 "presence".into(),
                 serde_json::to_value(p).map_err(crate::error::ClientError::Serialize)?,
             );
         }
-        if let Some(st) = &input.status_text {
-            patch.insert(
-                "statusText".into(),
-                st.map(serde_json::Value::from)
-                    .unwrap_or(serde_json::Value::Null),
-            );
+        if let Some(entry) = patch
+            .status_text
+            .map_entry()
+            .map_err(crate::error::ClientError::Serialize)?
+        {
+            patch_map.insert("statusText".into(), entry);
         }
-        if let Some(se) = &input.status_emoji {
-            patch.insert(
-                "statusEmoji".into(),
-                se.map(serde_json::Value::from)
-                    .unwrap_or(serde_json::Value::Null),
-            );
+        if let Some(entry) = patch
+            .status_emoji
+            .map_entry()
+            .map_err(crate::error::ClientError::Serialize)?
+        {
+            patch_map.insert("statusEmoji".into(), entry);
         }
-        if let Some(ea) = &input.expires_at {
-            patch.insert(
-                "expiresAt".into(),
-                ea.map(|d| serde_json::Value::from(d.as_str()))
-                    .unwrap_or(serde_json::Value::Null),
-            );
+        if let Some(entry) = patch
+            .expires_at
+            .map_entry()
+            .map_err(crate::error::ClientError::Serialize)?
+        {
+            patch_map.insert("expiresAt".into(), entry);
         }
-        if let Some(rs) = input.receipt_sharing {
-            patch.insert("receiptSharing".into(), rs.into());
+        if let Some(rs) = patch.receipt_sharing {
+            patch_map.insert("receiptSharing".into(), rs.into());
         }
         let args = serde_json::json!({
             "accountId": account_id,
-            "update": { input.id: serde_json::Value::Object(patch) },
+            "update": { id: serde_json::Value::Object(patch_map) },
         });
         let (call_id, req) = super::build_request("PresenceStatus/set", args);
         let resp = self.call(api_url, &req).await?;
@@ -172,14 +176,15 @@ impl crate::client::JmapChatClient {
     /// also defines `update` (e.g., extending `expires`) and `destroy` (unsubscribe);
     /// those are not yet implemented.
     ///
-    /// `client_id` is mapped to the server-assigned PushSubscription id in
-    /// `PushSubscriptionSetResponse.created`.
+    /// When `input.client_id` is `None`, a ULID is generated automatically.
     pub async fn push_subscription_set(
         &self,
         session: &crate::jmap::Session,
         input: &PushSubscriptionCreateInput<'_>,
     ) -> Result<PushSubscriptionSetResponse, crate::error::ClientError> {
         let api_url = session.api_url.as_str();
+        let mut buf = String::new();
+        let client_id = super::resolve_client_id(input.client_id, &mut buf);
         let mut create_obj = serde_json::json!({
             "deviceClientId": input.device_client_id,
             "url": input.url,
@@ -216,7 +221,7 @@ impl crate::client::JmapChatClient {
             create_obj["chatPush"] = serde_json::Value::Object(chat_push_map);
         }
         let args = serde_json::json!({
-            "create": { input.client_id: create_obj }
+            "create": { client_id: create_obj }
         });
         // RFC 8620 §3.3: only declare the chatPush capability when it is actually used.
         let mut using = vec!["urn:ietf:params:jmap:core".to_string()];
