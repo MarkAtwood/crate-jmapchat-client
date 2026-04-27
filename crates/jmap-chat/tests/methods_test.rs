@@ -313,6 +313,29 @@ fn get_response_empty_list_deserializes() {
     assert!(result.not_found.is_none());
 }
 
+/// Oracle: RFC 8620 §5.1 — when `notFound` is absent (not null) the field must
+/// deserialize to `None`.  Real servers omit `notFound` when `ids: null` is
+/// sent; serde handles absent `Option<T>` fields as `None` via the
+/// `MissingFieldDeserializer` path, but this test guards against accidental
+/// regression (e.g. adding `#[serde(skip_deserializing)]`).
+#[test]
+fn get_response_not_found_absent_deserializes() {
+    // notFound key is intentionally absent — not null, not [].
+    let raw = serde_json::json!({
+        "accountId": "acct2",
+        "state": "s1",
+        "list": []
+    });
+
+    let result: GetResponse<serde_json::Value> = serde_json::from_value(raw)
+        .expect("GetResponse<Value> must deserialize with notFound absent");
+
+    assert_eq!(result.account_id, "acct2");
+    assert_eq!(result.state, "s1");
+    assert!(result.list.is_empty());
+    assert!(result.not_found.is_none());
+}
+
 // ---------------------------------------------------------------------------
 // Test 8: chat_query — happy path
 // ---------------------------------------------------------------------------

@@ -47,6 +47,9 @@ impl super::SessionClient<'_> {
     /// [`Quota`] includes `used`, `hard_limit`, and optional `warn_limit` fields
     /// that callers can use to display storage bars and warnings.
     ///
+    /// The returned [`GetResponse::state`] token is preserved for future
+    /// `Quota/changes` delta-sync support (not yet implemented).
+    ///
     /// Only call when [`Session::supports_quotas`](crate::jmap::Session::supports_quotas)
     /// returns `true`.  Returns `ClientError::InvalidSession` if the session has
     /// no primary JMAP Chat account.
