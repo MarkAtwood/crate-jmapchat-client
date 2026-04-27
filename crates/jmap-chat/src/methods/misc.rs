@@ -74,11 +74,13 @@ impl crate::client::JmapChatClient {
         max_changes: Option<u64>,
     ) -> Result<super::ChangesResponse, crate::error::ClientError> {
         let (api_url, account_id) = Self::session_parts(session)?;
-        let args = serde_json::json!({
+        let mut args = serde_json::json!({
             "accountId": account_id,
             "sinceState": since_state,
-            "maxChanges": max_changes,
         });
+        if let Some(mc) = max_changes {
+            args["maxChanges"] = mc.into();
+        }
         let (call_id, req) = super::build_request("ReadPosition/changes", args);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
@@ -145,11 +147,13 @@ impl crate::client::JmapChatClient {
         max_changes: Option<u64>,
     ) -> Result<super::ChangesResponse, crate::error::ClientError> {
         let (api_url, account_id) = Self::session_parts(session)?;
-        let args = serde_json::json!({
+        let mut args = serde_json::json!({
             "accountId": account_id,
             "sinceState": since_state,
-            "maxChanges": max_changes,
         });
+        if let Some(mc) = max_changes {
+            args["maxChanges"] = mc.into();
+        }
         let (call_id, req) = super::build_request("PresenceStatus/changes", args);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)

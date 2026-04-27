@@ -21,11 +21,7 @@ use tokio_tungstenite::{accept_async, tungstenite::Message};
 /// and closes. Returns the `ws://` URL to connect to.
 async fn spawn_ws_server<F, Fut>(server_fn: F) -> String
 where
-    F: FnOnce(
-            tokio_tungstenite::WebSocketStream<tokio::net::TcpStream>,
-        ) -> Fut
-        + Send
-        + 'static,
+    F: FnOnce(tokio_tungstenite::WebSocketStream<tokio::net::TcpStream>) -> Fut + Send + 'static,
     Fut: std::future::Future<Output = ()> + Send + 'static,
 {
     let listener = TcpListener::bind("127.0.0.1:0")
@@ -83,7 +79,10 @@ async fn connect_and_clean_close() {
 
     let result = session.next_frame().await;
     // Server closed cleanly → stream ends → None
-    assert!(result.is_none(), "clean close must yield None, got {result:?}");
+    assert!(
+        result.is_none(),
+        "clean close must yield None, got {result:?}"
+    );
 }
 
 // ---------------------------------------------------------------------------
@@ -189,10 +188,7 @@ async fn receives_chat_presence_event() {
         WsFrame::ChatPresence(evt) => {
             assert_eq!(evt.contact_id.as_str(), "user-abc");
             assert_eq!(evt.presence, jmap_chat::types::ContactPresence::Online);
-            assert_eq!(
-                evt.status_text,
-                Some(Some("Working remotely".to_string()))
-            );
+            assert_eq!(evt.status_text, Some(Some("Working remotely".to_string())));
         }
         other => panic!("expected ChatPresence, got {other:?}"),
     }
@@ -296,7 +292,10 @@ async fn send_stream_enable_correct_json_shape() {
     assert_eq!(val["@type"], "ChatStreamEnable");
     assert_eq!(val["dataTypes"], serde_json::json!(["typing", "presence"]));
     assert_eq!(val["chatIds"], serde_json::json!(["chat-1"]));
-    assert!(val.get("contactIds").is_none(), "absent contactIds must be omitted");
+    assert!(
+        val.get("contactIds").is_none(),
+        "absent contactIds must be omitted"
+    );
 }
 
 // ---------------------------------------------------------------------------
@@ -326,5 +325,9 @@ async fn send_stream_disable_correct_json_shape() {
     assert_eq!(val["@type"], "ChatStreamDisable");
     // Only @type must be present — no other fields.
     let obj = val.as_object().unwrap();
-    assert_eq!(obj.len(), 1, "ChatStreamDisable must have exactly one field");
+    assert_eq!(
+        obj.len(),
+        1,
+        "ChatStreamDisable must have exactly one field"
+    );
 }

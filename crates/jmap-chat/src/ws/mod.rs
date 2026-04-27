@@ -42,9 +42,8 @@ pub enum WsFrame {
     Unknown { type_name: String },
 }
 
-type Inner = tokio_tungstenite::WebSocketStream<
-    tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>,
->;
+type Inner =
+    tokio_tungstenite::WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>;
 
 /// An established JMAP Chat WebSocket session.
 ///
@@ -112,15 +111,15 @@ impl WsSession {
     ///
     /// Spec: draft-atwood-jmap-chat-wss-00
     pub async fn send_stream_disable(&mut self) -> Result<(), crate::error::ClientError> {
-        let val = serde_json::to_value(&crate::types::ChatStreamDisable::default())?;
+        let val = serde_json::to_value(crate::types::ChatStreamDisable::default())?;
         self.send_json(&val).await
     }
 }
 
 /// Parse a raw WebSocket text frame into a `WsFrame`.
 fn parse_ws_frame(text: &str) -> Result<WsFrame, crate::error::ClientError> {
-    let val: serde_json::Value = serde_json::from_str(text)
-        .map_err(|e| crate::error::ClientError::Parse(e.to_string()))?;
+    let val: serde_json::Value =
+        serde_json::from_str(text).map_err(|e| crate::error::ClientError::Parse(e.to_string()))?;
 
     // Use a sentinel string for the absent case so Unknown carries a meaningful
     // type_name regardless of whether @type was missing or just unrecognized.
@@ -264,10 +263,7 @@ mod tests {
         match frame {
             WsFrame::ChatPresence(evt) => {
                 assert_eq!(evt.contact_id.as_str(), "user-3");
-                assert_eq!(
-                    evt.presence,
-                    crate::types::ContactPresence::Away,
-                );
+                assert_eq!(evt.presence, crate::types::ContactPresence::Away,);
             }
             other => panic!("expected ChatPresence, got {other:?}"),
         }
