@@ -182,6 +182,7 @@ impl PartialEq<UTCDate> for &str {
 /// A single JMAP method call or response: `[methodName, arguments, callId]` (RFC 8620 §3.2).
 ///
 /// Serializes and deserializes as a 3-element JSON array to match the JMAP wire format.
+#[non_exhaustive]
 #[derive(Debug, Clone)]
 pub struct Invocation {
     pub method: String,

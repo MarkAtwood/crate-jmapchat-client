@@ -24,7 +24,7 @@ impl super::SessionClient<'_> {
             "ids": ids,
             "properties": properties,
         });
-        let (call_id, req) = super::build_request("Message/get", args, &["urn:ietf:params:jmap:chat"]);
+        let (call_id, req) = super::build_request("Message/get", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -95,7 +95,7 @@ impl super::SessionClient<'_> {
         if let Some(l) = input.limit {
             args["limit"] = l.into();
         }
-        let (call_id, req) = super::build_request("Message/query", args, &["urn:ietf:params:jmap:chat"]);
+        let (call_id, req) = super::build_request("Message/query", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -114,7 +114,7 @@ impl super::SessionClient<'_> {
         if let Some(mc) = max_changes {
             args["maxChanges"] = mc.into();
         }
-        let (call_id, req) = super::build_request("Message/changes", args, &["urn:ietf:params:jmap:chat"]);
+        let (call_id, req) = super::build_request("Message/changes", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -144,7 +144,7 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "create": { client_id_str: create_obj },
         });
-        let (call_id, req) = super::build_request("Message/set", args, &["urn:ietf:params:jmap:chat"]);
+        let (call_id, req) = super::build_request("Message/set", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
         let set_resp: SetResponse = crate::client::extract_response(resp, call_id)?;
         if let Some(not_created) = &set_resp.not_created {
@@ -218,7 +218,7 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "update": { id: serde_json::Value::Object(patch_map) },
         });
-        let (call_id, req) = super::build_request("Message/set", args, &["urn:ietf:params:jmap:chat"]);
+        let (call_id, req) = super::build_request("Message/set", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -241,7 +241,7 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "destroy": ids,
         });
-        let (call_id, req) = super::build_request("Message/set", args, &["urn:ietf:params:jmap:chat"]);
+        let (call_id, req) = super::build_request("Message/set", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -264,7 +264,7 @@ impl super::SessionClient<'_> {
         if let Some(mc) = max_changes {
             args["maxChanges"] = mc.into();
         }
-        let (call_id, req) = super::build_request("Message/queryChanges", args, &["urn:ietf:params:jmap:chat"]);
+        let (call_id, req) = super::build_request("Message/queryChanges", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }

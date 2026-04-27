@@ -35,9 +35,19 @@ impl JmapChatClient {
         let parsed = url::Url::parse(base_url)
             .map_err(|e| ClientError::InvalidArgument(format!("base_url is not a valid URL: {e}")))?;
         let path = parsed.path();
-        if path != "/" && !path.is_empty() {
+        if path != "/" {
             return Err(ClientError::InvalidArgument(
                 format!("base_url must not have a path component, got: {path:?}")
+            ));
+        }
+        if parsed.query().is_some() {
+            return Err(ClientError::InvalidArgument(
+                "base_url must not have a query string".into(),
+            ));
+        }
+        if parsed.fragment().is_some() {
+            return Err(ClientError::InvalidArgument(
+                "base_url must not have a fragment".into(),
             ));
         }
         // Store without trailing slash
@@ -812,6 +822,30 @@ mod tests {
     fn new_accepts_valid_base_url() {
         let result = JmapChatClient::new(crate::auth::NoneAuth, "https://example.com");
         assert!(result.is_ok(), "valid base_url must be accepted");
+    }
+
+    /// Oracle: base_url validation — a URL with a query string must be rejected.
+    #[test]
+    fn new_rejects_base_url_with_query() {
+        let err = JmapChatClient::new(crate::auth::NoneAuth, "https://host?foo=1")
+            .map(|_| ())
+            .expect_err("base_url with query must be rejected");
+        assert!(
+            matches!(err, ClientError::InvalidArgument(_)),
+            "expected InvalidArgument, got {err:?}"
+        );
+    }
+
+    /// Oracle: base_url validation — a URL with a fragment must be rejected.
+    #[test]
+    fn new_rejects_base_url_with_fragment() {
+        let err = JmapChatClient::new(crate::auth::NoneAuth, "https://host#anchor")
+            .map(|_| ())
+            .expect_err("base_url with fragment must be rejected");
+        assert!(
+            matches!(err, ClientError::InvalidArgument(_)),
+            "expected InvalidArgument, got {err:?}"
+        );
     }
 
     /// Oracle: RFC 8620 §3.6.1 — when an invocation has method name "error",

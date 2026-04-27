@@ -17,7 +17,7 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "ids": ids,
         });
-        let (call_id, req) = super::build_request("ReadPosition/get", args, &["urn:ietf:params:jmap:chat"]);
+        let (call_id, req) = super::build_request("ReadPosition/get", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -42,7 +42,7 @@ impl super::SessionClient<'_> {
                 read_position_id: { "lastReadMessageId": last_read_message_id }
             },
         });
-        let (call_id, req) = super::build_request("ReadPosition/set", args, &["urn:ietf:params:jmap:chat"]);
+        let (call_id, req) = super::build_request("ReadPosition/set", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -59,7 +59,7 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "ids": None::<&[&str]>,
         });
-        let (call_id, req) = super::build_request("PresenceStatus/get", args, &["urn:ietf:params:jmap:chat"]);
+        let (call_id, req) = super::build_request("PresenceStatus/get", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -80,7 +80,7 @@ impl super::SessionClient<'_> {
         if let Some(mc) = max_changes {
             args["maxChanges"] = mc.into();
         }
-        let (call_id, req) = super::build_request("ReadPosition/changes", args, &["urn:ietf:params:jmap:chat"]);
+        let (call_id, req) = super::build_request("ReadPosition/changes", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -116,7 +116,7 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "update": { id: serde_json::Value::Object(patch_map) },
         });
-        let (call_id, req) = super::build_request("PresenceStatus/set", args, &["urn:ietf:params:jmap:chat"]);
+        let (call_id, req) = super::build_request("PresenceStatus/set", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -137,7 +137,7 @@ impl super::SessionClient<'_> {
         if let Some(mc) = max_changes {
             args["maxChanges"] = mc.into();
         }
-        let (call_id, req) = super::build_request("PresenceStatus/changes", args, &["urn:ietf:params:jmap:chat"]);
+        let (call_id, req) = super::build_request("PresenceStatus/changes", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -198,15 +198,26 @@ impl super::SessionClient<'_> {
             "create": { client_id: create_obj }
         });
         // RFC 8620 §3.3: only declare the chatPush capability when it is actually used.
-        let mut using = vec!["urn:ietf:params:jmap:core".to_string()];
-        if has_chat_push {
-            using.push("urn:ietf:params:jmap:chat:push".to_string());
-        }
-        let req = crate::jmap::JmapRequest {
-            using,
-            method_calls: vec![crate::jmap::Invocation::new("PushSubscription/set", args, "r1")],
+        let (call_id, req) = if has_chat_push {
+            let using: Vec<String> = super::USING_CORE
+                .iter()
+                .copied()
+                .chain(std::iter::once("urn:ietf:params:jmap:chat:push"))
+                .map(str::to_string)
+                .collect();
+            let req = crate::jmap::JmapRequest {
+                using,
+                method_calls: vec![crate::jmap::Invocation::new(
+                    "PushSubscription/set",
+                    args,
+                    super::CALL_ID,
+                )],
+            };
+            (super::CALL_ID, req)
+        } else {
+            super::build_request("PushSubscription/set", args, super::USING_CORE)
         };
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, "r1")
+        crate::client::extract_response(resp, call_id)
     }
 }
