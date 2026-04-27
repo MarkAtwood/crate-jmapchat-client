@@ -17,7 +17,7 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "ids": ids,
         });
-        let (call_id, req) = super::build_request("ReadPosition/get", args);
+        let (call_id, req) = super::build_request("ReadPosition/get", args, &["urn:ietf:params:jmap:chat"]);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -42,7 +42,7 @@ impl super::SessionClient<'_> {
                 read_position_id: { "lastReadMessageId": last_read_message_id }
             },
         });
-        let (call_id, req) = super::build_request("ReadPosition/set", args);
+        let (call_id, req) = super::build_request("ReadPosition/set", args, &["urn:ietf:params:jmap:chat"]);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -59,7 +59,7 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "ids": None::<&[&str]>,
         });
-        let (call_id, req) = super::build_request("PresenceStatus/get", args);
+        let (call_id, req) = super::build_request("PresenceStatus/get", args, &["urn:ietf:params:jmap:chat"]);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -80,7 +80,7 @@ impl super::SessionClient<'_> {
         if let Some(mc) = max_changes {
             args["maxChanges"] = mc.into();
         }
-        let (call_id, req) = super::build_request("ReadPosition/changes", args);
+        let (call_id, req) = super::build_request("ReadPosition/changes", args, &["urn:ietf:params:jmap:chat"]);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -116,7 +116,7 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "update": { id: serde_json::Value::Object(patch_map) },
         });
-        let (call_id, req) = super::build_request("PresenceStatus/set", args);
+        let (call_id, req) = super::build_request("PresenceStatus/set", args, &["urn:ietf:params:jmap:chat"]);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -137,7 +137,7 @@ impl super::SessionClient<'_> {
         if let Some(mc) = max_changes {
             args["maxChanges"] = mc.into();
         }
-        let (call_id, req) = super::build_request("PresenceStatus/changes", args);
+        let (call_id, req) = super::build_request("PresenceStatus/changes", args, &["urn:ietf:params:jmap:chat"]);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }

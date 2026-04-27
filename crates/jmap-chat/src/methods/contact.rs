@@ -18,7 +18,7 @@ impl super::SessionClient<'_> {
             "ids": ids,
             "properties": properties,
         });
-        let (call_id, req) = super::build_request("ChatContact/get", args);
+        let (call_id, req) = super::build_request("ChatContact/get", args, &["urn:ietf:params:jmap:chat"]);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -37,7 +37,7 @@ impl super::SessionClient<'_> {
         if let Some(mc) = max_changes {
             args["maxChanges"] = mc.into();
         }
-        let (call_id, req) = super::build_request("ChatContact/changes", args);
+        let (call_id, req) = super::build_request("ChatContact/changes", args, &["urn:ietf:params:jmap:chat"]);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -63,7 +63,7 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "update": { id: serde_json::Value::Object(patch_map) },
         });
-        let (call_id, req) = super::build_request("ChatContact/set", args);
+        let (call_id, req) = super::build_request("ChatContact/set", args, &["urn:ietf:params:jmap:chat"]);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -113,7 +113,7 @@ impl super::SessionClient<'_> {
         if let Some(l) = input.limit {
             args["limit"] = l.into();
         }
-        let (call_id, req) = super::build_request("ChatContact/query", args);
+        let (call_id, req) = super::build_request("ChatContact/query", args, &["urn:ietf:params:jmap:chat"]);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -133,7 +133,7 @@ impl super::SessionClient<'_> {
         if let Some(mc) = max_changes {
             args["maxChanges"] = mc.into();
         }
-        let (call_id, req) = super::build_request("ChatContact/queryChanges", args);
+        let (call_id, req) = super::build_request("ChatContact/queryChanges", args, &["urn:ietf:params:jmap:chat"]);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
