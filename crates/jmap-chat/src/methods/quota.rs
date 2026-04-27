@@ -24,7 +24,7 @@ pub struct Quota {
     /// Human-readable name for this quota (e.g. "Message Storage").
     pub name: String,
     /// Scope of the quota: `"account"`, `"domain"`, or `"global"`.
-    pub scope: String,
+    pub scope: crate::types::QuotaScope,
     /// Data type names covered by this quota (e.g. `["Message", "Chat"]`).
     pub data_types: Vec<String>,
     /// Bytes currently consumed.

@@ -34,7 +34,7 @@ pub enum SseEvent {
     /// A "presence" update event. Not persisted.
     Presence {
         contact_id: String,
-        presence: String,
+        presence: crate::types::ContactPresence,
         last_active_at: Option<String>,
         status_text: Option<String>,
         status_emoji: Option<String>,
@@ -117,7 +117,7 @@ struct TypingPayload {
 struct PresencePayload {
     #[serde(rename = "contactId")]
     contact_id: String,
-    presence: String,
+    presence: crate::types::ContactPresence,
     #[serde(rename = "lastActiveAt")]
     last_active_at: Option<String>,
     #[serde(rename = "statusText")]
@@ -235,7 +235,7 @@ mod tests {
                 status_emoji,
             } => {
                 assert_eq!(contact_id, "ct1");
-                assert_eq!(presence, "online");
+                assert_eq!(presence, crate::types::ContactPresence::Online);
                 assert_eq!(last_active_at.as_deref(), Some("2024-01-01T00:00:00Z"));
                 assert_eq!(status_text.as_deref(), Some("in a meeting"));
                 assert_eq!(status_emoji.as_deref(), Some("busy"));
