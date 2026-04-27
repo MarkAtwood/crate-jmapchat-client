@@ -1,4 +1,4 @@
-use jmap_chat::types::{Chat, Message};
+use jmap_chat::types::{Chat, ContactPresence, Message};
 
 /// Events sent from the background client task to the egui UI.
 #[derive(Debug)]
@@ -25,6 +25,21 @@ pub enum AppEvent {
     StatusChanged(ConnectionStatus),
     /// Transient error message to display to the user.
     Error(String),
+    /// Ephemeral typing indicator from the WebSocket stream (draft-atwood-jmap-chat-wss-00).
+    ///
+    /// `typing: true` = sender started typing; `false` = stopped.
+    /// Indicators decay automatically after 10 s of no update (the server may not
+    /// always send `typing: false` if the user disconnects while typing).
+    TypingIndicator {
+        chat_id: String,
+        sender_id: String,
+        typing: bool,
+    },
+    /// Ephemeral presence update from the WebSocket stream.
+    PresenceUpdate {
+        contact_id: String,
+        presence: ContactPresence,
+    },
 }
 
 /// Commands sent from the egui UI to the background client task.
