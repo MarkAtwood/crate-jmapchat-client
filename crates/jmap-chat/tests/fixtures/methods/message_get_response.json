@@ -1,0 +1,32 @@
+{
+  "methodResponses": [
+    [
+      "Message/get",
+      {
+        "accountId": "account1",
+        "state": "state-msg-001",
+        "list": [
+          {
+            "id": "01HV5Z6QKWJ7N3P8R2X4YTMD42",
+            "senderMsgId": "01HV5Z6QKWJ7N3P8R2X4YTMD42",
+            "chatId": "01HV5Z6QKWJ7N3P8R2X4YTMD3G",
+            "senderId": "self",
+            "body": "Hello, world!",
+            "bodyType": "text/plain",
+            "attachments": [],
+            "mentions": [],
+            "actions": [],
+            "reactions": {},
+            "replyCount": 0,
+            "sentAt": "2024-03-20T14:32:00Z",
+            "receivedAt": "2024-03-20T14:32:01Z",
+            "deliveryState": "delivered"
+          }
+        ],
+        "notFound": []
+      },
+      "r1"
+    ]
+  ],
+  "sessionState": "sess-abc"
+}

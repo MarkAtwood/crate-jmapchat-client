@@ -1,0 +1,24 @@
+{
+  "methodResponses": [
+    [
+      "PresenceStatus/get",
+      {
+        "accountId": "account1",
+        "state": "state-ps-001",
+        "list": [
+          {
+            "id": "01HV5Z6QKWJ7N3P8R2X4YTMD60",
+            "presence": "online",
+            "statusText": "Available",
+            "statusEmoji": "🟢",
+            "receiptSharing": true,
+            "updatedAt": "2024-04-20T14:00:00Z"
+          }
+        ],
+        "notFound": []
+      },
+      "r1"
+    ]
+  ],
+  "sessionState": "sess-abc"
+}

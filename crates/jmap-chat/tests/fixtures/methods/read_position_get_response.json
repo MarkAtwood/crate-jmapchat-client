@@ -1,0 +1,21 @@
+{
+  "methodResponses": [
+    [
+      "ReadPosition/get",
+      {
+        "accountId": "account1",
+        "state": "state-rp-001",
+        "list": [
+          {
+            "id": "01HV5Z6QKWJ7N3P8R2X4YTMD5J",
+            "chatId": "01HV5Z6QKWJ7N3P8R2X4YTMD3G",
+            "lastReadAt": "2024-03-20T14:00:00Z"
+          }
+        ],
+        "notFound": []
+      },
+      "r1"
+    ]
+  ],
+  "sessionState": "sess-abc"
+}
