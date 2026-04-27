@@ -192,7 +192,7 @@ impl eframe::App for App {
                         // no per-frame stripping or formatting.
                         for entry in &self.state.message_entries {
                             ui.horizontal(|ui| {
-                                ui.strong(&entry.message.sender_id);
+                                ui.strong(entry.message.sender_id.to_string());
                                 ui.label(" \u{00b7} ");
                                 ui.label(&entry.timestamp);
                             });

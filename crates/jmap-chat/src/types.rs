@@ -278,7 +278,7 @@ pub struct Reaction {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_emoji_id: Option<Id>,
     /// `"self"` for the owner's reaction, or a ChatContact.id.
-    pub sender_id: String,
+    pub sender_id: SenderIdOrSelf,
     /// Time the reaction was added.
     pub sent_at: UTCDate,
 }
@@ -530,6 +530,55 @@ pub struct DeliveryReceipt {
 }
 
 // ---------------------------------------------------------------------------
+// SenderIdOrSelf
+// ---------------------------------------------------------------------------
+
+/// The sender of a message or reaction.
+///
+/// Per spec: `"self"` for owner-composed messages; the sender's
+/// `ChatContact.id` for inbound messages.
+#[non_exhaustive]
+#[derive(Debug, Clone, PartialEq)]
+pub enum SenderIdOrSelf {
+    /// The mailbox owner composed this message. Wire value: `"self"`.
+    SelfSender,
+    /// An inbound message from a contact. Wire value: the contact's
+    /// `ChatContact.id` string.
+    Contact(String),
+}
+
+impl serde::Serialize for SenderIdOrSelf {
+    fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        match self {
+            SenderIdOrSelf::SelfSender => s.serialize_str("self"),
+            SenderIdOrSelf::Contact(id) => s.serialize_str(id),
+        }
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for SenderIdOrSelf {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        let s = String::deserialize(d)?;
+        if s == "self" {
+            Ok(SenderIdOrSelf::SelfSender)
+        } else if s.is_empty() {
+            Err(serde::de::Error::custom("sender_id must not be empty"))
+        } else {
+            Ok(SenderIdOrSelf::Contact(s))
+        }
+    }
+}
+
+impl std::fmt::Display for SenderIdOrSelf {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            SenderIdOrSelf::SelfSender => f.write_str("self"),
+            SenderIdOrSelf::Contact(id) => f.write_str(id),
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Message
 // ---------------------------------------------------------------------------
 
@@ -545,7 +594,7 @@ pub struct Message {
     /// ID of the containing Chat.
     pub chat_id: Id,
     /// `"self"` for owner-composed messages; the sender's ChatContact.id otherwise.
-    pub sender_id: String,
+    pub sender_id: SenderIdOrSelf,
     /// Message content.
     pub body: String,
     /// MIME type of `body`.
@@ -1043,7 +1092,7 @@ mod tests {
 
         // Oracle: spec §4.10 — senderId is "self" for owner-composed messages
         assert_eq!(msg.id, "01HV5Z6QKWJ7N3P8R2X4YTMD00");
-        assert_eq!(msg.sender_id, "self");
+        assert_eq!(msg.sender_id, SenderIdOrSelf::SelfSender);
         assert_eq!(msg.body, "Hello, world!");
         assert_eq!(msg.body_type, "text/plain");
         assert_eq!(msg.delivery_state, DeliveryState::Delivered);
@@ -1436,5 +1485,29 @@ mod tests {
             result.is_err(),
             "number for statusText must be a deserialization error"
         );
+    }
+
+    #[test]
+    fn sender_id_deserialize_self() {
+        let v: SenderIdOrSelf = serde_json::from_str("\"self\"").unwrap();
+        assert_eq!(v, SenderIdOrSelf::SelfSender);
+    }
+
+    #[test]
+    fn sender_id_deserialize_contact() {
+        let v: SenderIdOrSelf = serde_json::from_str("\"contact-abc123\"").unwrap();
+        assert_eq!(v, SenderIdOrSelf::Contact("contact-abc123".into()));
+    }
+
+    #[test]
+    fn sender_id_serialize_self() {
+        let v = SenderIdOrSelf::SelfSender;
+        assert_eq!(serde_json::to_string(&v).unwrap(), "\"self\"");
+    }
+
+    #[test]
+    fn sender_id_reject_empty() {
+        let result: Result<SenderIdOrSelf, _> = serde_json::from_str("\"\"");
+        assert!(result.is_err());
     }
 }
