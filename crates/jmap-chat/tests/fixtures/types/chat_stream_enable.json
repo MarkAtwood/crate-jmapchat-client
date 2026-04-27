@@ -1,0 +1,6 @@
+{
+  "@type": "ChatStreamEnable",
+  "dataTypes": ["typing", "presence"],
+  "chatIds": ["01HV5Z6QKWJ7N3P8R2X4YTMD3G"],
+  "contactIds": null
+}

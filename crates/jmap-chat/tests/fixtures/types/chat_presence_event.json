@@ -1,0 +1,7 @@
+{
+  "@type": "ChatPresenceEvent",
+  "contactId": "user:carol@example.com",
+  "presence": "busy",
+  "statusText": "Do not disturb",
+  "statusEmoji": "🔕"
+}

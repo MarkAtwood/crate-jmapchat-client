@@ -1,0 +1,12 @@
+{
+  "id": "user:carol@example.com",
+  "login": "carol@example.com",
+  "displayName": "Carol Smith",
+  "firstSeenAt": "2024-01-15T10:00:00Z",
+  "lastSeenAt": "2024-04-20T14:30:00Z",
+  "presence": "busy",
+  "statusText": "In a meeting",
+  "statusEmoji": "🗓️",
+  "lastActiveAt": "2024-04-20T14:25:00Z",
+  "blocked": false
+}

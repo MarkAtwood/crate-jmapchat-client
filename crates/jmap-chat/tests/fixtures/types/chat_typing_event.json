@@ -1,0 +1,6 @@
+{
+  "@type": "ChatTypingEvent",
+  "chatId": "01HV5Z6QKWJ7N3P8R2X4YTMD3G",
+  "senderId": "user:bob@example.com",
+  "typing": true
+}
