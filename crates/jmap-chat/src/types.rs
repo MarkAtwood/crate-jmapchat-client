@@ -194,8 +194,17 @@ impl serde::Serialize for EndpointType {
 
 impl<'de> serde::Deserialize<'de> for EndpointType {
     fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
-        let s = String::deserialize(d)?;
-        Ok(EndpointType::from_uri(&s))
+        let raw = String::deserialize(d)?;
+        Ok(match raw.as_str() {
+            "urn:jmap:chat:cap:vtc" => Self::Vtc,
+            "urn:jmap:chat:cap:payment" => Self::Payment,
+            "urn:jmap:chat:cap:blob" => Self::Blob,
+            "urn:jmap:chat:cap:calendar-event" => Self::CalendarEvent,
+            "urn:jmap:chat:cap:availability" => Self::Availability,
+            "urn:jmap:chat:cap:task" => Self::Task,
+            "urn:jmap:chat:cap:filenode" => Self::Filenode,
+            _ => Self::Other(raw),
+        })
     }
 }
 
@@ -1107,19 +1116,54 @@ impl<'de> serde::Deserialize<'de> for OwnerPresence {
 
 /// Stream data categories that can be requested via [`ChatStreamEnable`].
 ///
+/// Serializes as the canonical wire string (e.g. `"typing"`).
+/// Unknown values round-trip via the `Unknown(String)` variant, preserving the original
+/// wire string so it can be echoed back to the server.
+///
 /// Spec: draft-atwood-jmap-chat-wss-00 §Enabling Ephemeral Push.
-#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
-#[serde(rename_all = "lowercase")]
 #[non_exhaustive]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ChatStreamDataType {
     /// Typing indicator events (`"typing"`).
     Typing,
     /// Real-time presence update events (`"presence"`).
     Presence,
-    /// Catch-all for any unrecognized wire value from a future spec version.
-    /// If serialized, produces the literal string `"unknown"` — not the original wire value.
-    #[serde(other)]
-    Unknown,
+    /// Any unrecognized data type string, preserved as-is for lossless round-trip.
+    Unknown(String),
+}
+
+impl ChatStreamDataType {
+    /// The canonical wire string for this data type.
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Typing => "typing",
+            Self::Presence => "presence",
+            Self::Unknown(s) => s.as_str(),
+        }
+    }
+}
+
+impl std::fmt::Display for ChatStreamDataType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl serde::Serialize for ChatStreamDataType {
+    fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        s.serialize_str(self.as_str())
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for ChatStreamDataType {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        let raw = String::deserialize(d)?;
+        Ok(match raw.as_str() {
+            "typing" => Self::Typing,
+            "presence" => Self::Presence,
+            _ => Self::Unknown(raw),
+        })
+    }
 }
 
 /// Sent by the client to subscribe to ephemeral typing and presence events.
@@ -1829,10 +1873,6 @@ mod tests {
             "\"unknown\""
         );
         assert_eq!(
-            serde_json::to_string(&ChatStreamDataType::Unknown).unwrap(),
-            "\"unknown\""
-        );
-        assert_eq!(
             serde_json::to_string(&QuotaScope::Unknown).unwrap(),
             "\"unknown\""
         );
@@ -2267,5 +2307,74 @@ mod tests {
             serde_json::from_str::<OwnerPresence>("\"offline\"").unwrap(),
             OwnerPresence::Offline
         );
+    }
+
+    /// Oracle: spec §ChatStreamDataType — both known wire strings serialize to exact values.
+    #[test]
+    fn chat_stream_data_type_serialize_known_variants() {
+        // Wire strings from draft-atwood-jmap-chat-wss-00: "typing", "presence"
+        assert_eq!(
+            serde_json::to_string(&ChatStreamDataType::Typing).unwrap(),
+            "\"typing\""
+        );
+        assert_eq!(
+            serde_json::to_string(&ChatStreamDataType::Presence).unwrap(),
+            "\"presence\""
+        );
+    }
+
+    /// Oracle: spec §ChatStreamDataType — both known wire strings deserialize to correct variants.
+    #[test]
+    fn chat_stream_data_type_deserialize_known_variants() {
+        // Wire strings from draft-atwood-jmap-chat-wss-00: "typing", "presence"
+        assert_eq!(
+            serde_json::from_str::<ChatStreamDataType>("\"typing\"").unwrap(),
+            ChatStreamDataType::Typing
+        );
+        assert_eq!(
+            serde_json::from_str::<ChatStreamDataType>("\"presence\"").unwrap(),
+            ChatStreamDataType::Presence
+        );
+    }
+
+    /// Oracle: ChatStreamDataType::Unknown(String) preserves the original wire value on round-trip.
+    /// Unlike unit Unknown variants, this tuple variant stores and re-emits the original string.
+    #[test]
+    fn test_chat_stream_data_type_unknown_preserves_original_string() {
+        let future_value = "future-type";
+        let deserialized: ChatStreamDataType =
+            serde_json::from_str(&format!("\"{future_value}\"")).unwrap();
+        assert_eq!(
+            deserialized,
+            ChatStreamDataType::Unknown(future_value.to_string())
+        );
+        assert_eq!(
+            serde_json::to_string(&deserialized).unwrap(),
+            format!("\"{future_value}\"")
+        );
+    }
+
+    /// Oracle: ChatKind::Unknown(String) preserves the original wire value on round-trip.
+    #[test]
+    fn test_chat_kind_unknown_preserves_original_string() {
+        let result: ChatKind = serde_json::from_str("\"future-kind\"").unwrap();
+        assert_eq!(result, ChatKind::Unknown("future-kind".into()));
+        assert_eq!(serde_json::to_string(&result).unwrap(), "\"future-kind\"");
+    }
+
+    /// Oracle: ChatMemberRole::Unknown(String) preserves the original wire value on round-trip.
+    #[test]
+    fn test_chat_member_role_unknown_preserves_original_string() {
+        let result: ChatMemberRole = serde_json::from_str("\"owner\"").unwrap();
+        assert_eq!(result, ChatMemberRole::Unknown("owner".into()));
+        assert_eq!(serde_json::to_string(&result).unwrap(), "\"owner\"");
+    }
+
+    /// Oracle: OwnerPresence::Unknown(String) preserves the original wire value on round-trip.
+    #[test]
+    fn test_owner_presence_unknown_preserves_original_string() {
+        let result: OwnerPresence = serde_json::from_str("\"dnd\"").unwrap();
+        assert_eq!(result, OwnerPresence::Unknown("dnd".into()));
+        assert_eq!(serde_json::to_string(&result).unwrap(), "\"dnd\"");
     }
 }
