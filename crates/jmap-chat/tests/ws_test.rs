@@ -188,7 +188,10 @@ async fn receives_chat_presence_event() {
         WsFrame::ChatPresence(evt) => {
             assert_eq!(evt.contact_id.as_str(), "user-abc");
             assert_eq!(evt.presence, jmap_chat::ContactPresence::Online);
-            assert_eq!(evt.status_text, Some(Some("Working remotely".to_string())));
+            assert_eq!(
+                evt.status_text,
+                jmap_chat::Patch::Set("Working remotely".to_string())
+            );
         }
         other => panic!("expected ChatPresence, got {other:?}"),
     }
@@ -273,12 +276,13 @@ async fn send_stream_enable_correct_json_shape() {
     let client = JmapChatClient::new(NoneAuth, "http://127.0.0.1").unwrap();
     let mut session = client.connect_ws(&url).await.expect("connect_ws");
 
+    let chat_id = jmap_chat::Id::from_trusted("chat-1");
     let enable = ChatStreamEnable::new(
-        vec![
+        &[
             jmap_chat::ChatStreamDataType::Typing,
             jmap_chat::ChatStreamDataType::Presence,
         ],
-        Some(vec![jmap_chat::Id::from_trusted("chat-1")]),
+        Some(&[chat_id]),
         None,
     );
     session

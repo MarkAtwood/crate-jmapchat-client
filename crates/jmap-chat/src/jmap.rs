@@ -85,6 +85,18 @@ impl PartialEq<Id> for &str {
     }
 }
 
+impl PartialEq<String> for Id {
+    fn eq(&self, other: &String) -> bool {
+        self.0 == *other
+    }
+}
+
+impl PartialEq<Id> for String {
+    fn eq(&self, other: &Id) -> bool {
+        *self == other.0
+    }
+}
+
 /// An RFC 3339 UTC timestamp string (JMAP UTCDate, RFC 8620 §1.4).
 /// Guaranteed non-empty. Serializes/deserializes transparently as a JSON string.
 ///
@@ -174,6 +186,18 @@ impl PartialEq<&str> for UTCDate {
 }
 
 impl PartialEq<UTCDate> for &str {
+    fn eq(&self, other: &UTCDate) -> bool {
+        *self == other.0
+    }
+}
+
+impl PartialEq<String> for UTCDate {
+    fn eq(&self, other: &String) -> bool {
+        self.0 == *other
+    }
+}
+
+impl PartialEq<UTCDate> for String {
     fn eq(&self, other: &UTCDate) -> bool {
         *self == other.0
     }
@@ -277,9 +301,9 @@ impl JmapRequestBuilder {
     /// methods added via [`add_call`](JmapRequestBuilder::add_call).  An
     /// incorrect or empty `using` list will cause the server to return a
     /// `"unknownCapability"` error — the builder does not validate it.
-    pub fn new(using: Vec<String>) -> Self {
+    pub fn new(using: &[&str]) -> Self {
         Self {
-            using,
+            using: using.iter().map(|s| s.to_string()).collect(),
             method_calls: Vec::new(),
         }
     }
@@ -940,21 +964,19 @@ mod tests {
     /// and method_calls arrays, derived from spec structure.
     #[test]
     fn request_builder_produces_correct_structure() {
-        let req = JmapRequestBuilder::new(vec![
-            "urn:ietf:params:jmap:core".to_string(),
-            "urn:ietf:params:jmap:chat".to_string(),
-        ])
-        .add_call(
-            "Chat/get",
-            serde_json::json!({"accountId": "a1", "ids": null}),
-            "r1",
-        )
-        .add_call(
-            "Message/query",
-            serde_json::json!({"accountId": "a1", "chatId": "c1"}),
-            "r2",
-        )
-        .build();
+        let req =
+            JmapRequestBuilder::new(&["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:chat"])
+                .add_call(
+                    "Chat/get",
+                    serde_json::json!({"accountId": "a1", "ids": null}),
+                    "r1",
+                )
+                .add_call(
+                    "Message/query",
+                    serde_json::json!({"accountId": "a1", "chatId": "c1"}),
+                    "r2",
+                )
+                .build();
 
         assert_eq!(req.using.len(), 2);
         assert_eq!(req.method_calls.len(), 2);
@@ -968,21 +990,19 @@ mod tests {
     #[test]
     fn request_builder_serializes_to_fixture() {
         let expected = fixture("batch_request.json");
-        let req = JmapRequestBuilder::new(vec![
-            "urn:ietf:params:jmap:core".to_string(),
-            "urn:ietf:params:jmap:chat".to_string(),
-        ])
-        .add_call(
-            "Chat/get",
-            serde_json::json!({"accountId": "account1", "ids": null}),
-            "r1",
-        )
-        .add_call(
-            "Message/query",
-            serde_json::json!({"accountId": "account1", "chatId": "chat-001", "limit": 10}),
-            "r2",
-        )
-        .build();
+        let req =
+            JmapRequestBuilder::new(&["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:chat"])
+                .add_call(
+                    "Chat/get",
+                    serde_json::json!({"accountId": "account1", "ids": null}),
+                    "r1",
+                )
+                .add_call(
+                    "Message/query",
+                    serde_json::json!({"accountId": "account1", "chatId": "chat-001", "limit": 10}),
+                    "r2",
+                )
+                .build();
 
         let serialized = serde_json::to_value(&req).expect("serialize request");
         assert_eq!(serialized, expected);

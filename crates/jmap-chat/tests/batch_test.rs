@@ -52,21 +52,18 @@ async fn call_batch_returns_all_responses() {
     let client = JmapChatClient::new(jmap_chat::NoneAuth, &server.uri()).unwrap();
     let session = test_session(&server.uri());
 
-    let req = JmapRequestBuilder::new(vec![
-        "urn:ietf:params:jmap:core".to_string(),
-        "urn:ietf:params:jmap:chat".to_string(),
-    ])
-    .add_call(
-        "Chat/get",
-        serde_json::json!({"accountId": "account1", "ids": null}),
-        "r1",
-    )
-    .add_call(
-        "Message/query",
-        serde_json::json!({"accountId": "account1", "chatId": "chat-001", "limit": 10}),
-        "r2",
-    )
-    .build();
+    let req = JmapRequestBuilder::new(&["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:chat"])
+        .add_call(
+            "Chat/get",
+            serde_json::json!({"accountId": "account1", "ids": null}),
+            "r1",
+        )
+        .add_call(
+            "Message/query",
+            serde_json::json!({"accountId": "account1", "chatId": "chat-001", "limit": 10}),
+            "r2",
+        )
+        .build();
 
     let responses = client
         .call_batch(&session.api_url, &req)

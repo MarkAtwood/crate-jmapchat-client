@@ -1114,7 +1114,7 @@ async fn run_ws_stream(
 
     // Subscribe to all typing and presence events for all chats and contacts.
     let enable = ChatStreamEnable::new(
-        vec![ChatStreamDataType::Typing, ChatStreamDataType::Presence],
+        &[ChatStreamDataType::Typing, ChatStreamDataType::Presence],
         None, // all chats
         None, // all contacts
     );

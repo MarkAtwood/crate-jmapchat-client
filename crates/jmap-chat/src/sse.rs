@@ -4,6 +4,8 @@
 
 use std::collections::HashMap;
 
+use crate::jmap::Id;
+
 /// A parsed SSE frame: the event and the `id:` line value (if any).
 #[derive(Debug)]
 #[non_exhaustive]
@@ -27,13 +29,13 @@ pub enum SseEvent {
     },
     /// A "typing" indicator event. Not persisted; no state token.
     Typing {
-        chat_id: String,
-        sender_id: String,
+        chat_id: Id,
+        sender_id: Id,
         typing: bool,
     },
     /// A "presence" update event. Not persisted.
     Presence {
-        contact_id: String,
+        contact_id: Id,
         presence: crate::types::ContactPresence,
         last_active_at: Option<String>,
         status_text: Option<String>,
@@ -106,9 +108,9 @@ fn parse_state_data(data: &str) -> SseEvent {
 #[derive(serde::Deserialize)]
 struct TypingPayload {
     #[serde(rename = "chatId")]
-    chat_id: String,
+    chat_id: Id,
     #[serde(rename = "senderId")]
-    sender_id: String,
+    sender_id: Id,
     typing: bool,
 }
 
@@ -116,7 +118,7 @@ struct TypingPayload {
 #[derive(serde::Deserialize)]
 struct PresencePayload {
     #[serde(rename = "contactId")]
-    contact_id: String,
+    contact_id: Id,
     presence: crate::types::ContactPresence,
     #[serde(rename = "lastActiveAt")]
     last_active_at: Option<String>,

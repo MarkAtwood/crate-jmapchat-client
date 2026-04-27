@@ -3,31 +3,11 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 
 pub use crate::jmap::{Id, UTCDate};
+use crate::methods::Patch;
 
 /// Serde default helper returning `true`. Used for boolean fields whose absent/default value is `true`.
 pub(crate) fn default_true() -> bool {
     true
-}
-
-/// Deserializes an optionally-present, nullable string field into `Option<Option<String>>`.
-///
-/// - Field absent  → `None`           (no change; serde uses `#[serde(default)]`)
-/// - Field `null`  → `Some(None)`     (explicit clear)
-/// - Field `"s"`   → `Some(Some(s))`  (update)
-pub(crate) fn deserialize_optional_nullable_string<'de, D>(
-    deserializer: D,
-) -> Result<Option<Option<String>>, D::Error>
-where
-    D: serde::Deserializer<'de>,
-{
-    let v: serde_json::Value = serde::Deserialize::deserialize(deserializer)?;
-    match v {
-        serde_json::Value::Null => Ok(Some(None)),
-        serde_json::Value::String(s) => Ok(Some(Some(s))),
-        other => Err(serde::de::Error::custom(format!(
-            "expected null or string, got {other:?}"
-        ))),
-    }
 }
 
 // ---------------------------------------------------------------------------
@@ -58,8 +38,7 @@ pub struct Attachment {
 /// The type of a rich body span.
 /// Spec: draft-atwood-jmap-chat-00 §Rich Body Format
 #[non_exhaustive]
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "kebab-case")]
+#[derive(Debug, Clone, PartialEq)]
 pub enum SpanType {
     Text,
     Bold,
@@ -71,8 +50,56 @@ pub enum SpanType {
     Mention,
     Link,
     /// Catch-all for unrecognized span types. Clients MUST render `Span.text` as plain text.
-    #[serde(other)]
-    Unknown,
+    /// The original wire value is preserved for lossless round-trip.
+    Unknown(String),
+}
+
+impl SpanType {
+    /// The canonical wire string for this span type.
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Text => "text",
+            Self::Bold => "bold",
+            Self::Italic => "italic",
+            Self::BoldItalic => "bold-italic",
+            Self::Code => "code",
+            Self::Codeblock => "codeblock",
+            Self::Blockquote => "blockquote",
+            Self::Mention => "mention",
+            Self::Link => "link",
+            Self::Unknown(s) => s.as_str(),
+        }
+    }
+}
+
+impl std::fmt::Display for SpanType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl serde::Serialize for SpanType {
+    fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        s.serialize_str(self.as_str())
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for SpanType {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        let raw = String::deserialize(d)?;
+        Ok(match raw.as_str() {
+            "text" => SpanType::Text,
+            "bold" => SpanType::Bold,
+            "italic" => SpanType::Italic,
+            "bold-italic" => SpanType::BoldItalic,
+            "code" => SpanType::Code,
+            "codeblock" => SpanType::Codeblock,
+            "blockquote" => SpanType::Blockquote,
+            "mention" => SpanType::Mention,
+            "link" => SpanType::Link,
+            _ => SpanType::Unknown(raw),
+        })
+    }
 }
 
 /// A single styled or annotated run of text in a rich message body.
@@ -347,8 +374,7 @@ pub struct ChatContact {
 /// Last known presence state for a ChatContact.
 /// Spec: draft-atwood-jmap-chat-00 §4.7
 #[non_exhaustive]
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
+#[derive(Debug, Clone, PartialEq)]
 pub enum ContactPresence {
     Online,
     Away,
@@ -356,8 +382,48 @@ pub enum ContactPresence {
     Invisible,
     Offline,
     /// Catch-all for any unrecognized wire value, including legacy `"unknown"` from old servers.
-    #[serde(other)]
-    Unknown,
+    /// The original wire value is preserved for lossless round-trip.
+    Unknown(String),
+}
+
+impl ContactPresence {
+    /// The canonical wire string for this presence state.
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Online => "online",
+            Self::Away => "away",
+            Self::Busy => "busy",
+            Self::Invisible => "invisible",
+            Self::Offline => "offline",
+            Self::Unknown(s) => s.as_str(),
+        }
+    }
+}
+
+impl std::fmt::Display for ContactPresence {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl serde::Serialize for ContactPresence {
+    fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        s.serialize_str(self.as_str())
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for ContactPresence {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        let raw = String::deserialize(d)?;
+        Ok(match raw.as_str() {
+            "online" => ContactPresence::Online,
+            "away" => ContactPresence::Away,
+            "busy" => ContactPresence::Busy,
+            "invisible" => ContactPresence::Invisible,
+            "offline" => ContactPresence::Offline,
+            _ => ContactPresence::Unknown(raw),
+        })
+    }
 }
 
 /// Presence filter for [`crate::methods::ChatContactQueryInput`].
@@ -480,15 +546,47 @@ pub struct ChannelPermission {
 /// Whether a ChannelPermission targets a role or a member.
 /// Spec: draft-atwood-jmap-chat-00 §4.14
 #[non_exhaustive]
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
+#[derive(Debug, Clone, PartialEq)]
 pub enum ChannelPermissionTargetType {
     Role,
     Member,
     /// Catch-all for any unrecognized wire value from a future spec version.
-    /// If serialized, produces the literal string `"unknown"` — not the original wire value.
-    #[serde(other)]
-    Unknown,
+    /// The original wire value is preserved for lossless round-trip.
+    Unknown(String),
+}
+
+impl ChannelPermissionTargetType {
+    /// The canonical wire string for this target type.
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Role => "role",
+            Self::Member => "member",
+            Self::Unknown(s) => s.as_str(),
+        }
+    }
+}
+
+impl std::fmt::Display for ChannelPermissionTargetType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl serde::Serialize for ChannelPermissionTargetType {
+    fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        s.serialize_str(self.as_str())
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for ChannelPermissionTargetType {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        let raw = String::deserialize(d)?;
+        Ok(match raw.as_str() {
+            "role" => ChannelPermissionTargetType::Role,
+            "member" => ChannelPermissionTargetType::Member,
+            _ => ChannelPermissionTargetType::Unknown(raw),
+        })
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -841,17 +939,53 @@ pub struct Message {
 /// Delivery state of a Message.
 /// Spec: draft-atwood-jmap-chat-00 §4.10
 #[non_exhaustive]
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
+#[derive(Debug, Clone, PartialEq)]
 pub enum DeliveryState {
     Pending,
     Delivered,
     Failed,
     Received,
     /// Catch-all for any unrecognized wire value from a future spec version.
-    /// If serialized, produces the literal string `"unknown"` — not the original wire value.
-    #[serde(other)]
-    Unknown,
+    /// The original wire value is preserved for lossless round-trip.
+    Unknown(String),
+}
+
+impl DeliveryState {
+    /// The canonical wire string for this delivery state.
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Pending => "pending",
+            Self::Delivered => "delivered",
+            Self::Failed => "failed",
+            Self::Received => "received",
+            Self::Unknown(s) => s.as_str(),
+        }
+    }
+}
+
+impl std::fmt::Display for DeliveryState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl serde::Serialize for DeliveryState {
+    fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        s.serialize_str(self.as_str())
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for DeliveryState {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        let raw = String::deserialize(d)?;
+        Ok(match raw.as_str() {
+            "pending" => DeliveryState::Pending,
+            "delivered" => DeliveryState::Delivered,
+            "failed" => DeliveryState::Failed,
+            "received" => DeliveryState::Received,
+            _ => DeliveryState::Unknown(raw),
+        })
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -1226,15 +1360,15 @@ pub struct ChatStreamEnable {
 impl ChatStreamEnable {
     /// Construct a new `ChatStreamEnable` message.
     pub fn new(
-        data_types: Vec<ChatStreamDataType>,
-        chat_ids: Option<Vec<Id>>,
-        contact_ids: Option<Vec<Id>>,
+        data_types: &[ChatStreamDataType],
+        chat_ids: Option<&[Id]>,
+        contact_ids: Option<&[Id]>,
     ) -> Self {
         Self {
             msg_type: "ChatStreamEnable".to_string(),
-            data_types,
-            chat_ids,
-            contact_ids,
+            data_types: data_types.to_vec(),
+            chat_ids: chat_ids.map(|s| s.to_vec()),
+            contact_ids: contact_ids.map(|s| s.to_vec()),
         }
     }
 }
@@ -1296,21 +1430,13 @@ pub struct ChatPresenceEvent {
     /// Updated last-active timestamp, if known.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_active_at: Option<UTCDate>,
-    /// Updated status text. Outer `None` = absent (no change). `Some(None)` = explicit null (clear).
-    /// `Some(Some(s))` = update to new value.
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        deserialize_with = "deserialize_optional_nullable_string"
-    )]
-    pub status_text: Option<Option<String>>,
+    /// Updated status text. `Keep` = absent (no change). `Clear` = explicit null (clear).
+    /// `Set(s)` = update to new value.
+    #[serde(default, skip_serializing_if = "Patch::is_keep")]
+    pub status_text: Patch<String>,
     /// Updated status emoji. Same null/absent semantics as `status_text`.
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        deserialize_with = "deserialize_optional_nullable_string"
-    )]
-    pub status_emoji: Option<Option<String>>,
+    #[serde(default, skip_serializing_if = "Patch::is_keep")]
+    pub status_emoji: Patch<String>,
 }
 
 // ---------------------------------------------------------------------------
@@ -1385,7 +1511,7 @@ pub struct ChatPushConfig {
     /// Explicit Chat ids for which push is enabled. `None` enables push for
     /// all Chats of the matching kinds the account is a member of.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub chat_ids: Option<Vec<String>>,
+    pub chat_ids: Option<Vec<Id>>,
     /// `ChatMessageEntry` fields to include in each payload entry.
     /// `None` uses the server default set.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1412,19 +1538,19 @@ pub struct ChatPushConfig {
 #[serde(rename_all = "camelCase")]
 pub struct ChatMessageEntry {
     /// Server-assigned id of the new message.
-    pub message_id: String,
+    pub message_id: Id,
     /// Id of the Chat containing the message.
-    pub chat_id: String,
+    pub chat_id: Id,
     /// Kind of the Chat: `"direct"`, `"group"`, or `"channel"`.
     pub chat_kind: ChatKind,
     /// Display name of the Chat. Present for group and channel chats.
     pub chat_name: Option<String>,
     /// For channel chats: id of the containing Space.
-    pub space_id: Option<String>,
+    pub space_id: Option<Id>,
     /// For channel chats: display name of the containing Space.
     pub space_name: Option<String>,
     /// ChatContact.id of the message sender (authoritative identity).
-    pub sender_id: String,
+    pub sender_id: Id,
     /// Sender display name at push-generation time (snapshot; not authoritative).
     pub sender_display_name: Option<String>,
     /// Sender's claimed composition time.
@@ -1449,7 +1575,7 @@ pub struct ChatMessagePush {
     #[serde(rename = "@type")]
     pub type_name: String,
     /// The account id for which this payload was generated.
-    pub account_id: String,
+    pub account_id: Id,
     /// The `Message` state after all entries in `messages` are applied.
     pub state: String,
     /// Message entries that triggered this push.
@@ -1463,9 +1589,8 @@ pub struct ChatMessagePush {
 /// RFC 8620 §6.2 quota scope — the set of accounts the quota limit applies to.
 ///
 /// Wire strings: `"account"`, `"domain"`, `"global"`.
-#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
-#[serde(rename_all = "lowercase")]
 #[non_exhaustive]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum QuotaScope {
     /// Quota applies to this account only.
     Account,
@@ -1474,9 +1599,44 @@ pub enum QuotaScope {
     /// Quota applies to all accounts on the server.
     Global,
     /// Catch-all for any unrecognized wire value from a future spec version.
-    /// If serialized, produces the literal string `"unknown"` — not the original wire value.
-    #[serde(other)]
-    Unknown,
+    /// The original wire value is preserved for lossless round-trip.
+    Unknown(String),
+}
+
+impl QuotaScope {
+    /// The canonical wire string for this quota scope.
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Account => "account",
+            Self::Domain => "domain",
+            Self::Global => "global",
+            Self::Unknown(s) => s.as_str(),
+        }
+    }
+}
+
+impl std::fmt::Display for QuotaScope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl serde::Serialize for QuotaScope {
+    fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        s.serialize_str(self.as_str())
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for QuotaScope {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        let raw = String::deserialize(d)?;
+        Ok(match raw.as_str() {
+            "account" => QuotaScope::Account,
+            "domain" => QuotaScope::Domain,
+            "global" => QuotaScope::Global,
+            _ => QuotaScope::Unknown(raw),
+        })
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -1683,14 +1843,17 @@ mod tests {
         assert_eq!(invisible, ContactPresence::Invisible);
     }
 
-    /// Oracle: spec ContactPresence — unrecognized wire value deserializes to Unknown (catch-all).
+    /// Oracle: spec ContactPresence — unrecognized wire value deserializes to Unknown(String).
     #[test]
     fn test_contact_presence_unknown_catch_all() {
         let unknown: ContactPresence = serde_json::from_str("\"some-future-value\"").unwrap();
-        assert_eq!(unknown, ContactPresence::Unknown);
-        // Legacy "unknown" wire value also maps to Unknown
+        assert_eq!(
+            unknown,
+            ContactPresence::Unknown("some-future-value".into())
+        );
+        // Legacy "unknown" wire value also maps to Unknown(String)
         let legacy: ContactPresence = serde_json::from_str("\"unknown\"").unwrap();
-        assert_eq!(legacy, ContactPresence::Unknown);
+        assert_eq!(legacy, ContactPresence::Unknown("unknown".into()));
     }
 
     /// Oracle: spec §Chat — absent receiveTypingIndicators defaults to true.
@@ -1746,12 +1909,15 @@ mod tests {
         );
     }
 
-    /// Oracle: spec §RichBody — unknown span type deserializes to SpanType::Unknown with text preserved.
+    /// Oracle: spec §RichBody — unknown span type deserializes to SpanType::Unknown(String) with text preserved.
     #[test]
     fn test_rich_body_unknown_span_type_uses_text_fallback() {
         let json = r#"{"spans": [{"type": "future-type", "text": "fallback text"}]}"#;
         let rb: RichBody = serde_json::from_str(json).expect("must parse");
-        assert_eq!(rb.spans[0].span_type, SpanType::Unknown);
+        assert_eq!(
+            rb.spans[0].span_type,
+            SpanType::Unknown("future-type".into())
+        );
         assert_eq!(rb.spans[0].text, "fallback text");
     }
 
@@ -1772,8 +1938,8 @@ mod tests {
         let evt: ChatPresenceEvent = serde_json::from_str(&json).expect("must parse");
         assert_eq!(evt.contact_id, "user:carol@example.com");
         assert_eq!(evt.presence, ContactPresence::Busy);
-        assert_eq!(evt.status_text, Some(Some("Do not disturb".to_string())));
-        assert_eq!(evt.status_emoji, Some(Some("🔕".to_string())));
+        assert_eq!(evt.status_text, Patch::Set("Do not disturb".to_string()));
+        assert_eq!(evt.status_emoji, Patch::Set("🔕".to_string()));
     }
 
     /// Oracle: spec §ChatPresenceEvent — null statusText/statusEmoji means explicit clear.
@@ -1784,13 +1950,13 @@ mod tests {
         assert_eq!(evt.presence, ContactPresence::Online);
         assert_eq!(
             evt.status_text,
-            Some(None),
-            "null in JSON must become Some(None)"
+            Patch::Clear,
+            "null in JSON must become Patch::Clear"
         );
         assert_eq!(
             evt.status_emoji,
-            Some(None),
-            "null in JSON must become Some(None)"
+            Patch::Clear,
+            "null in JSON must become Patch::Clear"
         );
     }
 
@@ -1801,12 +1967,12 @@ mod tests {
             r#"{"@type":"ChatPresenceEvent","contactId":"user:x@example.com","presence":"online"}"#;
         let evt: ChatPresenceEvent = serde_json::from_str(json).expect("must parse");
         assert!(
-            evt.status_text.is_none(),
-            "absent means no change (outer None)"
+            evt.status_text.is_keep(),
+            "absent means no change (Patch::Keep)"
         );
         assert!(
-            evt.status_emoji.is_none(),
-            "absent means no change (outer None)"
+            evt.status_emoji.is_keep(),
+            "absent means no change (Patch::Keep)"
         );
     }
 
@@ -1822,9 +1988,10 @@ mod tests {
         );
         assert!(msg.contact_ids.is_none());
         // Test constructor
+        let chat_id = Id::from_trusted("01HV5Z6QKWJ7N3P8R2X4YTMD3G");
         let constructed = ChatStreamEnable::new(
-            vec![ChatStreamDataType::Typing, ChatStreamDataType::Presence],
-            Some(vec![Id::from_trusted("01HV5Z6QKWJ7N3P8R2X4YTMD3G")]),
+            &[ChatStreamDataType::Typing, ChatStreamDataType::Presence],
+            Some(&[chat_id]),
             None,
         );
         assert_eq!(constructed.msg_type, "ChatStreamEnable");
@@ -1896,23 +2063,7 @@ mod tests {
         assert_eq!(v, ChatKind::Unknown("thread".into()));
     }
 
-    /// Oracle: unit Unknown catch-all variants serialize as the literal string "unknown".
-    /// The original wire value is NOT preserved — this is a known serde #[serde(other)] limitation.
-    /// These types are deserialization-only in practice; this test documents the fallback behavior.
-    #[test]
-    fn test_unknown_catch_all_variants_serialize_as_literal_unknown() {
-        assert_eq!(
-            serde_json::to_string(&DeliveryState::Unknown).unwrap(),
-            "\"unknown\""
-        );
-        assert_eq!(
-            serde_json::to_string(&QuotaScope::Unknown).unwrap(),
-            "\"unknown\""
-        );
-    }
-
-    /// Oracle: ChatKind::Unknown(String), ChatMemberRole::Unknown(String), and
-    /// OwnerPresence::Unknown(String) preserve and re-emit the original wire string.
+    /// Oracle: all Unknown(String) variants preserve and re-emit the original wire string.
     #[test]
     fn test_unknown_tuple_variants_preserve_original_string() {
         assert_eq!(
@@ -1926,6 +2077,26 @@ mod tests {
         assert_eq!(
             serde_json::to_string(&OwnerPresence::Unknown("dnd".into())).unwrap(),
             "\"dnd\""
+        );
+        assert_eq!(
+            serde_json::to_string(&DeliveryState::Unknown("bounced".into())).unwrap(),
+            "\"bounced\""
+        );
+        assert_eq!(
+            serde_json::to_string(&QuotaScope::Unknown("department".into())).unwrap(),
+            "\"department\""
+        );
+        assert_eq!(
+            serde_json::to_string(&ContactPresence::Unknown("dnd".into())).unwrap(),
+            "\"dnd\""
+        );
+        assert_eq!(
+            serde_json::to_string(&ChannelPermissionTargetType::Unknown("team".into())).unwrap(),
+            "\"team\""
+        );
+        assert_eq!(
+            serde_json::to_string(&SpanType::Unknown("future-span".into())).unwrap(),
+            "\"future-span\""
         );
     }
 
@@ -1992,11 +2163,11 @@ mod tests {
         assert_eq!(v, ChatMemberRole::Unknown("owner".into()));
     }
 
-    /// Oracle: unknown DeliveryState wire value must deserialize to Unknown, not fail.
+    /// Oracle: unknown DeliveryState wire value must deserialize to Unknown(String), not fail.
     #[test]
     fn test_delivery_state_unknown_wire_value_becomes_unknown() {
         let v: DeliveryState = serde_json::from_str("\"bounced\"").unwrap();
-        assert_eq!(v, DeliveryState::Unknown);
+        assert_eq!(v, DeliveryState::Unknown("bounced".into()));
     }
 
     /// Oracle: unknown OwnerPresence wire value must deserialize to Unknown, not fail.
@@ -2006,18 +2177,18 @@ mod tests {
         assert_eq!(v, OwnerPresence::Unknown("dnd".into()));
     }
 
-    /// Oracle: unknown ChannelPermissionTargetType wire value must deserialize to Unknown, not fail.
+    /// Oracle: unknown ChannelPermissionTargetType wire value must deserialize to Unknown(String), not fail.
     #[test]
     fn test_channel_permission_target_type_unknown_wire_value_becomes_unknown() {
         let v: ChannelPermissionTargetType = serde_json::from_str("\"group\"").unwrap();
-        assert_eq!(v, ChannelPermissionTargetType::Unknown);
+        assert_eq!(v, ChannelPermissionTargetType::Unknown("group".into()));
     }
 
     /// Oracle: ChatStreamEnable with None optional fields must serialize WITHOUT those keys.
     /// Spec: absent = all member chats/contacts. Sending null is non-conformant.
     #[test]
     fn test_chat_stream_enable_none_fields_absent_in_serialization() {
-        let msg = ChatStreamEnable::new(vec![ChatStreamDataType::Typing], None, None);
+        let msg = ChatStreamEnable::new(&[ChatStreamDataType::Typing], None, None);
         let json = serde_json::to_string(&msg).unwrap();
         let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
         assert!(
@@ -2030,9 +2201,9 @@ mod tests {
         );
     }
 
-    /// Oracle: deserialize_optional_nullable_string must error on non-null, non-string JSON values.
+    /// Oracle: ChatPresenceEvent statusText must reject non-null, non-string JSON values.
     #[test]
-    fn test_deserialize_optional_nullable_string_rejects_non_string() {
+    fn test_chat_presence_event_status_rejects_non_string() {
         // statusText: 42 (number) — must not parse to Ok
         let json =
             r#"{"@type":"ChatPresenceEvent","contactId":"x","presence":"online","statusText":42}"#;

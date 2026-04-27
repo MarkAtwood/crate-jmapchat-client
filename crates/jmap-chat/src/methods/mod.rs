@@ -118,6 +118,15 @@ pub struct SetError {
     pub server_retry_after: Option<crate::jmap::UTCDate>,
 }
 
+impl std::fmt::Display for SetError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self.description {
+            Some(desc) => write!(f, "{}: {}", self.error_type, desc),
+            None => write!(f, "{}", self.error_type),
+        }
+    }
+}
+
 /// RFC 8620 §5.6 — /queryChanges response.
 ///
 /// Reports which IDs were removed from and added to a query result set since
@@ -171,9 +180,25 @@ pub enum Patch<T> {
     Clear,
 }
 
+impl<T> Patch<T> {
+    /// Returns `true` if this is `Patch::Keep` (field should be omitted from serialization).
+    pub fn is_keep(&self) -> bool {
+        matches!(self, Patch::Keep)
+    }
+}
+
 impl<T> From<T> for Patch<T> {
     fn from(v: T) -> Self {
         Patch::Set(v)
+    }
+}
+
+impl<T> From<Option<T>> for Patch<T> {
+    fn from(opt: Option<T>) -> Self {
+        match opt {
+            Some(v) => Patch::Set(v),
+            None => Patch::Keep,
+        }
     }
 }
 
@@ -186,6 +211,29 @@ impl<T: serde::Serialize> Patch<T> {
             Patch::Clear => Ok(Some(serde_json::Value::Null)),
             Patch::Set(v) => serde_json::to_value(v).map(Some),
         }
+    }
+}
+
+impl<T: serde::Serialize> serde::Serialize for Patch<T> {
+    fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        match self {
+            // Keep should be skipped via #[serde(skip_serializing_if = "Patch::is_keep")]
+            // If called anyway, serialize as null (safe fallback).
+            Patch::Keep => s.serialize_none(),
+            Patch::Clear => s.serialize_none(),
+            Patch::Set(v) => v.serialize(s),
+        }
+    }
+}
+
+impl<'de, T: serde::Deserialize<'de>> serde::Deserialize<'de> for Patch<T> {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        // Option::deserialize maps: JSON null → None, JSON value → Some(T)
+        // Combined with #[serde(default)] on the field, absent → Patch::Keep (default).
+        Option::<T>::deserialize(d).map(|opt| match opt {
+            None => Patch::Clear,
+            Some(v) => Patch::Set(v),
+        })
     }
 }
 
