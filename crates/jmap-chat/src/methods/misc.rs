@@ -161,8 +161,7 @@ impl super::SessionClient<'_> {
         input: &PushSubscriptionCreateInput<'_>,
     ) -> Result<PushSubscriptionCreateResponse, crate::error::ClientError> {
         let api_url = self.api_url();
-        let mut buf = String::new();
-        let client_id = super::resolve_client_id(input.client_id, &mut buf);
+        let client_id = super::resolve_client_id(input.client_id);
         let mut create_obj = serde_json::json!({
             "deviceClientId": input.device_client_id,
             "url": input.url,

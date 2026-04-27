@@ -139,8 +139,7 @@ impl super::SessionClient<'_> {
         input: &SpaceCreateInput<'_>,
     ) -> Result<SetResponse, crate::error::ClientError> {
         let (api_url, account_id) = self.session_parts()?;
-        let mut buf = String::new();
-        let client_id = super::resolve_client_id(input.client_id, &mut buf);
+        let client_id = super::resolve_client_id(input.client_id);
         let mut create_obj = serde_json::json!({ "name": input.name });
         if let Some(d) = input.description {
             create_obj["description"] = d.into();

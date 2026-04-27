@@ -709,16 +709,11 @@ fn build_request(
 
 /// Resolve an optional caller-supplied client ID, generating a ULID if absent.
 ///
-/// When `id` is `None`, `buf` is overwritten with a fresh ULID and a reference
-/// into `buf` is returned. When `id` is `Some(s)`, `s` is returned directly and
-/// `buf` is not touched. The returned `&str` borrows from whichever source was
-/// used and is valid as long as the caller's `buf` remains in scope.
-pub(super) fn resolve_client_id<'a>(id: Option<&'a str>, buf: &'a mut String) -> &'a str {
+/// Returns `Cow::Borrowed(s)` when `id` is `Some(s)`, and `Cow::Owned(ulid)`
+/// when `id` is `None`.
+pub(super) fn resolve_client_id(id: Option<&str>) -> std::borrow::Cow<'_, str> {
     match id {
-        Some(s) => s,
-        None => {
-            *buf = ulid::Ulid::new().to_string();
-            buf.as_str()
-        }
+        Some(s) => std::borrow::Cow::Borrowed(s),
+        None => std::borrow::Cow::Owned(ulid::Ulid::new().to_string()),
     }
 }

@@ -150,7 +150,6 @@ impl super::SessionClient<'_> {
         input: &ChatCreateInput<'_>,
     ) -> Result<SetResponse, crate::error::ClientError> {
         let (api_url, account_id) = self.session_parts()?;
-        let mut buf = String::new();
         let create_obj;
         let client_id_opt = match input {
             ChatCreateInput::Direct {
@@ -206,7 +205,7 @@ impl super::SessionClient<'_> {
                 *client_id
             }
         };
-        let client_id = super::resolve_client_id(client_id_opt, &mut buf);
+        let client_id = super::resolve_client_id(client_id_opt);
         let args = serde_json::json!({
             "accountId": account_id,
             "create": { client_id: create_obj },

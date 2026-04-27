@@ -101,7 +101,7 @@ impl crate::client::JmapChatClient {
 
         let resp = req.send().await.map_err(crate::error::ClientError::Http)?;
         let status = resp.status();
-        crate::client::JmapChatClient::auth_failed_if(status)?;
+        crate::client::JmapChatClient::check_auth_status(status)?;
         let resp = resp
             .error_for_status()
             .map_err(crate::error::ClientError::Http)?;
@@ -159,7 +159,7 @@ impl crate::client::JmapChatClient {
 
         let resp = req.send().await.map_err(crate::error::ClientError::Http)?;
         let status = resp.status();
-        crate::client::JmapChatClient::auth_failed_if(status)?;
+        crate::client::JmapChatClient::check_auth_status(status)?;
         let resp = resp
             .error_for_status()
             .map_err(crate::error::ClientError::Http)?;

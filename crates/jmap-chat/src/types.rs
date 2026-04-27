@@ -195,16 +195,7 @@ impl serde::Serialize for EndpointType {
 impl<'de> serde::Deserialize<'de> for EndpointType {
     fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
         let raw = String::deserialize(d)?;
-        Ok(match raw.as_str() {
-            "urn:jmap:chat:cap:vtc" => Self::Vtc,
-            "urn:jmap:chat:cap:payment" => Self::Payment,
-            "urn:jmap:chat:cap:blob" => Self::Blob,
-            "urn:jmap:chat:cap:calendar-event" => Self::CalendarEvent,
-            "urn:jmap:chat:cap:availability" => Self::Availability,
-            "urn:jmap:chat:cap:task" => Self::Task,
-            "urn:jmap:chat:cap:filenode" => Self::Filenode,
-            _ => Self::Other(raw),
-        })
+        Ok(Self::from_uri(&raw))
     }
 }
 

@@ -29,15 +29,28 @@ impl JmapChatClient {
     /// server origin without a trailing slash or path component, e.g.
     /// `"https://100.64.1.1:8008"`.
     pub fn new(auth: impl AuthProvider + 'static, base_url: &str) -> Result<Self, ClientError> {
+        if base_url.is_empty() {
+            return Err(ClientError::InvalidArgument("base_url may not be empty".into()));
+        }
+        let parsed = url::Url::parse(base_url)
+            .map_err(|e| ClientError::InvalidArgument(format!("base_url is not a valid URL: {e}")))?;
+        let path = parsed.path();
+        if path != "/" && !path.is_empty() {
+            return Err(ClientError::InvalidArgument(
+                format!("base_url must not have a path component, got: {path:?}")
+            ));
+        }
+        // Store without trailing slash
+        let base_url = base_url.trim_end_matches('/').to_string();
         let http = auth.build_client()?;
         Ok(Self {
-            base_url: base_url.to_string(),
+            base_url,
             auth: Arc::new(auth),
             http,
         })
     }
 
-    pub(crate) fn auth_failed_if(status: reqwest::StatusCode) -> Result<(), ClientError> {
+    pub(crate) fn check_auth_status(status: reqwest::StatusCode) -> Result<(), ClientError> {
         if status == 401 || status == 403 {
             Err(ClientError::AuthFailed(status.as_u16()))
         } else {
@@ -64,7 +77,7 @@ impl JmapChatClient {
         let resp = req.send().await.map_err(ClientError::Http)?;
 
         let status = resp.status();
-        Self::auth_failed_if(status)?;
+        Self::check_auth_status(status)?;
 
         let resp = resp.error_for_status().map_err(ClientError::Http)?;
 
@@ -112,7 +125,7 @@ impl JmapChatClient {
         let resp = builder.send().await.map_err(ClientError::Http)?;
 
         let status = resp.status();
-        Self::auth_failed_if(status)?;
+        Self::check_auth_status(status)?;
 
         let resp = resp.error_for_status().map_err(ClientError::Http)?;
 
@@ -180,7 +193,7 @@ impl JmapChatClient {
         &self,
         event_source_url: &str,
         last_event_id: Option<&str>,
-    ) -> Result<impl futures::Stream<Item = Result<SseFrame, ClientError>>, ClientError> {
+    ) -> Result<impl futures::Stream<Item = Result<SseFrame, ClientError>> + Send, ClientError> {
         let mut req = self
             .http
             .get(event_source_url)
@@ -196,7 +209,7 @@ impl JmapChatClient {
         let resp = req.send().await.map_err(ClientError::Http)?;
 
         let status = resp.status();
-        Self::auth_failed_if(status)?;
+        Self::check_auth_status(status)?;
 
         let resp = resp.error_for_status().map_err(ClientError::Http)?;
 
@@ -769,6 +782,35 @@ mod tests {
         let _slice = &buf[scan_from..];
         // The fix must land on byte 1 — the start of the emoji.
         assert_eq!(scan_from, 1, "fix must land on the emoji's start byte");
+    }
+
+    /// Oracle: base_url validation — a URL with a path component must be rejected.
+    #[test]
+    fn new_rejects_base_url_with_path() {
+        let result = JmapChatClient::new(crate::auth::NoneAuth, "https://host/path")
+            .map(|_| ());
+        match result {
+            Err(ClientError::InvalidArgument(_)) => {}
+            other => panic!("expected InvalidArgument, got {other:?}"),
+        }
+    }
+
+    /// Oracle: base_url validation — an invalid URL string must be rejected.
+    #[test]
+    fn new_rejects_invalid_url() {
+        let result = JmapChatClient::new(crate::auth::NoneAuth, "not a url")
+            .map(|_| ());
+        match result {
+            Err(ClientError::InvalidArgument(_)) => {}
+            other => panic!("expected InvalidArgument, got {other:?}"),
+        }
+    }
+
+    /// Oracle: base_url validation — a valid origin URL must be accepted.
+    #[test]
+    fn new_accepts_valid_base_url() {
+        let result = JmapChatClient::new(crate::auth::NoneAuth, "https://example.com");
+        assert!(result.is_ok(), "valid base_url must be accepted");
     }
 
     /// Oracle: RFC 8620 §3.6.1 — when an invocation has method name "error",

@@ -26,6 +26,7 @@ tokio = { version = "1", features = ["full"] }
 sha2 = "0.10"
 tokio-tungstenite = { version = "0.29", features = ["rustls-tls-webpki-roots"] }
 ulid = "1"
+url = "2"
 
 # dev
 tokio-test = "0.4"
