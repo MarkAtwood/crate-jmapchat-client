@@ -1,5 +1,5 @@
 use super::{
-    GetResponse, PresenceStatusPatch, PushSubscriptionCreateInput, PushSubscriptionSetResponse,
+    GetResponse, PresenceStatusPatch, PushSubscriptionCreateInput, PushSubscriptionCreateResponse,
     SetResponse,
 };
 
@@ -159,7 +159,7 @@ impl super::SessionClient<'_> {
     pub async fn push_subscription_create(
         &self,
         input: &PushSubscriptionCreateInput<'_>,
-    ) -> Result<PushSubscriptionSetResponse, crate::error::ClientError> {
+    ) -> Result<PushSubscriptionCreateResponse, crate::error::ClientError> {
         let api_url = self.api_url();
         let mut buf = String::new();
         let client_id = super::resolve_client_id(input.client_id, &mut buf);

@@ -5,6 +5,8 @@
 
 use serde::Deserialize;
 
+use super::GetResponse;
+
 /// A single JMAP Quota object (RFC 8621 §2).
 ///
 /// Describes a storage limit that applies to one or more data types within
@@ -50,7 +52,7 @@ impl super::SessionClient<'_> {
     /// no primary JMAP Chat account.
     ///
     /// Spec: RFC 8621 §2
-    pub async fn quota_get(&self) -> Result<Vec<Quota>, crate::error::ClientError> {
+    pub async fn quota_get(&self) -> Result<GetResponse<Quota>, crate::error::ClientError> {
         let (api_url, account_id) = self.session_parts()?;
         let args = serde_json::json!({
             "accountId": account_id,
@@ -64,13 +66,6 @@ impl super::SessionClient<'_> {
         .build();
 
         let resp = self.call(api_url, &req).await?;
-        let get_resp = crate::client::extract_response::<QuotaGetResponse>(resp, "r1")?;
-        Ok(get_resp.list)
+        crate::client::extract_response(resp, "r1")
     }
-}
-
-/// Wire shape for the `Quota/get` method response.
-#[derive(Debug, Deserialize)]
-struct QuotaGetResponse {
-    list: Vec<Quota>,
 }
