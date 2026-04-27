@@ -1,5 +1,7 @@
 // JmapChatClient: fetch_session, call, subscribe_events (Steps 5-7)
 
+use std::sync::Arc;
+
 use crate::auth::AuthProvider;
 use crate::error::ClientError;
 use crate::jmap::{JmapRequest, JmapResponse, Session};
@@ -12,9 +14,10 @@ use futures::StreamExt;
 /// obtain a [`Session`] before issuing any JMAP method calls.
 ///
 /// [`fetch_session`]: JmapChatClient::fetch_session
+#[derive(Clone)]
 pub struct JmapChatClient {
     base_url: String,
-    auth: Box<dyn AuthProvider>,
+    auth: Arc<dyn AuthProvider>,
     http: reqwest::Client,
 }
 
@@ -29,7 +32,7 @@ impl JmapChatClient {
         let http = auth.build_client()?;
         Ok(Self {
             base_url: base_url.to_string(),
-            auth: Box::new(auth),
+            auth: Arc::new(auth),
             http,
         })
     }
@@ -284,6 +287,14 @@ mod tests {
     use super::*;
     use wiremock::matchers::{method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
+
+    /// Oracle: `JmapChatClient` must implement `Clone` (compile-time check).
+    /// The Arc<dyn AuthProvider> field and reqwest::Client are both Clone.
+    #[test]
+    fn client_is_clone() {
+        fn assert_clone<T: Clone>() {}
+        assert_clone::<JmapChatClient>();
+    }
 
     fn session_fixture() -> serde_json::Value {
         let text = std::fs::read_to_string(
