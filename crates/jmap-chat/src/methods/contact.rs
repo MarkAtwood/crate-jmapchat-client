@@ -82,6 +82,8 @@ impl super::SessionClient<'_> {
             filter.insert("blocked".into(), b.into());
         }
         if let Some(p) = &input.filter_presence {
+            // Unknown is a catch-all for unrecognized wire values; it has no
+            // defined filter semantics and must never be sent to the server.
             if *p == crate::types::ContactPresence::Unknown {
                 return Err(crate::error::ClientError::InvalidArgument(
                     "filter_presence: ContactPresence::Unknown is not a valid filter value".into(),

@@ -10,14 +10,19 @@ pub mod utils;
 pub mod ws;
 
 // Core client types
+#[doc(inline)]
 pub use client::JmapChatClient;
+#[doc(inline)]
 pub use methods::SessionClient;
 
 // Error type
+#[doc(inline)]
 pub use error::ClientError;
 
 // Auth providers
+#[doc(inline)]
 pub use auth::{AuthProvider, BasicAuth, BearerAuth, CustomCaAuth, NoneAuth};
 
 // JMAP core types
+#[doc(inline)]
 pub use jmap::{Id, Session, UTCDate};
