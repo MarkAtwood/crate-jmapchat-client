@@ -1,0 +1,12 @@
+{
+  "methodResponses": [["PushSubscription/set", {
+    "accountId": null,
+    "created": {
+      "client-push-001": {
+        "id": "push-server-001",
+        "expires": "2026-05-27T00:00:00Z"
+      }
+    }
+  }, "r1"]],
+  "sessionState": "sess-abc"
+}

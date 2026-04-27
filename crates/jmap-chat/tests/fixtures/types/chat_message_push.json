@@ -1,0 +1,22 @@
+{
+  "@type": "ChatMessagePush",
+  "accountId": "u1",
+  "state": "d35ecb040aab",
+  "messages": [
+    {
+      "messageId": "01J3YKZQP5MWVT8PPBEHTJ3HX",
+      "chatId": "01J3XKZQN4MWVT8PPBEHTJ3HX",
+      "chatKind": "channel",
+      "chatName": "general",
+      "spaceId": "01J2WKZQM3LVST7OOBDHSI2GW",
+      "spaceName": "ACME Corp",
+      "senderId": "user:alice@example.com",
+      "senderDisplayName": "Alice",
+      "sentAt": "2026-04-26T14:32:00Z",
+      "hasMention": true,
+      "hasMentionAll": false,
+      "encrypted": false,
+      "bodySnippet": "Hey @bob, the deploy is ready for review"
+    }
+  ]
+}

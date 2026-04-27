@@ -1045,6 +1045,91 @@ pub struct ChatPresenceEvent {
 }
 
 // ---------------------------------------------------------------------------
+// Push Notification Types
+// ---------------------------------------------------------------------------
+
+/// Per-account push configuration for a PushSubscription.
+/// Spec: draft-atwood-jmap-chat-push-00 §3.2
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ChatPushConfig {
+    /// Chat kinds for which push is enabled (`"direct"`, `"group"`, `"channel"`).
+    /// `None` enables push for all kinds.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub kinds: Option<Vec<String>>,
+    /// Explicit Chat ids for which push is enabled. `None` enables push for
+    /// all Chats of the matching kinds the account is a member of.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub chat_ids: Option<Vec<String>>,
+    /// `ChatMessageEntry` fields to include in each payload entry.
+    /// `None` uses the server default set.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub properties: Option<Vec<String>>,
+    /// Web Push urgency for notifications from this config (default `"normal"`).
+    /// MUST be a value in `ChatPushCapability.supported_urgency_values`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub urgency: Option<String>,
+    /// Overrides `urgency` for payloads containing a direct or Space-wide mention.
+    /// MUST be a value in `ChatPushCapability.supported_urgency_values`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub mention_urgency: Option<String>,
+}
+
+/// One message entry in a `ChatMessagePush` payload.
+/// Spec: draft-atwood-jmap-chat-push-00 §4.2
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ChatMessageEntry {
+    /// Server-assigned id of the new message.
+    pub message_id: String,
+    /// Id of the Chat containing the message.
+    pub chat_id: String,
+    /// Kind of the Chat: `"direct"`, `"group"`, or `"channel"`.
+    pub chat_kind: String,
+    /// Display name of the Chat. Present for group and channel chats.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub chat_name: Option<String>,
+    /// For channel chats: id of the containing Space.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub space_id: Option<String>,
+    /// For channel chats: display name of the containing Space.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub space_name: Option<String>,
+    /// ChatContact.id of the message sender (authoritative identity).
+    pub sender_id: String,
+    /// Sender display name at push-generation time (snapshot; not authoritative).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sender_display_name: Option<String>,
+    /// Sender's claimed composition time.
+    pub sent_at: UTCDate,
+    /// `true` if the account owner's ChatContact.id appears in `mentions`.
+    pub has_mention: bool,
+    /// `true` if the message carried a Space-wide mention scope.
+    pub has_mention_all: bool,
+    /// `true` if the message body is end-to-end encrypted; `bodySnippet` is absent when `true`.
+    pub encrypted: bool,
+    /// Truncated plaintext rendering of the message body. Absent when `encrypted` is `true`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub body_snippet: Option<String>,
+}
+
+/// Push payload delivered directly to the registered push endpoint.
+/// Spec: draft-atwood-jmap-chat-push-00 §4.1
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ChatMessagePush {
+    /// MUST be `"ChatMessagePush"`.
+    #[serde(rename = "@type")]
+    pub type_name: String,
+    /// The account id for which this payload was generated.
+    pub account_id: String,
+    /// The `Message` state after all entries in `messages` are applied.
+    pub state: String,
+    /// Message entries that triggered this push.
+    pub messages: Vec<ChatMessageEntry>,
+}
+
+// ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
 
@@ -1512,5 +1597,64 @@ mod tests {
     fn sender_id_reject_empty() {
         let result: Result<SenderIdOrSelf, _> = serde_json::from_str("\"\"");
         assert!(result.is_err());
+    }
+
+    /// Oracle: draft-atwood-jmap-chat-push-00 §4 example payload (§4.1 / §4.2).
+    /// Fixture hand-written from the spec example at §4.1.
+    #[test]
+    fn chat_message_push_from_fixture() {
+        let text = fixture("chat_message_push.json");
+        let push: ChatMessagePush =
+            serde_json::from_str(&text).expect("deserialize ChatMessagePush");
+
+        assert_eq!(push.type_name, "ChatMessagePush");
+        assert_eq!(push.account_id, "u1");
+        assert_eq!(push.state, "d35ecb040aab");
+        assert_eq!(push.messages.len(), 1);
+
+        let entry = &push.messages[0];
+        assert_eq!(entry.message_id, "01J3YKZQP5MWVT8PPBEHTJ3HX");
+        assert_eq!(entry.chat_id, "01J3XKZQN4MWVT8PPBEHTJ3HX");
+        assert_eq!(entry.chat_kind, "channel");
+        assert_eq!(entry.chat_name.as_deref(), Some("general"));
+        assert_eq!(entry.space_id.as_deref(), Some("01J2WKZQM3LVST7OOBDHSI2GW"));
+        assert_eq!(entry.space_name.as_deref(), Some("ACME Corp"));
+        assert_eq!(entry.sender_id, "user:alice@example.com");
+        assert_eq!(entry.sender_display_name.as_deref(), Some("Alice"));
+        assert!(entry.has_mention);
+        assert!(!entry.has_mention_all);
+        assert!(!entry.encrypted);
+        assert_eq!(
+            entry.body_snippet.as_deref(),
+            Some("Hey @bob, the deploy is ready for review")
+        );
+    }
+
+    /// Oracle: spec §4.2 — when `encrypted` is true, `bodySnippet` MUST be absent.
+    #[test]
+    fn chat_message_push_encrypted_no_snippet() {
+        let json = r#"{
+            "@type": "ChatMessagePush",
+            "accountId": "u1",
+            "state": "abc",
+            "messages": [{
+                "messageId": "01HV5Z6QKWJ7N3P8R2X4YTMDSP",
+                "chatId": "01HV5Z6QKWJ7N3P8R2X4YTMDCT",
+                "chatKind": "direct",
+                "senderId": "user:bob@example.com",
+                "sentAt": "2026-04-26T14:32:00Z",
+                "hasMention": false,
+                "hasMentionAll": false,
+                "encrypted": true
+            }]
+        }"#;
+        let push: ChatMessagePush =
+            serde_json::from_str(json).expect("deserialize encrypted ChatMessagePush");
+        let entry = &push.messages[0];
+        assert!(entry.encrypted);
+        assert!(
+            entry.body_snippet.is_none(),
+            "bodySnippet must be absent when encrypted"
+        );
     }
 }

@@ -82,6 +82,21 @@ pub struct SetResponse<T = serde_json::Value> {
     pub not_destroyed: Option<HashMap<String, SetError>>,
 }
 
+/// Response to [`JmapChatClient::push_subscription_set`] (RFC 8620 §7.2).
+///
+/// `account_id` is always `null` for PushSubscription objects (they are not
+/// account-scoped). `Option<String>` handles both the null case and servers
+/// that echo the session accountId anyway.
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PushSubscriptionSetResponse {
+    #[serde(default)]
+    pub account_id: Option<String>,
+    pub created: Option<HashMap<String, serde_json::Value>>,
+    #[serde(default)]
+    pub not_created: Option<HashMap<String, SetError>>,
+}
+
 /// A /set operation failure for a single object (RFC 8620 §5.3).
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -490,6 +505,31 @@ pub struct SpaceUpdateInput<'a> {
     pub add_channels: &'a [SpaceAddChannelInput<'a>],
     /// Channel Chat ids to remove (`manage_channels` required). Pass `&[]` when unused.
     pub remove_channels: &'a [&'a str],
+}
+
+/// Input parameters for [`JmapChatClient::push_subscription_set`].
+///
+/// Creates a PushSubscription (RFC 8620 §7.2) with the optional `chatPush`
+/// extension (draft-atwood-jmap-chat-push-00 §3.1).
+///
+/// `Default` is intentionally not derived: `client_id`, `device_client_id`,
+/// and `url` have no safe default values.
+#[derive(Debug)]
+pub struct PushSubscriptionCreateInput<'a> {
+    /// Caller-supplied creation key (mapped to the server-assigned id in the response).
+    pub client_id: &'a str,
+    /// Stable client device identifier, used by the server to deduplicate subscriptions.
+    pub device_client_id: &'a str,
+    /// Push endpoint URL registered with the platform push service.
+    pub url: &'a str,
+    /// Subscription expiry time. `None` lets the server choose.
+    pub expires: Option<&'a crate::jmap::UTCDate>,
+    /// Data type names to include in StateChange notifications.
+    /// `None` means the server delivers all changed types.
+    pub types: Option<&'a [&'a str]>,
+    /// Per-account ChatPushConfig entries for inline push. Each entry is
+    /// `(accountId, config)`. Pass `None` to omit the `chatPush` property.
+    pub chat_push: Option<&'a [(&'a str, crate::types::ChatPushConfig)]>,
 }
 
 // ---------------------------------------------------------------------------

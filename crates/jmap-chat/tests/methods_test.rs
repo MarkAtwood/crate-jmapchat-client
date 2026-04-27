@@ -11,9 +11,9 @@ use jmap_chat::error::ClientError;
 use jmap_chat::methods::{
     AddMemberInput, ChatContactQueryInput, ChatContactSetInput, ChatCreateDirectInput,
     ChatCreateGroupInput, ChatQueryInput, ChatUpdateInput, GetResponse, MessageCreateInput,
-    MessageQueryInput, MessageUpdateInput, PresenceStatusSetInput, ReactionChange,
-    SpaceBanCreateInput, SpaceCreateInput, SpaceInviteCreateInput, SpaceJoinInput, SpaceQueryInput,
-    SpaceUpdateInput,
+    MessageQueryInput, MessageUpdateInput, PresenceStatusSetInput, PushSubscriptionCreateInput,
+    ReactionChange, SpaceBanCreateInput, SpaceCreateInput, SpaceInviteCreateInput, SpaceJoinInput,
+    SpaceQueryInput, SpaceUpdateInput,
 };
 use jmap_chat::types::OwnerPresence;
 use wiremock::matchers::{body_json, method};
@@ -2376,4 +2376,78 @@ async fn space_join_by_space_id() {
     // Oracle: space_join_response.json — accountId and spaceId present
     assert_eq!(result.account_id, "account1");
     assert_eq!(result.space_id, "01HV5Z6QKWJ7N3P8R2X4YTMDSP");
+}
+
+// ---------------------------------------------------------------------------
+// Test 56: push_subscription_set — body shape + happy path
+// ---------------------------------------------------------------------------
+
+/// Oracle: RFC 8620 §7.2 — PushSubscription/set response with created map.
+/// draft-atwood-jmap-chat-push-00 §3.1 — chatPush property in create object.
+///
+/// Body matcher: verifies the `using` array includes `urn:ietf:params:jmap:chat:push`,
+/// `chatPush` is present with the correct account id key, and urgency is included.
+#[tokio::test]
+async fn push_subscription_set_returns_typed_response() {
+    let server = MockServer::start().await;
+
+    Mock::given(method("POST"))
+        .and(body_json(serde_json::json!({
+            "using": ["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:chat:push"],
+            "methodCalls": [["PushSubscription/set", {
+                "create": {
+                    "client-push-001": {
+                        "deviceClientId": "device-abc",
+                        "url": "https://push.example.com/endpoint",
+                        "types": ["Message"],
+                        "chatPush": {
+                            "account1": {
+                                "urgency": "normal",
+                                "mentionUrgency": "high"
+                            }
+                        }
+                    }
+                }
+            }, "r1"]]
+        })))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .set_body_json(fixture("push_subscription_set_response.json")),
+        )
+        .mount(&server)
+        .await;
+
+    let client = JmapChatClient::new(jmap_chat::auth::NoneAuth, &server.uri())
+        .expect("client construction must succeed");
+
+    let api_url = format!("{}/api", server.uri());
+    let push_config = jmap_chat::types::ChatPushConfig {
+        kinds: None,
+        chat_ids: None,
+        properties: None,
+        urgency: Some("normal".to_string()),
+        mention_urgency: Some("high".to_string()),
+    };
+    let result = client
+        .push_subscription_set(
+            &test_session(&api_url),
+            &PushSubscriptionCreateInput {
+                client_id: "client-push-001",
+                device_client_id: "device-abc",
+                url: "https://push.example.com/endpoint",
+                expires: None,
+                types: Some(&["Message"]),
+                chat_push: Some(&[("account1", push_config)]),
+            },
+        )
+        .await
+        .expect("push_subscription_set must succeed");
+
+    // Oracle: push_subscription_set_response.json — created map has one entry; accountId null
+    let created = result.created.expect("created must be Some");
+    assert!(created.contains_key("client-push-001"));
+    assert!(
+        result.account_id.is_none(),
+        "accountId must be null for PushSubscription/set"
+    );
 }
