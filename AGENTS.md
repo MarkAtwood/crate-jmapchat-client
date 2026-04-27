@@ -8,11 +8,16 @@ Before doing any work:
 
 ## Source material
 
-### Specs (in `docs/`)
-- `docs/draft-atwood-jmap-chat-00.md` — **primary spec**: all data types, methods, SSE
+### Specs (in `~/PROJECT/jmap-chat-spec/`)
+- `draft-atwood-jmap-chat-00.md` — **primary spec**: all data types, methods, SSE
   events, blob upload/download, authorization model. Read this first.
-- `docs/draft-atwood-jmap-chat-federation-00.md` — federation companion (Peer/* methods,
+- `draft-atwood-jmap-chat-federation-00.md` — federation companion (Peer/* methods,
   peer discovery). Informational only — we implement none of these.
+- `draft-atwood-jmap-chat-wss-00.md` — WebSocket companion spec.
+- `draft-atwood-jmap-chat-push-00.md` — rich push notification companion.
+- `draft-atwood-jmap-cid-00.md` — blob content identifier companion.
+- `draft-atwood-jmap-chat-filenode-00.md` — filenode companion (future; skip for now).
+- RFCs are in the `references/` subdirectory.
 
 ### Reference code (do NOT copy wholesale; study patterns only)
 - `~/PROJECT/kith/crates/kith-tui/` — working ratatui + crossterm TUI. Study for:
@@ -22,8 +27,8 @@ Before doing any work:
   (`is_tailnet_ip`, `Role::Peer`, Tailscale DER cert logic, hardcoded ports).
 
 ### Older / superseded material
-- `~/GIT/ideas/draft-atwood-jmap-chat-00.md` — older draft; superseded by `docs/` version.
-  Consult only if the `docs/` version is ambiguous.
+- `~/GIT/ideas/draft-atwood-jmap-chat-00.md` — older draft; superseded by the
+  `~/PROJECT/jmap-chat-spec/` version. Consult only if the current spec is ambiguous.
 
 ### Key external specs
 - RFC 8620 — JMAP base protocol (session GET, API POST, SSE/EventSource, blob)
@@ -77,7 +82,8 @@ Each subagent reads only what it needs — grep for specific symbols rather than
 
 ## Restrictions
 
-- Do not commit or push without explicit user approval
+- Do not push without explicit user approval
+- Commits are allowed without asking during review loops (PROMPT-review-myoss.md + PROMPT-do-beads.md cycles); push still requires approval
 - Do not use TodoWrite or markdown task lists — use `bd create` for all tracking
 - Do not add features not described in PROJECT.md
 - Do not start a phase without filing its epic and issues in beads first

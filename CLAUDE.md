@@ -65,7 +65,8 @@ root, client cert) and per-request header injection (Bearer, Basic). kith uses
 
 ## Coding Rules
 
-- Do not commit or push without explicit user approval
+- Do not push without explicit user approval
+- Commits are allowed without asking during review loops (PROMPT-review-myoss.md + PROMPT-do-beads.md cycles); push still requires approval
 - No dead code, no commented-out code, no TODO comments in committed code
 - No `unwrap()` or `expect()` in production code paths; use `?` and `ClientError`
 - Never log credentials: Bearer tokens, Basic passwords, client key bytes
