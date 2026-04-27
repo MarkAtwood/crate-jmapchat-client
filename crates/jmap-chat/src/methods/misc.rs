@@ -1,4 +1,4 @@
-use super::{GetResponse, SetResponse};
+use super::{GetResponse, PushSubscriptionCreateInput, PushSubscriptionSetResponse, SetResponse};
 
 impl crate::client::JmapChatClient {
     /// Fetch ReadPosition objects by IDs (JMAP Chat §5 ReadPosition/get).
@@ -153,5 +153,59 @@ impl crate::client::JmapChatClient {
         let (call_id, req) = super::build_request("PresenceStatus/changes", args);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
+    }
+
+    /// Create a PushSubscription with the optional `chatPush` extension
+    /// (RFC 8620 §7.2 / draft-atwood-jmap-chat-push-00 §3.1).
+    ///
+    /// PushSubscriptions are account-independent: no `accountId` is included
+    /// in the request (RFC 8620 §7.2). The `using` array includes
+    /// `urn:ietf:params:jmap:chat:push` when `chat_push` is present.
+    ///
+    /// `client_id` is mapped to the server-assigned PushSubscription id in
+    /// `SetResponse.created`.
+    pub async fn push_subscription_set(
+        &self,
+        session: &crate::jmap::Session,
+        input: &PushSubscriptionCreateInput<'_>,
+    ) -> Result<PushSubscriptionSetResponse, crate::error::ClientError> {
+        let api_url = session.api_url.as_str();
+        let mut create_obj = serde_json::json!({
+            "deviceClientId": input.device_client_id,
+            "url": input.url,
+        });
+        if let Some(exp) = input.expires {
+            create_obj["expires"] = exp.as_str().into();
+        }
+        if let Some(types) = input.types {
+            create_obj["types"] = serde_json::Value::Array(
+                types
+                    .iter()
+                    .map(|t| serde_json::Value::String((*t).to_owned()))
+                    .collect(),
+            );
+        }
+        if let Some(cp) = input.chat_push {
+            let mut chat_push_map = serde_json::Map::new();
+            for (account_id, config) in cp {
+                chat_push_map.insert(
+                    (*account_id).to_owned(),
+                    serde_json::to_value(config).map_err(crate::error::ClientError::Serialize)?,
+                );
+            }
+            create_obj["chatPush"] = serde_json::Value::Object(chat_push_map);
+        }
+        let args = serde_json::json!({
+            "create": { input.client_id: create_obj }
+        });
+        let req = crate::jmap::JmapRequest {
+            using: vec![
+                "urn:ietf:params:jmap:core".to_string(),
+                "urn:ietf:params:jmap:chat:push".to_string(),
+            ],
+            method_calls: vec![("PushSubscription/set".to_string(), args, "r1".to_string())],
+        };
+        let resp = self.call(api_url, &req).await?;
+        crate::client::extract_response(resp, "r1")
     }
 }
