@@ -94,43 +94,39 @@ pub async fn run(
         }
     };
 
-    let api_url = session.api_url.clone();
     let event_source_url = session.event_source_url.clone();
 
-    let account_id = match session.chat_account_id() {
-        Some(id) => id.to_string(),
-        None => {
-            send_event(
-                &tx,
-                &ctx,
-                AppEvent::Error(
-                    "Server has no JMAP Chat account — \
-                     check that the server supports the JMAP Chat extension"
-                        .to_string(),
-                ),
-            );
-            send_event(
-                &tx,
-                &ctx,
-                AppEvent::StatusChanged(ConnectionStatus::Disconnected),
-            );
-            return;
-        }
-    };
+    if session.chat_account_id().is_none() {
+        send_event(
+            &tx,
+            &ctx,
+            AppEvent::Error(
+                "Server has no JMAP Chat account — \
+                 check that the server supports the JMAP Chat extension"
+                    .to_string(),
+            ),
+        );
+        send_event(
+            &tx,
+            &ctx,
+            AppEvent::StatusChanged(ConnectionStatus::Disconnected),
+        );
+        return;
+    }
 
     send_event(
         &tx,
         &ctx,
         AppEvent::SessionReady {
-            api_url: api_url.clone(),
-            account_id: account_id.clone(),
+            api_url: session.api_url.clone(),
+            account_id: session.chat_account_id().unwrap_or_default().to_string(),
         },
     );
 
     // Load all chats; track the server state string for future delta sync.
     // `None` means no baseline: delta sync will fall back to a full reload.
     let mut chat_state: Option<String> =
-        match load_chats(Arc::clone(&client), &api_url, &account_id, &tx, &ctx).await {
+        match load_chats(Arc::clone(&client), &session, &tx, &ctx).await {
             Ok(state) => Some(state),
             Err(e) => {
                 send_event(
@@ -151,7 +147,7 @@ pub async fn run(
     // both guard against the missing-key case: try_mark_read silently skips;
     // MarkRead reloads the full set and retries once before giving up.
     let mut read_positions: HashMap<String, String> =
-        match load_read_positions(Arc::clone(&client), &api_url, &account_id).await {
+        match load_read_positions(Arc::clone(&client), &session).await {
             Ok(map) => map,
             Err(e) => {
                 send_event(
@@ -214,8 +210,7 @@ pub async fn run(
                         sse_backoff_idx = 0; // reset backoff on successful event
                         handle_state_change(
                             Arc::clone(&client),
-                            &api_url,
-                            &account_id,
+                            &session,
                             &changed,
                             &current_chat,
                             &mut chat_state,
@@ -239,8 +234,7 @@ pub async fn run(
                         current_chat = Some(chat_id.clone());
                         match load_messages_for_chat(
                             Arc::clone(&client),
-                            &api_url,
-                            &account_id,
+                            &session,
                             &chat_id,
                             &tx,
                             &ctx,
@@ -253,8 +247,7 @@ pub async fn run(
                                 // messages at that point.
                                 try_mark_read(
                                     &client,
-                                    &api_url,
-                                    &account_id,
+                                    &session,
                                     &chat_id,
                                     last_msg_id,
                                     &read_positions,
@@ -278,8 +271,7 @@ pub async fn run(
                         let sent_at = now_rfc3339();
                         match client
                             .message_create(
-                                &api_url,
-                                &account_id,
+                                &session,
                                 &client_id,
                                 &chat_id,
                                 &body,
@@ -293,8 +285,7 @@ pub async fn run(
                                 if current_chat.as_deref() == Some(&chat_id) {
                                     match load_messages_for_chat(
                                         Arc::clone(&client),
-                                        &api_url,
-                                        &account_id,
+                                        &session,
                                         &chat_id,
                                         &tx,
                                         &ctx,
@@ -306,8 +297,7 @@ pub async fn run(
                                             // sender has obviously seen all messages.
                                             try_mark_read(
                                                 &client,
-                                                &api_url,
-                                                &account_id,
+                                                &session,
                                                 &chat_id,
                                                 last_msg_id,
                                                 &read_positions,
@@ -341,7 +331,7 @@ pub async fn run(
                     Some(AppCommand::MarkRead { chat_id, message_id }) => {
                         if let Some(rp_id) = read_positions.get(&chat_id) {
                             if let Err(e) = client
-                                .read_position_set(&api_url, &account_id, rp_id, &message_id)
+                                .read_position_set(&session, rp_id, &message_id)
                                 .await
                             {
                                 send_event(
@@ -356,8 +346,7 @@ pub async fn run(
                             // No read-position record yet; refresh the full set then retry once.
                             match load_read_positions(
                                 Arc::clone(&client),
-                                &api_url,
-                                &account_id,
+                                &session,
                             )
                             .await
                             {
@@ -366,8 +355,7 @@ pub async fn run(
                                     if let Some(rp_id) = read_positions.get(&chat_id) {
                                         if let Err(e) = client
                                             .read_position_set(
-                                                &api_url,
-                                                &account_id,
+                                                &session,
                                                 rp_id,
                                                 &message_id,
                                             )
@@ -474,20 +462,19 @@ async fn bootstrap_session(
 /// Returns the server `state` string from the get response.
 async fn load_chats(
     client: Arc<JmapChatClient>,
-    api_url: &str,
-    account_id: &str,
+    session: &jmap_chat::jmap::Session,
     tx: &EventSender,
     ctx: &egui::Context,
 ) -> Result<String, ClientError> {
     let query = client
-        .chat_query(api_url, account_id, None, None, None, Some(200))
+        .chat_query(session, None, None, None, Some(200))
         .await?;
 
     // Always call chat_get even when ids is empty, so we get the current state
     // string and can use Chat/changes for future delta sync.
     let id_refs: Vec<&str> = query.ids.iter().map(String::as_str).collect();
     let resp = client
-        .chat_get(api_url, account_id, Some(&id_refs), None)
+        .chat_get(session, Some(&id_refs), None)
         .await?;
     let state = resp.state.clone();
     send_event(tx, ctx, AppEvent::ChatsLoaded(resp.list));
@@ -500,16 +487,14 @@ async fn load_chats(
 
 async fn load_messages_for_chat(
     client: Arc<JmapChatClient>,
-    api_url: &str,
-    account_id: &str,
+    session: &jmap_chat::jmap::Session,
     chat_id: &str,
     tx: &EventSender,
     ctx: &egui::Context,
 ) -> Result<Option<String>, ClientError> {
     let query = client
         .message_query(
-            api_url,
-            account_id,
+            session,
             Some(chat_id),
             None,
             None,
@@ -523,7 +508,7 @@ async fn load_messages_for_chat(
     } else {
         let id_refs: Vec<&str> = query.ids.iter().map(String::as_str).collect();
         client
-            .message_get(api_url, account_id, &id_refs, None)
+            .message_get(session, &id_refs, None)
             .await?
             .list
     };
@@ -564,10 +549,9 @@ async fn load_messages_for_chat(
 /// read_position_id.
 async fn load_read_positions(
     client: Arc<JmapChatClient>,
-    api_url: &str,
-    account_id: &str,
+    session: &jmap_chat::jmap::Session,
 ) -> Result<HashMap<String, String>, ClientError> {
-    let resp = client.read_position_get(api_url, account_id, None).await?;
+    let resp = client.read_position_get(session, None).await?;
     let mut map = HashMap::with_capacity(resp.list.len());
     for rp in resp.list {
         map.insert(rp.chat_id.to_string(), rp.id.to_string());
@@ -590,11 +574,9 @@ async fn load_read_positions(
 /// The explicit `MarkRead` command handler uses a different path with retry
 /// logic (reload all read positions and try once more), because that is a
 /// deliberate user action rather than a background heuristic.
-#[allow(clippy::too_many_arguments)]
 async fn try_mark_read(
     client: &JmapChatClient,
-    api_url: &str,
-    account_id: &str,
+    session: &jmap_chat::jmap::Session,
     chat_id: &str,
     last_msg_id: Option<String>,
     read_positions: &HashMap<String, String>,
@@ -604,7 +586,7 @@ async fn try_mark_read(
     if let Some(msg_id) = last_msg_id {
         if let Some(rp_id) = read_positions.get(chat_id) {
             if let Err(e) = client
-                .read_position_set(api_url, account_id, rp_id, &msg_id)
+                .read_position_set(session, rp_id, &msg_id)
                 .await
             {
                 send_event(
@@ -711,23 +693,20 @@ async fn run_sse_stream(
 // point between the SSE stream and all three data-refresh paths (chats,
 // messages, state tracking). Splitting it would scatter the flow across helper
 // structs without reducing complexity.
-#[allow(clippy::too_many_arguments)]
 async fn handle_state_change(
     client: Arc<JmapChatClient>,
-    api_url: &str,
-    account_id: &str,
+    session: &jmap_chat::jmap::Session,
     changed: &HashMap<String, HashMap<String, String>>,
     current_chat: &Option<String>,
     chat_state: &mut Option<String>,
     tx: &EventSender,
     ctx: &egui::Context,
 ) {
-    if let Some(type_map) = changed.get(account_id) {
+    if let Some(type_map) = changed.get(session.chat_account_id().unwrap_or_default()) {
         if type_map.contains_key("Chat") {
             if let Some(new_state) = chat_delta_sync(
                 Arc::clone(&client),
-                api_url,
-                account_id,
+                session,
                 chat_state.as_deref(),
                 tx,
                 ctx,
@@ -742,8 +721,7 @@ async fn handle_state_change(
             if let Some(chat_id) = current_chat {
                 if let Err(e) = load_messages_for_chat(
                     Arc::clone(&client),
-                    api_url,
-                    account_id,
+                    session,
                     chat_id,
                     tx,
                     ctx,
@@ -772,12 +750,11 @@ async fn handle_state_change(
 /// unchanged on the next sync attempt).
 async fn full_reload_chats(
     client: Arc<JmapChatClient>,
-    api_url: &str,
-    account_id: &str,
+    session: &jmap_chat::jmap::Session,
     tx: &EventSender,
     ctx: &egui::Context,
 ) -> Option<String> {
-    match load_chats(client, api_url, account_id, tx, ctx).await {
+    match load_chats(client, session, tx, ctx).await {
         Ok(s) => Some(s),
         Err(e) => {
             send_event(
@@ -805,19 +782,18 @@ async fn full_reload_chats(
 /// is left unchanged so the next attempt retries with the same baseline).
 async fn chat_delta_sync(
     client: Arc<JmapChatClient>,
-    api_url: &str,
-    account_id: &str,
+    session: &jmap_chat::jmap::Session,
     chat_state: Option<&str>,
     tx: &EventSender,
     ctx: &egui::Context,
 ) -> Option<String> {
     let state = match chat_state {
-        None => return full_reload_chats(Arc::clone(&client), api_url, account_id, tx, ctx).await,
+        None => return full_reload_chats(Arc::clone(&client), session, tx, ctx).await,
         Some(s) => s,
     };
 
     let changes = match client
-        .chat_changes(api_url, account_id, state, Some(500))
+        .chat_changes(session, state, Some(500))
         .await
     {
         Ok(c) => c,
@@ -825,7 +801,7 @@ async fn chat_delta_sync(
             if error_type == "cannotCalculateChanges" =>
         {
             // Server's change history has expired; fall back to a full reload.
-            return full_reload_chats(Arc::clone(&client), api_url, account_id, tx, ctx).await;
+            return full_reload_chats(Arc::clone(&client), session, tx, ctx).await;
         }
         Err(e) => {
             send_event(
@@ -838,7 +814,7 @@ async fn chat_delta_sync(
     };
 
     if changes.has_more_changes {
-        return full_reload_chats(Arc::clone(&client), api_url, account_id, tx, ctx).await;
+        return full_reload_chats(Arc::clone(&client), session, tx, ctx).await;
     }
 
     // Build the fetch list without cloning the ID strings.
@@ -853,7 +829,7 @@ async fn chat_delta_sync(
         Vec::new()
     } else {
         match client
-            .chat_get(api_url, account_id, Some(&id_refs), None)
+            .chat_get(session, Some(&id_refs), None)
             .await
         {
             Ok(resp) => resp.list,
