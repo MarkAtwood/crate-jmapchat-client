@@ -1,5 +1,5 @@
 use super::{
-    ChangesResponse, ChatContactQueryInput, ChatContactSetInput, GetResponse, QueryChangesResponse,
+    ChangesResponse, ChatContactPatch, ChatContactQueryInput, GetResponse, QueryChangesResponse,
     QueryResponse, SetResponse,
 };
 
@@ -51,23 +51,24 @@ impl crate::client::JmapChatClient {
     pub async fn chat_contact_set(
         &self,
         session: &crate::jmap::Session,
-        input: &ChatContactSetInput<'_>,
+        id: &str,
+        patch: &ChatContactPatch<'_>,
     ) -> Result<SetResponse, crate::error::ClientError> {
         let (api_url, account_id) = Self::session_parts(session)?;
-        let mut patch = serde_json::Map::new();
-        if let Some(b) = input.blocked {
-            patch.insert("blocked".into(), b.into());
+        let mut patch_map = serde_json::Map::new();
+        if let Some(b) = patch.blocked {
+            patch_map.insert("blocked".into(), b.into());
         }
-        if let Some(dn) = &input.display_name {
-            patch.insert(
-                "displayName".into(),
-                dn.map(serde_json::Value::from)
-                    .unwrap_or(serde_json::Value::Null),
-            );
+        if let Some(entry) = patch
+            .display_name
+            .map_entry()
+            .map_err(crate::error::ClientError::Serialize)?
+        {
+            patch_map.insert("displayName".into(), entry);
         }
         let args = serde_json::json!({
             "accountId": account_id,
-            "update": { input.id: serde_json::Value::Object(patch) },
+            "update": { id: serde_json::Value::Object(patch_map) },
         });
         let (call_id, req) = super::build_request("ChatContact/set", args);
         let resp = self.call(api_url, &req).await?;

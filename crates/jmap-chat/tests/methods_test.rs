@@ -9,11 +9,11 @@
 use jmap_chat::client::JmapChatClient;
 use jmap_chat::error::ClientError;
 use jmap_chat::methods::{
-    AddMemberInput, ChatContactQueryInput, ChatContactSetInput, ChatCreateChannelInput,
-    ChatCreateDirectInput, ChatCreateGroupInput, ChatQueryInput, ChatUpdateInput, GetResponse,
-    MessageCreateInput, MessageQueryInput, MessageUpdateInput, PresenceStatusSetInput,
+    AddMemberInput, ChatContactPatch, ChatContactQueryInput, ChatCreateChannelInput,
+    ChatCreateDirectInput, ChatCreateGroupInput, ChatPatch, ChatQueryInput, GetResponse,
+    MessageCreateInput, MessagePatch, MessageQueryInput, PresenceStatusPatch,
     PushSubscriptionCreateInput, ReactionChange, SpaceBanCreateInput, SpaceCreateInput,
-    SpaceInviteCreateInput, SpaceJoinInput, SpaceQueryInput, SpaceUpdateInput,
+    SpaceInviteCreateInput, SpaceJoinInput, SpacePatch, SpaceQueryInput,
 };
 use jmap_chat::types::OwnerPresence;
 use wiremock::matchers::{body_json, method};
@@ -109,7 +109,7 @@ async fn message_create_returns_typed_response() {
         .message_create(
             &test_session(&api_url),
             &MessageCreateInput {
-                client_id: "client-ulid-001",
+                client_id: Some("client-ulid-001"),
                 chat_id: "01HV5Z6QKWJ7N3P8R2X4YTMD3G",
                 body: "Hello, world!",
                 body_type: "text/plain",
@@ -702,13 +702,10 @@ async fn presence_status_set_returns_typed_response() {
     let result = client
         .presence_status_set(
             &test_session(&api_url),
-            &PresenceStatusSetInput {
-                id: "01HV5Z6QKWJ7N3P8R2X4YTMD99",
+            "01HV5Z6QKWJ7N3P8R2X4YTMD99",
+            &PresenceStatusPatch {
                 presence: Some(OwnerPresence::Away),
-                status_text: None,
-                status_emoji: None,
-                expires_at: None,
-                receipt_sharing: None,
+                ..Default::default()
             },
         )
         .await
@@ -837,7 +834,7 @@ async fn custom_emoji_set_returns_typed_response() {
 
     let api_url = format!("{}/api", server.uri());
     let input = CustomEmojiCreateInput {
-        client_id: "emoji-new-1",
+        client_id: Some("emoji-new-1"),
         name: "partyparrot",
         blob_id: "01HV5Z6QKWJ7N3P8R2X4YTMDDD",
         space_id: None,
@@ -989,7 +986,7 @@ async fn space_ban_set_returns_typed_response() {
 
     let api_url = format!("{}/api", server.uri());
     let input = SpaceBanCreateInput {
-        client_id: "ban-new-1",
+        client_id: Some("ban-new-1"),
         space_id: "01HV5Z6QKWJ7N3P8R2X4YTMD10",
         user_id: "01HV5Z6QKWJ7N3P8R2X4YTMD03",
         reason: None,
@@ -1121,7 +1118,7 @@ async fn space_invite_set_returns_typed_response() {
 
     let api_url = format!("{}/api", server.uri());
     let input = SpaceInviteCreateInput {
-        client_id: "invite-new-1",
+        client_id: Some("invite-new-1"),
         space_id: "01HV5Z6QKWJ7N3P8R2X4YTMD10",
         default_channel_id: None,
         expires_at: None,
@@ -1172,20 +1169,16 @@ async fn message_set_update_body_edit_returns_typed_response() {
 
     let api_url = format!("{}/api", server.uri());
     let result = client
-        .message_set_update(
+        .message_update(
             &test_session(&api_url),
-            &MessageUpdateInput {
-                id: "01HV5Z6QKWJ7N3P8R2X4YTMD42",
+            "01HV5Z6QKWJ7N3P8R2X4YTMD42",
+            &MessagePatch {
                 body: Some("Hello, edited!"),
-                body_type: None,
-                reaction_changes: &[],
-                read_at: None,
-                deleted_at: None,
-                deleted_for_all: None,
+                ..Default::default()
             },
         )
         .await
-        .expect("message_set_update must succeed");
+        .expect("message_update must succeed");
 
     // Oracle: RFC 8620 §5.3 — newState is present, updated map contains the message ID
     assert_eq!(result.new_state, "state-msg-002");
@@ -1241,20 +1234,16 @@ async fn message_set_update_add_reaction_sends_correct_patch() {
         sent_at: &sent_at,
     };
     let result = client
-        .message_set_update(
+        .message_update(
             &test_session(&api_url),
-            &MessageUpdateInput {
-                id: "01HV5Z6QKWJ7N3P8R2X4YTMD42",
-                body: None,
-                body_type: None,
-                reaction_changes: &[reaction],
-                read_at: None,
-                deleted_at: None,
-                deleted_for_all: None,
+            "01HV5Z6QKWJ7N3P8R2X4YTMD42",
+            &MessagePatch {
+                reaction_changes: Some(&[reaction]),
+                ..Default::default()
             },
         )
         .await
-        .expect("message_set_update with reaction must succeed");
+        .expect("message_update with reaction must succeed");
 
     // Oracle: RFC 8620 §5.3 — newState is present
     assert_eq!(result.new_state, "state-msg-002");
@@ -1291,9 +1280,9 @@ async fn message_set_destroy_returns_typed_response() {
 
     let api_url = format!("{}/api", server.uri());
     let result = client
-        .message_set_destroy(&test_session(&api_url), &["01HV5Z6QKWJ7N3P8R2X4YTMD42"])
+        .message_destroy(&test_session(&api_url), &["01HV5Z6QKWJ7N3P8R2X4YTMD42"])
         .await
-        .expect("message_set_destroy must succeed");
+        .expect("message_destroy must succeed");
 
     // Oracle: RFC 8620 §5.3 — destroyed list contains the id
     assert_eq!(result.new_state, "state-msg-002");
@@ -1313,7 +1302,7 @@ async fn message_set_destroy_rejects_empty_ids() {
         .expect("client construction must succeed");
 
     let err = client
-        .message_set_destroy(&test_session("http://127.0.0.1:1/api"), &[])
+        .message_destroy(&test_session("http://127.0.0.1:1/api"), &[])
         .await
         .expect_err("empty ids must be rejected");
 
@@ -1454,7 +1443,7 @@ async fn chat_create_direct_returns_typed_response() {
         .chat_create_direct(
             &test_session(&api_url),
             &ChatCreateDirectInput {
-                client_id: "client-direct-001",
+                client_id: Some("client-direct-001"),
                 contact_id: "contact-id-001",
             },
         )
@@ -1516,7 +1505,7 @@ async fn chat_create_group_returns_typed_response() {
         .chat_create_group(
             &test_session(&api_url),
             &ChatCreateGroupInput {
-                client_id: "client-group-001",
+                client_id: Some("client-group-001"),
                 name: "Test Group",
                 member_ids: &["contact-id-002"],
                 description: None,
@@ -1575,26 +1564,16 @@ async fn chat_set_update_muted_returns_typed_response() {
 
     let api_url = format!("{}/api", server.uri());
     let result = client
-        .chat_set_update(
+        .chat_update(
             &test_session(&api_url),
-            &ChatUpdateInput {
-                id: "01HV5Z6QKWJ7N3P8R2X4YTMDAA",
+            "01HV5Z6QKWJ7N3P8R2X4YTMDAA",
+            &ChatPatch {
                 muted: Some(true),
-                mute_until: None,
-                receive_typing_indicators: None,
-                pinned_message_ids: None,
-                message_expiry_seconds: None,
-                receipt_sharing: None,
-                name: None,
-                description: None,
-                avatar_blob_id: None,
-                add_members: &[],
-                remove_members: &[],
-                update_member_roles: &[],
+                ..Default::default()
             },
         )
         .await
-        .expect("chat_set_update must succeed");
+        .expect("chat_update must succeed");
 
     // Oracle: RFC 8620 §5.3 — newState reflects the post-update state
     assert_eq!(result.new_state, "chat-state-002");
@@ -1744,26 +1723,16 @@ async fn chat_set_update_with_add_members_role_serializes_correctly() {
         role: Some(jmap_chat::types::ChatMemberRole::Admin),
     }];
     let result = client
-        .chat_set_update(
+        .chat_update(
             &test_session(&api_url),
-            &ChatUpdateInput {
-                id: "01HV5Z6QKWJ7N3P8R2X4YTMDAA",
-                muted: None,
-                mute_until: None,
-                receive_typing_indicators: None,
-                pinned_message_ids: None,
-                message_expiry_seconds: None,
-                receipt_sharing: None,
-                name: None,
-                description: None,
-                avatar_blob_id: None,
-                add_members: &members,
-                remove_members: &[],
-                update_member_roles: &[],
+            "01HV5Z6QKWJ7N3P8R2X4YTMDAA",
+            &ChatPatch {
+                add_members: Some(&members),
+                ..Default::default()
             },
         )
         .await
-        .expect("chat_set_update must succeed");
+        .expect("chat_update must succeed");
 
     // Oracle: chat_set_update_response.json — newState is "chat-state-002"
     assert_eq!(result.new_state, "chat-state-002");
@@ -1849,10 +1818,10 @@ async fn chat_contact_set_blocked_returns_typed_response() {
     let result = client
         .chat_contact_set(
             &test_session(&api_url),
-            &ChatContactSetInput {
-                id: "01HV5Z6QKWJ7N3P8R2X4YTMDCC",
+            "01HV5Z6QKWJ7N3P8R2X4YTMDCC",
+            &ChatContactPatch {
                 blocked: Some(true),
-                display_name: None,
+                ..Default::default()
             },
         )
         .await
@@ -2088,7 +2057,7 @@ async fn space_create_returns_typed_response() {
         .space_create(
             &test_session(&api_url),
             &SpaceCreateInput {
-                client_id: "client-space-001",
+                client_id: Some("client-space-001"),
                 name: "Engineering",
                 description: None,
                 icon_blob_id: None,
@@ -2136,24 +2105,16 @@ async fn space_set_update_returns_typed_response() {
 
     let api_url = format!("{}/api", server.uri());
     let result = client
-        .space_set_update(
+        .space_update(
             &test_session(&api_url),
-            &SpaceUpdateInput {
-                id: "01HV5Z6QKWJ7N3P8R2X4YTMDSP",
+            "01HV5Z6QKWJ7N3P8R2X4YTMDSP",
+            &SpacePatch {
                 name: Some("Engineering Team"),
-                description: None,
-                icon_blob_id: None,
-                is_public: None,
-                is_publicly_previewable: None,
-                add_members: &[],
-                remove_members: &[],
-                update_members: &[],
-                add_channels: &[],
-                remove_channels: &[],
+                ..Default::default()
             },
         )
         .await
-        .expect("space_set_update must succeed");
+        .expect("space_update must succeed");
 
     // Oracle: space_set_update_response.json — updated map has one entry
     let updated = result.updated.expect("updated must be Some");
@@ -2190,7 +2151,7 @@ async fn space_set_destroy_returns_typed_response() {
 
     let api_url = format!("{}/api", server.uri());
     let result = client
-        .space_set_destroy(&test_session(&api_url), &["01HV5Z6QKWJ7N3P8R2X4YTMDSP"])
+        .space_destroy(&test_session(&api_url), &["01HV5Z6QKWJ7N3P8R2X4YTMDSP"])
         .await
         .expect("space_set_destroy must succeed");
 
@@ -2428,7 +2389,7 @@ async fn push_subscription_set_returns_typed_response() {
         .push_subscription_set(
             &test_session(&api_url),
             &PushSubscriptionCreateInput {
-                client_id: "client-push-001",
+                client_id: Some("client-push-001"),
                 device_client_id: "device-abc",
                 url: "https://push.example.com/endpoint",
                 expires: None,
@@ -2523,20 +2484,16 @@ async fn message_set_update_read_at_sends_correct_patch() {
 
     let api_url = format!("{}/api", server.uri());
     client
-        .message_set_update(
+        .message_update(
             &test_session(&api_url),
-            &MessageUpdateInput {
-                id: "01HV5Z6QKWJ7N3P8R2X4YTMD42",
-                body: None,
-                body_type: None,
-                reaction_changes: &[],
+            "01HV5Z6QKWJ7N3P8R2X4YTMD42",
+            &MessagePatch {
                 read_at: Some(&read_at),
-                deleted_at: None,
-                deleted_for_all: None,
+                ..Default::default()
             },
         )
         .await
-        .expect("message_set_update with readAt must succeed");
+        .expect("message_update with readAt must succeed");
 }
 
 // ---------------------------------------------------------------------------
@@ -2610,7 +2567,7 @@ async fn message_create_rate_limited_returns_error() {
         .message_create(
             &test_session(&api_url),
             &MessageCreateInput {
-                client_id: "client-id-001",
+                client_id: Some("client-id-001"),
                 chat_id: "chat-001",
                 body: "Hello",
                 body_type: "text/plain",
@@ -2658,7 +2615,7 @@ async fn chat_set_destroy_returns_typed_response() {
 
     let api_url = format!("{}/api", server.uri());
     let result = client
-        .chat_set_destroy(&test_session(&api_url), &["01HV5Z6QKWJ7N3P8R2X4YTMDCH"])
+        .chat_destroy(&test_session(&api_url), &["01HV5Z6QKWJ7N3P8R2X4YTMDCH"])
         .await
         .expect("chat_set_destroy must succeed");
 
@@ -2707,7 +2664,7 @@ async fn chat_create_channel_returns_typed_response() {
         .chat_create_channel(
             &test_session(&api_url),
             &ChatCreateChannelInput {
-                client_id: "client-ch-001",
+                client_id: Some("client-ch-001"),
                 space_id: "space-001",
                 name: "general",
                 description: None,

@@ -74,7 +74,9 @@ impl crate::client::JmapChatClient {
             if let Some(mu) = inp.max_uses {
                 obj["maxUses"] = mu.into();
             }
-            args["create"] = serde_json::json!({ inp.client_id: obj });
+            let mut buf = String::new();
+            let client_id = super::resolve_client_id(inp.client_id, &mut buf);
+            args["create"] = serde_json::json!({ client_id: obj });
         }
         let (call_id, req) = super::build_request("SpaceInvite/set", args);
         let resp = self.call(api_url, &req).await?;

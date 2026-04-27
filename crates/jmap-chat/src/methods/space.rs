@@ -1,7 +1,7 @@
 use super::{
     ChangesResponse, GetResponse, QueryChangesResponse, QueryResponse, SetResponse,
     SpaceAddChannelInput, SpaceAddMemberInput, SpaceCreateInput, SpaceJoinInput, SpaceJoinResponse,
-    SpaceQueryInput, SpaceUpdateInput, SpaceUpdateMemberInput,
+    SpacePatch, SpaceQueryInput, SpaceUpdateMemberInput,
 };
 
 impl crate::client::JmapChatClient {
@@ -53,14 +53,14 @@ impl crate::client::JmapChatClient {
     ///
     /// Permanently removes the listed Space IDs from the account.
     /// `ids` must be non-empty; the guard fires before any network call.
-    pub async fn space_set_destroy(
+    pub async fn space_destroy(
         &self,
         session: &crate::jmap::Session,
         ids: &[&str],
     ) -> Result<SetResponse, crate::error::ClientError> {
         if ids.is_empty() {
             return Err(crate::error::ClientError::InvalidArgument(
-                "space_set_destroy: ids may not be empty".into(),
+                "space_destroy: ids may not be empty".into(),
             ));
         }
         let (api_url, account_id) = Self::session_parts(session)?;
@@ -136,14 +136,17 @@ impl crate::client::JmapChatClient {
 
     /// Create a new Space (JMAP Chat §Space/set create).
     ///
-    /// `client_id` is a caller-supplied ULID used as the creation key. The server
-    /// maps it to the server-assigned Space id in `SetResponse.created`.
+    /// When `input.client_id` is `None`, a ULID is generated automatically.
+    /// The server maps the creation key to the server-assigned Space id in
+    /// `SetResponse.created`.
     pub async fn space_create(
         &self,
         session: &crate::jmap::Session,
         input: &SpaceCreateInput<'_>,
     ) -> Result<SetResponse, crate::error::ClientError> {
         let (api_url, account_id) = Self::session_parts(session)?;
+        let mut buf = String::new();
+        let client_id = super::resolve_client_id(input.client_id, &mut buf);
         let mut create_obj = serde_json::json!({ "name": input.name });
         if let Some(d) = input.description {
             create_obj["description"] = d.into();
@@ -153,7 +156,7 @@ impl crate::client::JmapChatClient {
         }
         let args = serde_json::json!({
             "accountId": account_id,
-            "create": { input.client_id: create_obj },
+            "create": { client_id: create_obj },
         });
         let (call_id, req) = super::build_request("Space/set", args);
         let resp = self.call(api_url, &req).await?;
@@ -186,140 +189,140 @@ impl crate::client::JmapChatClient {
 
     /// Update Space properties (JMAP Chat §Space/set update).
     ///
-    /// Issues an `update` operation patching only the fields present in `input`.
-    /// Nullable fields (`description`, `icon_blob_id`) accept `Some(None)` to clear
-    /// and `Some(Some(v))` to set. Slice fields default to `&[]` for no-change.
-    ///
-    /// If all fields are absent/empty, an empty patch is sent — RFC 8620 §5.3
-    /// permits this; the server treats it as a no-op but still returns the Space
-    /// in `updated`.
+    /// Issues an `update` operation patching only the fields present in `patch`.
+    /// Use `Patch::Set(v)` to set nullable fields, `Patch::Clear` to null-clear
+    /// them, and `Patch::Keep` (default) to leave them unchanged. Slice fields
+    /// default to `None` for no-change.
     ///
     /// **Out of scope**: `addRoles`, `removeRoles`, `updateRoles`,
     /// `updateChannels`, `addCategories`, `removeCategories`, `updateCategories`
     /// are not included. Role and category management will be added in a future
     /// iteration of this API.
-    pub async fn space_set_update(
+    pub async fn space_update(
         &self,
         session: &crate::jmap::Session,
-        input: &SpaceUpdateInput<'_>,
+        id: &str,
+        patch: &SpacePatch<'_>,
     ) -> Result<SetResponse, crate::error::ClientError> {
         let (api_url, account_id) = Self::session_parts(session)?;
-        let mut patch = serde_json::Map::new();
+        let mut patch_map = serde_json::Map::new();
 
-        if let Some(n) = input.name {
-            patch.insert("name".into(), n.into());
+        if let Some(n) = patch.name {
+            patch_map.insert("name".into(), n.into());
         }
-        if let Some(desc) = &input.description {
-            patch.insert(
-                "description".into(),
-                desc.map(serde_json::Value::from)
-                    .unwrap_or(serde_json::Value::Null),
-            );
+        if let Some(entry) = patch
+            .description
+            .map_entry()
+            .map_err(crate::error::ClientError::Serialize)?
+        {
+            patch_map.insert("description".into(), entry);
         }
-        if let Some(ib) = &input.icon_blob_id {
-            patch.insert(
-                "iconBlobId".into(),
-                ib.map(serde_json::Value::from)
-                    .unwrap_or(serde_json::Value::Null),
-            );
+        if let Some(entry) = patch
+            .icon_blob_id
+            .map_entry()
+            .map_err(crate::error::ClientError::Serialize)?
+        {
+            patch_map.insert("iconBlobId".into(), entry);
         }
-        if let Some(ip) = input.is_public {
-            patch.insert("isPublic".into(), ip.into());
+        if let Some(ip) = patch.is_public {
+            patch_map.insert("isPublic".into(), ip.into());
         }
-        if let Some(ipp) = input.is_publicly_previewable {
-            patch.insert("isPubliclyPreviewable".into(), ipp.into());
+        if let Some(ipp) = patch.is_publicly_previewable {
+            patch_map.insert("isPubliclyPreviewable".into(), ipp.into());
         }
-        if !input.add_members.is_empty() {
-            let arr: Vec<serde_json::Value> = input
-                .add_members
-                .iter()
-                .map(|m: &SpaceAddMemberInput<'_>| {
-                    let mut obj = serde_json::json!({ "id": m.id });
-                    if let Some(role_ids) = m.role_ids {
-                        obj["roleIds"] = serde_json::Value::Array(
-                            role_ids
-                                .iter()
-                                .map(|id| serde_json::Value::String((*id).to_owned()))
-                                .collect(),
-                        );
-                    }
-                    obj
-                })
-                .collect();
-            patch.insert("addMembers".into(), serde_json::Value::Array(arr));
+        if let Some(members) = patch.add_members {
+            if !members.is_empty() {
+                let arr: Vec<serde_json::Value> = members
+                    .iter()
+                    .map(|m: &SpaceAddMemberInput<'_>| {
+                        let mut obj = serde_json::json!({ "id": m.id });
+                        if let Some(role_ids) = m.role_ids {
+                            obj["roleIds"] = serde_json::Value::Array(
+                                role_ids
+                                    .iter()
+                                    .map(|id| serde_json::Value::String((*id).to_owned()))
+                                    .collect(),
+                            );
+                        }
+                        obj
+                    })
+                    .collect();
+                patch_map.insert("addMembers".into(), serde_json::Value::Array(arr));
+            }
         }
-        if !input.remove_members.is_empty() {
-            patch.insert(
-                "removeMembers".into(),
-                serde_json::Value::Array(
-                    input
-                        .remove_members
-                        .iter()
-                        .map(|id| serde_json::Value::String((*id).to_owned()))
-                        .collect(),
-                ),
-            );
+        if let Some(rm) = patch.remove_members {
+            if !rm.is_empty() {
+                patch_map.insert(
+                    "removeMembers".into(),
+                    serde_json::Value::Array(
+                        rm.iter()
+                            .map(|id| serde_json::Value::String((*id).to_owned()))
+                            .collect(),
+                    ),
+                );
+            }
         }
-        if !input.update_members.is_empty() {
-            let arr: Vec<serde_json::Value> = input
-                .update_members
-                .iter()
-                .map(|u: &SpaceUpdateMemberInput<'_>| {
-                    let mut obj = serde_json::json!({ "id": u.id });
-                    if let Some(role_ids) = u.role_ids {
-                        obj["roleIds"] = serde_json::Value::Array(
-                            role_ids
-                                .iter()
-                                .map(|id| serde_json::Value::String((*id).to_owned()))
-                                .collect(),
-                        );
-                    }
-                    if let Some(nick) = &u.nick {
-                        obj["nick"] = nick
-                            .map(serde_json::Value::from)
-                            .unwrap_or(serde_json::Value::Null);
-                    }
-                    obj
-                })
-                .collect();
-            patch.insert("updateMembers".into(), serde_json::Value::Array(arr));
+        if let Some(um) = patch.update_members {
+            if !um.is_empty() {
+                let arr: Vec<serde_json::Value> = um
+                    .iter()
+                    .map(|u: &SpaceUpdateMemberInput<'_>| -> Result<serde_json::Value, serde_json::Error> {
+                        let mut obj = serde_json::json!({ "id": u.id });
+                        if let Some(role_ids) = u.role_ids {
+                            obj["roleIds"] = serde_json::Value::Array(
+                                role_ids
+                                    .iter()
+                                    .map(|id| serde_json::Value::String((*id).to_owned()))
+                                    .collect(),
+                            );
+                        }
+                        if let Some(entry) = u.nick.map_entry()? {
+                            obj["nick"] = entry;
+                        }
+                        Ok(obj)
+                    })
+                    .collect::<Result<Vec<_>, _>>()
+                    .map_err(crate::error::ClientError::Serialize)?;
+                patch_map.insert("updateMembers".into(), serde_json::Value::Array(arr));
+            }
         }
-        if !input.add_channels.is_empty() {
-            let arr: Vec<serde_json::Value> = input
-                .add_channels
-                .iter()
-                .map(|c: &SpaceAddChannelInput<'_>| {
-                    let mut obj = serde_json::json!({ "name": c.name });
-                    if let Some(cat) = c.category_id {
-                        obj["categoryId"] = cat.into();
-                    }
-                    if let Some(pos) = c.position {
-                        obj["position"] = pos.into();
-                    }
-                    if let Some(t) = c.topic {
-                        obj["topic"] = t.into();
-                    }
-                    obj
-                })
-                .collect();
-            patch.insert("addChannels".into(), serde_json::Value::Array(arr));
+        if let Some(ac) = patch.add_channels {
+            if !ac.is_empty() {
+                let arr: Vec<serde_json::Value> = ac
+                    .iter()
+                    .map(|c: &SpaceAddChannelInput<'_>| {
+                        let mut obj = serde_json::json!({ "name": c.name });
+                        if let Some(cat) = c.category_id {
+                            obj["categoryId"] = cat.into();
+                        }
+                        if let Some(pos) = c.position {
+                            obj["position"] = pos.into();
+                        }
+                        if let Some(t) = c.topic {
+                            obj["topic"] = t.into();
+                        }
+                        obj
+                    })
+                    .collect();
+                patch_map.insert("addChannels".into(), serde_json::Value::Array(arr));
+            }
         }
-        if !input.remove_channels.is_empty() {
-            patch.insert(
-                "removeChannels".into(),
-                serde_json::Value::Array(
-                    input
-                        .remove_channels
-                        .iter()
-                        .map(|id| serde_json::Value::String((*id).to_owned()))
-                        .collect(),
-                ),
-            );
+        if let Some(rc) = patch.remove_channels {
+            if !rc.is_empty() {
+                patch_map.insert(
+                    "removeChannels".into(),
+                    serde_json::Value::Array(
+                        rc.iter()
+                            .map(|id| serde_json::Value::String((*id).to_owned()))
+                            .collect(),
+                    ),
+                );
+            }
         }
 
         let args = serde_json::json!({
             "accountId": account_id,
-            "update": { input.id: serde_json::Value::Object(patch) },
+            "update": { id: serde_json::Value::Object(patch_map) },
         });
         let (call_id, req) = super::build_request("Space/set", args);
         let resp = self.call(api_url, &req).await?;

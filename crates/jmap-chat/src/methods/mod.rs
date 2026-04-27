@@ -146,6 +146,44 @@ pub struct TypingResponse {
 }
 
 // ---------------------------------------------------------------------------
+// Patch<T>: three-way update value for nullable fields
+// ---------------------------------------------------------------------------
+
+/// Three-way patch value for nullable JMAP fields.
+///
+/// - `Keep` (default): the field is omitted from the patch — server leaves it unchanged.
+/// - `Set(v)`: the field is included with value `v`.
+/// - `Clear`: the field is included as JSON `null` (clears the server-side value).
+///
+/// Use `Patch::from(v)` or `.into()` to construct `Set(v)`. Use `Default::default()`
+/// or `Patch::Keep` to leave the field unchanged.
+#[derive(Debug, Default)]
+pub enum Patch<T> {
+    #[default]
+    Keep,
+    Set(T),
+    Clear,
+}
+
+impl<T> From<T> for Patch<T> {
+    fn from(v: T) -> Self {
+        Patch::Set(v)
+    }
+}
+
+impl<T: serde::Serialize> Patch<T> {
+    /// Returns `None` when `Keep` (omit key from patch),
+    /// `Some(Value::Null)` when `Clear`, or `Some(serialized_value)` when `Set`.
+    pub fn map_entry(&self) -> Result<Option<serde_json::Value>, serde_json::Error> {
+        match self {
+            Patch::Keep => Ok(None),
+            Patch::Clear => Ok(Some(serde_json::Value::Null)),
+            Patch::Set(v) => serde_json::to_value(v).map(Some),
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Input types for methods with many optional parameters
 // ---------------------------------------------------------------------------
 
@@ -181,7 +219,8 @@ pub struct MessageQueryInput<'a> {
 /// Input parameters for [`JmapChatClient::message_create`].
 #[derive(Debug)]
 pub struct MessageCreateInput<'a> {
-    pub client_id: &'a str,
+    /// Caller-supplied creation key. When `None`, a ULID is generated automatically.
+    pub client_id: Option<&'a str>,
     pub chat_id: &'a str,
     pub body: &'a str,
     /// MIME type for the message body. Spec-defined values: `"text/plain"`,
@@ -211,24 +250,22 @@ pub enum ReactionChange<'a> {
     Remove { sender_reaction_id: &'a str },
 }
 
-/// Input parameters for [`JmapChatClient::message_set_update`].
+/// Patch parameters for [`JmapChatClient::message_update`].
 ///
-/// All fields except `id` are optional; absent fields are not included in the
-/// patch (the server leaves them unchanged). For chat-level deletion, set
+/// All fields are optional; absent fields (i.e. `None`) are not included in
+/// the patch (the server leaves them unchanged). For chat-level deletion, set
 /// `deleted_at` (soft-delete) and optionally `deleted_for_all: Some(true)`
 /// (hard-delete, propagated to all participants).
-#[derive(Debug)]
-pub struct MessageUpdateInput<'a> {
-    /// `Message.id` to update.
-    pub id: &'a str,
+///
+/// Use `..Default::default()` to fill in unused fields.
+#[derive(Debug, Default)]
+pub struct MessagePatch<'a> {
     /// New message body text (author-only edit).
     pub body: Option<&'a str>,
     /// MIME type for `body` — `"text/plain"` or `"text/markdown"`.
     pub body_type: Option<&'a str>,
-    /// Reaction changes to apply in this update. Pass `&[]` when only other
-    /// fields are being patched. Example: `reaction_changes: &changes[..]`
-    /// where `changes: Vec<ReactionChange<'_>>` is built by the caller.
-    pub reaction_changes: &'a [ReactionChange<'a>],
+    /// Reaction changes to apply. `None` (default) = no reaction changes.
+    pub reaction_changes: Option<&'a [ReactionChange<'a>]>,
     /// Set the read-receipt timestamp (`Message.readAt`).
     pub read_at: Option<&'a crate::jmap::UTCDate>,
     /// Set the deletion timestamp for soft/hard delete.
@@ -238,24 +275,20 @@ pub struct MessageUpdateInput<'a> {
     pub deleted_for_all: Option<bool>,
 }
 
-/// Input parameters for [`JmapChatClient::presence_status_set`].
+/// Patch parameters for [`JmapChatClient::presence_status_set`].
 ///
-/// All fields except `id` are optional. A field that is `None` is omitted from
-/// the patch, leaving the server value unchanged. For nullable spec fields
-/// (`status_text`, `status_emoji`, `expires_at`) use `Some(None)` to clear
-/// the field and `Some(Some(value))` to set it.
+/// All fields are optional. A field that is `Patch::Keep` (default) is omitted
+/// from the patch, leaving the server value unchanged. Use `Patch::Set(v)` to
+/// set a value and `Patch::Clear` to null-clear a nullable field.
 ///
-/// `Default` is intentionally not derived: `id` has no safe default value and
-/// an empty-string id would produce an invalid `/set` patch key.
-#[derive(Debug)]
-pub struct PresenceStatusSetInput<'a> {
-    /// The PresenceStatus.id to update (from `presence_status_get`).
-    pub id: &'a str,
+/// Use `..Default::default()` to fill in unused fields.
+#[derive(Debug, Default)]
+pub struct PresenceStatusPatch<'a> {
     pub presence: Option<crate::types::OwnerPresence>,
-    pub status_text: Option<Option<&'a str>>,
-    pub status_emoji: Option<Option<&'a str>>,
-    /// Set or clear the auto-clear deadline. `Some(None)` removes any deadline.
-    pub expires_at: Option<Option<&'a crate::jmap::UTCDate>>,
+    pub status_text: Patch<&'a str>,
+    pub status_emoji: Patch<&'a str>,
+    /// Set or clear the auto-clear deadline. `Patch::Clear` removes any deadline.
+    pub expires_at: Patch<&'a crate::jmap::UTCDate>,
     pub receipt_sharing: Option<bool>,
 }
 
@@ -272,8 +305,8 @@ pub struct CustomEmojiQueryInput<'a> {
 /// Parameters for creating one CustomEmoji via [`JmapChatClient::custom_emoji_set`].
 #[derive(Debug)]
 pub struct CustomEmojiCreateInput<'a> {
-    /// Caller-supplied ULID used as the creation key in the JMAP create map.
-    pub client_id: &'a str,
+    /// Caller-supplied creation key. When `None`, a ULID is generated automatically.
+    pub client_id: Option<&'a str>,
     /// Shortcode name without colons (e.g., `catjam`).
     pub name: &'a str,
     /// blobId of the emoji image (already uploaded).
@@ -285,8 +318,8 @@ pub struct CustomEmojiCreateInput<'a> {
 /// Parameters for creating one SpaceInvite via [`JmapChatClient::space_invite_set`].
 #[derive(Debug)]
 pub struct SpaceInviteCreateInput<'a> {
-    /// Caller-supplied ULID used as the creation key.
-    pub client_id: &'a str,
+    /// Caller-supplied creation key. When `None`, a ULID is generated automatically.
+    pub client_id: Option<&'a str>,
     pub space_id: &'a str,
     pub default_channel_id: Option<&'a str>,
     pub expires_at: Option<&'a crate::jmap::UTCDate>,
@@ -296,8 +329,8 @@ pub struct SpaceInviteCreateInput<'a> {
 /// Parameters for creating one SpaceBan via [`JmapChatClient::space_ban_set`].
 #[derive(Debug)]
 pub struct SpaceBanCreateInput<'a> {
-    /// Caller-supplied ULID used as the creation key.
-    pub client_id: &'a str,
+    /// Caller-supplied creation key. When `None`, a ULID is generated automatically.
+    pub client_id: Option<&'a str>,
     pub space_id: &'a str,
     /// ChatContact.id of the user to ban.
     pub user_id: &'a str,
@@ -305,18 +338,16 @@ pub struct SpaceBanCreateInput<'a> {
     pub expires_at: Option<&'a crate::jmap::UTCDate>,
 }
 
-/// Input parameters for [`JmapChatClient::chat_contact_set`].
+/// Patch parameters for [`JmapChatClient::chat_contact_set`].
 ///
-/// Only `id` is required; absent fields are omitted from the patch. For the
-/// nullable `display_name` field, use `Some(None)` to clear and `Some(Some(s))`
-/// to set. `Default` is intentionally not derived: `id` has no safe default.
-#[derive(Debug)]
-pub struct ChatContactSetInput<'a> {
-    /// `ChatContact.id` to update.
-    pub id: &'a str,
+/// All fields are optional; absent fields are omitted from the patch. For the
+/// nullable `display_name` field, use `Patch::Set(s)` to set and `Patch::Clear`
+/// to clear. Use `..Default::default()` to fill in unused fields.
+#[derive(Debug, Default)]
+pub struct ChatContactPatch<'a> {
     pub blocked: Option<bool>,
-    /// `Some(None)` clears `displayName`; `Some(Some(s))` sets it.
-    pub display_name: Option<Option<&'a str>>,
+    /// `Patch::Clear` clears `displayName`; `Patch::Set(s)` sets it.
+    pub display_name: Patch<&'a str>,
 }
 
 /// Input parameters for [`JmapChatClient::chat_contact_query`].
@@ -338,8 +369,8 @@ pub struct ChatContactQueryInput<'a> {
 /// Input parameters for [`JmapChatClient::space_create`].
 #[derive(Debug)]
 pub struct SpaceCreateInput<'a> {
-    /// Caller-supplied ULID used as the creation key in the JMAP create map.
-    pub client_id: &'a str,
+    /// Caller-supplied creation key. When `None`, a ULID is generated automatically.
+    pub client_id: Option<&'a str>,
     /// Display name for the Space.
     pub name: &'a str,
     pub description: Option<&'a str>,
@@ -376,7 +407,7 @@ pub struct SpaceJoinResponse {
     pub space_id: String,
 }
 
-/// One entry in the `addMembers` patch key for [`JmapChatClient::chat_set_update`].
+/// One entry in the `addMembers` patch key for [`JmapChatClient::chat_update`].
 #[derive(Debug)]
 pub struct AddMemberInput<'a> {
     /// ChatContact.id of the member to add.
@@ -385,7 +416,7 @@ pub struct AddMemberInput<'a> {
     pub role: Option<crate::types::ChatMemberRole>,
 }
 
-/// One entry in the `updateMemberRoles` patch key for [`JmapChatClient::chat_set_update`].
+/// One entry in the `updateMemberRoles` patch key for [`JmapChatClient::chat_update`].
 #[derive(Debug)]
 pub struct UpdateMemberRoleInput<'a> {
     /// ChatContact.id of the member to update.
@@ -397,8 +428,8 @@ pub struct UpdateMemberRoleInput<'a> {
 /// Input parameters for [`JmapChatClient::chat_create_direct`].
 #[derive(Debug)]
 pub struct ChatCreateDirectInput<'a> {
-    /// Caller-supplied ULID used as the creation key in the JMAP create map.
-    pub client_id: &'a str,
+    /// Caller-supplied creation key. When `None`, a ULID is generated automatically.
+    pub client_id: Option<&'a str>,
     /// ChatContact.id of the other participant.
     pub contact_id: &'a str,
 }
@@ -406,8 +437,8 @@ pub struct ChatCreateDirectInput<'a> {
 /// Input parameters for [`JmapChatClient::chat_create_group`].
 #[derive(Debug)]
 pub struct ChatCreateGroupInput<'a> {
-    /// Caller-supplied ULID used as the creation key in the JMAP create map.
-    pub client_id: &'a str,
+    /// Caller-supplied creation key. When `None`, a ULID is generated automatically.
+    pub client_id: Option<&'a str>,
     /// Display name for the group.
     pub name: &'a str,
     /// ChatContact.ids of initial non-owner members.
@@ -420,8 +451,8 @@ pub struct ChatCreateGroupInput<'a> {
 /// Input parameters for [`JmapChatClient::chat_create_channel`].
 #[derive(Debug)]
 pub struct ChatCreateChannelInput<'a> {
-    /// Caller-supplied ULID used as the creation key in the JMAP create map.
-    pub client_id: &'a str,
+    /// Caller-supplied creation key. When `None`, a ULID is generated automatically.
+    pub client_id: Option<&'a str>,
     /// The Space this channel belongs to.
     pub space_id: &'a str,
     /// Display name for the channel.
@@ -429,45 +460,41 @@ pub struct ChatCreateChannelInput<'a> {
     pub description: Option<&'a str>,
 }
 
-/// Input parameters for [`JmapChatClient::chat_set_update`].
+/// Patch parameters for [`JmapChatClient::chat_update`].
 ///
-/// All fields except `id` are optional; absent fields are not included in the
-/// patch. For nullable spec fields (`mute_until`, `description`, `avatar_blob_id`)
-/// use `Some(None)` to clear and `Some(Some(value))` to set. Slice fields
-/// (`pinned_message_ids`, `add_members`, `remove_members`, `update_member_roles`)
-/// default to `&[]` when no changes are needed.
+/// All fields are optional; absent fields are not included in the patch (the
+/// server leaves them unchanged). For nullable spec fields (`mute_until`,
+/// `description`, `avatar_blob_id`) use `Patch::Set(v)` to set and
+/// `Patch::Clear` to null-clear. Slice fields default to `None` (no change).
 ///
-/// `Default` is intentionally not derived: `id` has no safe default value.
-#[derive(Debug)]
-pub struct ChatUpdateInput<'a> {
-    /// `Chat.id` to update.
-    pub id: &'a str,
+/// Use `..Default::default()` to fill in unused fields.
+#[derive(Debug, Default)]
+pub struct ChatPatch<'a> {
     pub muted: Option<bool>,
-    /// `Some(None)` clears `muteUntil`; `Some(Some(t))` sets it.
-    pub mute_until: Option<Option<&'a crate::jmap::UTCDate>>,
+    /// `Patch::Clear` clears `muteUntil`; `Patch::Set(t)` sets it.
+    pub mute_until: Patch<&'a crate::jmap::UTCDate>,
     pub receive_typing_indicators: Option<bool>,
-    /// Replace the entire pinned-message list. Pass `Some(&[])` to clear all pins.
+    /// Replace the entire pinned-message list. `Some(&[])` clears all pins.
     pub pinned_message_ids: Option<&'a [&'a str]>,
     /// Spec defines this as `UnsignedInt` (non-nullable). To remove a previously
-    /// set value, omit this field — servers must handle the absence gracefully
-    /// (the spec does not define a null-clear path for `messageExpirySeconds`).
+    /// set value, omit this field.
     pub message_expiry_seconds: Option<u64>,
     pub receipt_sharing: Option<bool>,
     /// New display name (group chats, admin only).
     pub name: Option<&'a str>,
-    /// `Some(None)` clears; `Some(Some(s))` sets (group chats, admin only).
-    pub description: Option<Option<&'a str>>,
-    /// `Some(None)` clears; `Some(Some(id))` sets (group chats, admin only).
-    pub avatar_blob_id: Option<Option<&'a str>>,
-    /// Members to add (group chats, admin only). Pass `&[]` when unused.
-    pub add_members: &'a [AddMemberInput<'a>],
-    /// ChatContact.ids to remove (group chats, admin only). Pass `&[]` when unused.
-    pub remove_members: &'a [&'a str],
-    /// Role changes for existing members (group chats, admin only). Pass `&[]` when unused.
-    pub update_member_roles: &'a [UpdateMemberRoleInput<'a>],
+    /// `Patch::Clear` clears; `Patch::Set(s)` sets (group chats, admin only).
+    pub description: Patch<&'a str>,
+    /// `Patch::Clear` clears; `Patch::Set(id)` sets (group chats, admin only).
+    pub avatar_blob_id: Patch<&'a str>,
+    /// Members to add (group chats, admin only). `None` = no change.
+    pub add_members: Option<&'a [AddMemberInput<'a>]>,
+    /// ChatContact.ids to remove (group chats, admin only). `None` = no change.
+    pub remove_members: Option<&'a [&'a str]>,
+    /// Role changes for existing members (group chats, admin only). `None` = no change.
+    pub update_member_roles: Option<&'a [UpdateMemberRoleInput<'a>]>,
 }
 
-/// One member to add in the `addMembers` patch key of [`JmapChatClient::space_set_update`].
+/// One member to add in the `addMembers` patch key of [`JmapChatClient::space_update`].
 #[derive(Debug)]
 pub struct SpaceAddMemberInput<'a> {
     /// ChatContact.id of the member to add.
@@ -476,17 +503,17 @@ pub struct SpaceAddMemberInput<'a> {
     pub role_ids: Option<&'a [&'a str]>,
 }
 
-/// One member update in the `updateMembers` patch key of [`JmapChatClient::space_set_update`].
+/// One member update in the `updateMembers` patch key of [`JmapChatClient::space_update`].
 #[derive(Debug)]
 pub struct SpaceUpdateMemberInput<'a> {
     /// ChatContact.id of the member to update.
     pub id: &'a str,
     pub role_ids: Option<&'a [&'a str]>,
-    /// `Some(None)` clears the nick; `Some(Some(s))` sets it.
-    pub nick: Option<Option<&'a str>>,
+    /// `Patch::Clear` clears the nick; `Patch::Set(s)` sets it.
+    pub nick: Patch<&'a str>,
 }
 
-/// One channel to add in the `addChannels` patch key of [`JmapChatClient::space_set_update`].
+/// One channel to add in the `addChannels` patch key of [`JmapChatClient::space_update`].
 #[derive(Debug)]
 pub struct SpaceAddChannelInput<'a> {
     pub name: &'a str,
@@ -495,38 +522,36 @@ pub struct SpaceAddChannelInput<'a> {
     pub topic: Option<&'a str>,
 }
 
-/// Input parameters for [`JmapChatClient::space_set_update`].
+/// Patch parameters for [`JmapChatClient::space_update`].
 ///
-/// All fields except `id` are optional. Absent fields are omitted from the patch.
-/// Nullable fields (`description`, `icon_blob_id`) use `Some(None)` to clear.
-/// Slice fields default to `&[]` when no changes are needed.
+/// All fields are optional. Absent fields are omitted from the patch.
+/// Nullable fields (`description`, `icon_blob_id`) use `Patch::Set(v)` to set
+/// and `Patch::Clear` to null-clear. Slice fields default to `None` (no change).
 ///
 /// Scope: metadata + member + channel management. Role and category management
 /// are out of scope for this epic.
 ///
-/// `Default` is intentionally not derived: `id` has no safe default value.
-#[derive(Debug)]
-pub struct SpaceUpdateInput<'a> {
-    /// `Space.id` to update.
-    pub id: &'a str,
+/// Use `..Default::default()` to fill in unused fields.
+#[derive(Debug, Default)]
+pub struct SpacePatch<'a> {
     /// New display name (`manage_space` permission required).
     pub name: Option<&'a str>,
-    /// `Some(None)` clears; `Some(Some(s))` sets.
-    pub description: Option<Option<&'a str>>,
-    /// `Some(None)` clears; `Some(Some(id))` sets.
-    pub icon_blob_id: Option<Option<&'a str>>,
+    /// `Patch::Clear` clears; `Patch::Set(s)` sets.
+    pub description: Patch<&'a str>,
+    /// `Patch::Clear` clears; `Patch::Set(id)` sets.
+    pub icon_blob_id: Patch<&'a str>,
     pub is_public: Option<bool>,
     pub is_publicly_previewable: Option<bool>,
-    /// Members to add (`manage_members` required). Pass `&[]` when unused.
-    pub add_members: &'a [SpaceAddMemberInput<'a>],
-    /// ChatContact.ids to remove (`manage_members` required). Pass `&[]` when unused.
-    pub remove_members: &'a [&'a str],
-    /// Member updates (`manage_members` required). Pass `&[]` when unused.
-    pub update_members: &'a [SpaceUpdateMemberInput<'a>],
-    /// Channels to add (`manage_channels` required). Pass `&[]` when unused.
-    pub add_channels: &'a [SpaceAddChannelInput<'a>],
-    /// Channel Chat ids to remove (`manage_channels` required). Pass `&[]` when unused.
-    pub remove_channels: &'a [&'a str],
+    /// Members to add (`manage_members` required). `None` = no change.
+    pub add_members: Option<&'a [SpaceAddMemberInput<'a>]>,
+    /// ChatContact.ids to remove (`manage_members` required). `None` = no change.
+    pub remove_members: Option<&'a [&'a str]>,
+    /// Member updates (`manage_members` required). `None` = no change.
+    pub update_members: Option<&'a [SpaceUpdateMemberInput<'a>]>,
+    /// Channels to add (`manage_channels` required). `None` = no change.
+    pub add_channels: Option<&'a [SpaceAddChannelInput<'a>]>,
+    /// Channel Chat ids to remove (`manage_channels` required). `None` = no change.
+    pub remove_channels: Option<&'a [&'a str]>,
 }
 
 /// Input parameters for [`JmapChatClient::push_subscription_set`].
@@ -534,12 +559,12 @@ pub struct SpaceUpdateInput<'a> {
 /// Creates a PushSubscription (RFC 8620 §7.2) with the optional `chatPush`
 /// extension (draft-atwood-jmap-chat-push-00 §3.1).
 ///
-/// `Default` is intentionally not derived: `client_id`, `device_client_id`,
-/// and `url` have no safe default values.
+/// `client_id`, `device_client_id`, and `url` have no safe defaults; they
+/// must always be supplied.
 #[derive(Debug)]
 pub struct PushSubscriptionCreateInput<'a> {
-    /// Caller-supplied creation key (mapped to the server-assigned id in the response).
-    pub client_id: &'a str,
+    /// Caller-supplied creation key. When `None`, a ULID is generated automatically.
+    pub client_id: Option<&'a str>,
     /// Stable client device identifier, used by the server to deduplicate subscriptions.
     pub device_client_id: &'a str,
     /// Push endpoint URL registered with the platform push service.
@@ -587,6 +612,22 @@ fn chat_using() -> &'static [String] {
             "urn:ietf:params:jmap:chat".to_string(),
         ]
     })
+}
+
+/// Resolve an optional caller-supplied client ID, generating a ULID if absent.
+///
+/// When `id` is `None`, `buf` is overwritten with a fresh ULID and a reference
+/// into `buf` is returned. When `id` is `Some(s)`, `s` is returned directly and
+/// `buf` is not touched. The returned `&str` borrows from whichever source was
+/// used and is valid as long as the caller's `buf` remains in scope.
+pub(super) fn resolve_client_id<'a>(id: Option<&'a str>, buf: &'a mut String) -> &'a str {
+    match id {
+        Some(s) => s,
+        None => {
+            *buf = ulid::Ulid::new().to_string();
+            buf.as_str()
+        }
+    }
 }
 
 // ---------------------------------------------------------------------------

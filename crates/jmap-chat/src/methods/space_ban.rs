@@ -66,9 +66,11 @@ impl crate::client::JmapChatClient {
         if let Some(ea) = input.expires_at {
             create_obj["expiresAt"] = ea.as_str().into();
         }
+        let mut buf = String::new();
+        let client_id = super::resolve_client_id(input.client_id, &mut buf);
         let args = serde_json::json!({
             "accountId": account_id,
-            "create": { input.client_id: create_obj },
+            "create": { client_id: create_obj },
             "destroy": destroy,
         });
         let (call_id, req) = super::build_request("SpaceBan/set", args);
