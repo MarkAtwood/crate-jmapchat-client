@@ -425,39 +425,42 @@ pub struct UpdateMemberRoleInput<'a> {
     pub role: crate::types::ChatMemberRole,
 }
 
-/// Input parameters for [`JmapChatClient::chat_create_direct`].
+/// Input parameters for [`JmapChatClient::chat_create`].
+///
+/// Discriminates the three Chat creation kinds from the spec. Each variant
+/// carries the fields required for that kind plus an optional `client_id`;
+/// when `None`, a ULID is generated automatically.
 #[derive(Debug)]
-pub struct ChatCreateDirectInput<'a> {
-    /// Caller-supplied creation key. When `None`, a ULID is generated automatically.
-    pub client_id: Option<&'a str>,
-    /// ChatContact.id of the other participant.
-    pub contact_id: &'a str,
-}
-
-/// Input parameters for [`JmapChatClient::chat_create_group`].
-#[derive(Debug)]
-pub struct ChatCreateGroupInput<'a> {
-    /// Caller-supplied creation key. When `None`, a ULID is generated automatically.
-    pub client_id: Option<&'a str>,
-    /// Display name for the group.
-    pub name: &'a str,
-    /// ChatContact.ids of initial non-owner members.
-    pub member_ids: &'a [&'a str],
-    pub description: Option<&'a str>,
-    pub avatar_blob_id: Option<&'a str>,
-    pub message_expiry_seconds: Option<u64>,
-}
-
-/// Input parameters for [`JmapChatClient::chat_create_channel`].
-#[derive(Debug)]
-pub struct ChatCreateChannelInput<'a> {
-    /// Caller-supplied creation key. When `None`, a ULID is generated automatically.
-    pub client_id: Option<&'a str>,
-    /// The Space this channel belongs to.
-    pub space_id: &'a str,
-    /// Display name for the channel.
-    pub name: &'a str,
-    pub description: Option<&'a str>,
+pub enum ChatCreateInput<'a> {
+    /// Create a direct (one-to-one) chat.
+    Direct {
+        /// Caller-supplied creation key. When `None`, a ULID is generated automatically.
+        client_id: Option<&'a str>,
+        /// ChatContact.id of the other participant.
+        contact_id: &'a str,
+    },
+    /// Create a group chat.
+    Group {
+        /// Caller-supplied creation key. When `None`, a ULID is generated automatically.
+        client_id: Option<&'a str>,
+        /// Display name for the group.
+        name: &'a str,
+        /// ChatContact.ids of initial non-owner members.
+        member_ids: &'a [&'a str],
+        description: Option<&'a str>,
+        avatar_blob_id: Option<&'a str>,
+        message_expiry_seconds: Option<u64>,
+    },
+    /// Create a channel chat inside a Space.
+    Channel {
+        /// Caller-supplied creation key. When `None`, a ULID is generated automatically.
+        client_id: Option<&'a str>,
+        /// The Space this channel belongs to.
+        space_id: &'a str,
+        /// Display name for the channel.
+        name: &'a str,
+        description: Option<&'a str>,
+    },
 }
 
 /// Patch parameters for [`JmapChatClient::chat_update`].

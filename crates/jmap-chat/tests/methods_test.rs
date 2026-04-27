@@ -9,11 +9,10 @@
 use jmap_chat::client::JmapChatClient;
 use jmap_chat::error::ClientError;
 use jmap_chat::methods::{
-    AddMemberInput, ChatContactPatch, ChatContactQueryInput, ChatCreateChannelInput,
-    ChatCreateDirectInput, ChatCreateGroupInput, ChatPatch, ChatQueryInput, GetResponse,
-    MessageCreateInput, MessagePatch, MessageQueryInput, PresenceStatusPatch,
-    PushSubscriptionCreateInput, ReactionChange, SpaceBanCreateInput, SpaceCreateInput,
-    SpaceInviteCreateInput, SpaceJoinInput, SpacePatch, SpaceQueryInput,
+    AddMemberInput, ChatContactPatch, ChatContactQueryInput, ChatCreateInput, ChatPatch,
+    ChatQueryInput, GetResponse, MessageCreateInput, MessagePatch, MessageQueryInput,
+    PresenceStatusPatch, PushSubscriptionCreateInput, ReactionChange, SpaceBanCreateInput,
+    SpaceCreateInput, SpaceInviteCreateInput, SpaceJoinInput, SpacePatch, SpaceQueryInput,
 };
 use jmap_chat::types::OwnerPresence;
 use wiremock::matchers::{body_json, method};
@@ -1440,15 +1439,15 @@ async fn chat_create_direct_returns_typed_response() {
 
     let api_url = format!("{}/api", server.uri());
     let result = client
-        .chat_create_direct(
+        .chat_create(
             &test_session(&api_url),
-            &ChatCreateDirectInput {
+            &ChatCreateInput::Direct {
                 client_id: Some("client-direct-001"),
                 contact_id: "contact-id-001",
             },
         )
         .await
-        .expect("chat_create_direct must succeed");
+        .expect("chat_create direct must succeed");
 
     // Oracle: RFC 8620 §5.3 — newState is present, created map contains the client key
     assert_eq!(result.new_state, "chat-state-001");
@@ -1502,9 +1501,9 @@ async fn chat_create_group_returns_typed_response() {
 
     let api_url = format!("{}/api", server.uri());
     let result = client
-        .chat_create_group(
+        .chat_create(
             &test_session(&api_url),
-            &ChatCreateGroupInput {
+            &ChatCreateInput::Group {
                 client_id: Some("client-group-001"),
                 name: "Test Group",
                 member_ids: &["contact-id-002"],
@@ -1514,7 +1513,7 @@ async fn chat_create_group_returns_typed_response() {
             },
         )
         .await
-        .expect("chat_create_group must succeed");
+        .expect("chat_create group must succeed");
 
     // Oracle: RFC 8620 §5.3 — newState is present, created map contains the client key
     assert_eq!(result.new_state, "chat-state-001");
@@ -2661,9 +2660,9 @@ async fn chat_create_channel_returns_typed_response() {
 
     let api_url = format!("{}/api", server.uri());
     let result = client
-        .chat_create_channel(
+        .chat_create(
             &test_session(&api_url),
-            &ChatCreateChannelInput {
+            &ChatCreateInput::Channel {
                 client_id: Some("client-ch-001"),
                 space_id: "space-001",
                 name: "general",
@@ -2671,7 +2670,7 @@ async fn chat_create_channel_returns_typed_response() {
             },
         )
         .await
-        .expect("chat_create_channel must succeed");
+        .expect("chat_create channel must succeed");
 
     // Oracle: fixture created map contains client_id → server-assigned ID
     let created = result.created.expect("created map must be present");
