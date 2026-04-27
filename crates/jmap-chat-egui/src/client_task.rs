@@ -24,7 +24,7 @@ use jmap_chat::client::JmapChatClient;
 use jmap_chat::error::ClientError;
 use jmap_chat::methods::{ChatQueryInput, MessageCreateInput, MessageQueryInput};
 use jmap_chat::sse::SseEvent;
-use jmap_chat::types::{ChatStreamEnable, ContactPresence};
+use jmap_chat::types::{ChatStreamDataType, ChatStreamEnable, ContactPresence};
 use jmap_chat::ws::WsFrame;
 
 use crate::event::{AppCommand, AppEvent, ConnectionStatus};
@@ -1115,7 +1115,7 @@ async fn run_ws_stream(
 
     // Subscribe to all typing and presence events for all chats and contacts.
     let enable = ChatStreamEnable::new(
-        vec!["typing".to_string(), "presence".to_string()],
+        vec![ChatStreamDataType::Typing, ChatStreamDataType::Presence],
         None, // all chats
         None, // all contacts
     );

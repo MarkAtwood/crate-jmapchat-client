@@ -131,8 +131,8 @@ pub struct RichBody {
 
 /// Known `type` URI values for an [`Endpoint`].
 ///
-/// `Endpoint.endpoint_type` is typed as `String` on the wire to accept future extension types.
-/// Use this enum to match against known values without losing forward compatibility.
+/// Serializes as the canonical URI string (e.g. `"urn:jmap:chat:cap:vtc"`).
+/// Unknown URIs round-trip via the `Other(String)` variant.
 ///
 /// Spec: draft-atwood-jmap-chat-00 §4.2
 #[non_exhaustive]
@@ -186,6 +186,19 @@ impl EndpointType {
     }
 }
 
+impl serde::Serialize for EndpointType {
+    fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        s.serialize_str(self.as_uri())
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for EndpointType {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        let s = String::deserialize(d)?;
+        Ok(EndpointType::from_uri(&s))
+    }
+}
+
 /// An out-of-band capability endpoint advertised on a ChatContact or Session.
 /// Spec: draft-atwood-jmap-chat-00 §4.2
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -193,7 +206,7 @@ impl EndpointType {
 pub struct Endpoint {
     /// URI identifying the capability type.
     #[serde(rename = "type")]
-    pub endpoint_type: String,
+    pub endpoint_type: EndpointType,
     /// The endpoint URI. Format is type-specific.
     pub uri: String,
     /// Human-readable label for this endpoint.
@@ -215,7 +228,7 @@ pub struct Endpoint {
 pub struct MessageAction {
     /// URI identifying the action type (same namespace as Endpoint.type).
     #[serde(rename = "type")]
-    pub action_type: String,
+    pub action_type: EndpointType,
     /// The action URI. Peer-supplied; MUST be treated as untrusted.
     pub uri: String,
     /// Human-readable label for the action.
@@ -991,6 +1004,22 @@ pub enum OwnerPresence {
 // The `@type` field is the JSON discriminator; clients dispatch on it manually.
 // ---------------------------------------------------------------------------
 
+/// Stream data categories that can be requested via [`ChatStreamEnable`].
+///
+/// Spec: draft-atwood-jmap-chat-wss-00 §Enabling Ephemeral Push.
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "lowercase")]
+#[non_exhaustive]
+pub enum ChatStreamDataType {
+    /// Typing indicator events (`"typing"`).
+    Typing,
+    /// Real-time presence update events (`"presence"`).
+    Presence,
+    /// Unrecognized value — silently ignored per spec.
+    #[serde(other)]
+    Unknown,
+}
+
 /// Sent by the client to subscribe to ephemeral typing and presence events.
 /// Spec: draft-atwood-jmap-chat-wss-00
 ///
@@ -1002,9 +1031,9 @@ pub struct ChatStreamEnable {
     /// Discriminator. Always `"ChatStreamEnable"` on the wire.
     #[serde(rename = "@type")]
     pub(crate) msg_type: String,
-    /// Which event categories to receive: `"typing"` and/or `"presence"`.
+    /// Which event categories to receive.
     /// Unrecognized values alongside recognized ones are silently ignored by the server.
-    pub data_types: Vec<String>,
+    pub data_types: Vec<ChatStreamDataType>,
     /// Chat IDs to receive typing events for. `None` = all member chats.
     /// Only relevant when `"typing"` is in `data_types`.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1018,7 +1047,7 @@ pub struct ChatStreamEnable {
 impl ChatStreamEnable {
     /// Construct a new `ChatStreamEnable` message.
     pub fn new(
-        data_types: Vec<String>,
+        data_types: Vec<ChatStreamDataType>,
         chat_ids: Option<Vec<Id>>,
         contact_ids: Option<Vec<Id>>,
     ) -> Self {
@@ -1109,6 +1138,23 @@ pub struct ChatPresenceEvent {
 // Push Notification Types
 // ---------------------------------------------------------------------------
 
+/// RFC 8030 §5.3 push urgency levels used in [`ChatPushConfig`] and [`ChatPushCapability`].
+///
+/// Wire strings: `"very-low"`, `"low"`, `"normal"`, `"high"`.
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "kebab-case")]
+#[non_exhaustive]
+pub enum PushUrgency {
+    /// Background-only delivery, minimal power impact.
+    VeryLow,
+    Low,
+    Normal,
+    High,
+    /// Unrecognized urgency value.
+    #[serde(other)]
+    Unknown,
+}
+
 /// Per-account push configuration for a PushSubscription.
 /// Spec: draft-atwood-jmap-chat-push-00 §3.2
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -1117,7 +1163,7 @@ pub struct ChatPushConfig {
     /// Chat kinds for which push is enabled (`"direct"`, `"group"`, `"channel"`).
     /// `None` enables push for all kinds.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub kinds: Option<Vec<String>>,
+    pub kinds: Option<Vec<ChatKind>>,
     /// Explicit Chat ids for which push is enabled. `None` enables push for
     /// all Chats of the matching kinds the account is a member of.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1129,11 +1175,11 @@ pub struct ChatPushConfig {
     /// Web Push urgency for notifications from this config (default `"normal"`).
     /// MUST be a value in `ChatPushCapability.supported_urgency_values`.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub urgency: Option<String>,
+    pub urgency: Option<PushUrgency>,
     /// Overrides `urgency` for payloads containing a direct or Space-wide mention.
     /// MUST be a value in `ChatPushCapability.supported_urgency_values`.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub mention_urgency: Option<String>,
+    pub mention_urgency: Option<PushUrgency>,
 }
 
 /// One message entry in a `ChatMessagePush` payload.
@@ -1152,7 +1198,7 @@ pub struct ChatMessageEntry {
     /// Id of the Chat containing the message.
     pub chat_id: String,
     /// Kind of the Chat: `"direct"`, `"group"`, or `"channel"`.
-    pub chat_kind: String,
+    pub chat_kind: ChatKind,
     /// Display name of the Chat. Present for group and channel chats.
     pub chat_name: Option<String>,
     /// For channel chats: id of the containing Space.
@@ -1190,6 +1236,28 @@ pub struct ChatMessagePush {
     pub state: String,
     /// Message entries that triggered this push.
     pub messages: Vec<ChatMessageEntry>,
+}
+
+// ---------------------------------------------------------------------------
+// Quota
+// ---------------------------------------------------------------------------
+
+/// RFC 8620 §6.2 quota scope — the set of accounts the quota limit applies to.
+///
+/// Wire strings: `"account"`, `"domain"`, `"global"`.
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "lowercase")]
+#[non_exhaustive]
+pub enum QuotaScope {
+    /// Quota applies to this account only.
+    Account,
+    /// Quota applies to all accounts sharing this domain.
+    Domain,
+    /// Quota applies to all accounts on the server.
+    Global,
+    /// Unrecognized scope value.
+    #[serde(other)]
+    Unknown,
 }
 
 // ---------------------------------------------------------------------------
@@ -1529,11 +1597,14 @@ mod tests {
         let json = fixture("chat_stream_enable.json");
         let msg: ChatStreamEnable = serde_json::from_str(&json).expect("must parse");
         assert_eq!(msg.msg_type, "ChatStreamEnable");
-        assert_eq!(msg.data_types, vec!["typing", "presence"]);
+        assert_eq!(
+            msg.data_types,
+            vec![ChatStreamDataType::Typing, ChatStreamDataType::Presence]
+        );
         assert!(msg.contact_ids.is_none());
         // Test constructor
         let constructed = ChatStreamEnable::new(
-            vec!["typing".to_string(), "presence".to_string()],
+            vec![ChatStreamDataType::Typing, ChatStreamDataType::Presence],
             Some(vec![Id::from_trusted("01HV5Z6QKWJ7N3P8R2X4YTMD3G")]),
             None,
         );
@@ -1657,7 +1728,7 @@ mod tests {
     /// Spec: absent = all member chats/contacts. Sending null is non-conformant.
     #[test]
     fn test_chat_stream_enable_none_fields_absent_in_serialization() {
-        let msg = ChatStreamEnable::new(vec!["typing".to_string()], None, None);
+        let msg = ChatStreamEnable::new(vec![ChatStreamDataType::Typing], None, None);
         let json = serde_json::to_string(&msg).unwrap();
         let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
         assert!(
@@ -1726,7 +1797,7 @@ mod tests {
         let entry = &push.messages[0];
         assert_eq!(entry.message_id, "01J3YKZQP5MWVT8PPBEHTJ3HX");
         assert_eq!(entry.chat_id, "01J3XKZQN4MWVT8PPBEHTJ3HX");
-        assert_eq!(entry.chat_kind, "channel");
+        assert_eq!(entry.chat_kind, ChatKind::Channel);
         assert_eq!(entry.chat_name.as_deref(), Some("general"));
         assert_eq!(entry.space_id.as_deref(), Some("01J2WKZQM3LVST7OOBDHSI2GW"));
         assert_eq!(entry.space_name.as_deref(), Some("ACME Corp"));

@@ -117,7 +117,7 @@ async fn quota_get_returns_quota_list() {
         .find(|q| q.id == "quota-msg-1")
         .expect("quota-msg-1 must be present");
     assert_eq!(msg_quota.name, "Message Storage");
-    assert_eq!(msg_quota.scope, "account");
+    assert_eq!(msg_quota.scope, jmap_chat::types::QuotaScope::Account);
     assert_eq!(msg_quota.data_types, vec!["Message"]);
     assert_eq!(msg_quota.used, 52428800);
     assert_eq!(msg_quota.hard_limit, 1073741824);

@@ -2402,8 +2402,8 @@ async fn push_subscription_create_returns_typed_response() {
         kinds: None,
         chat_ids: None,
         properties: None,
-        urgency: Some("normal".to_string()),
-        mention_urgency: Some("high".to_string()),
+        urgency: Some(jmap_chat::types::PushUrgency::Normal),
+        mention_urgency: Some(jmap_chat::types::PushUrgency::High),
     };
     let result = client
         .with_session(&test_session(&api_url))

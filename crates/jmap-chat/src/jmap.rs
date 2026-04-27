@@ -557,7 +557,7 @@ pub struct ChatPushCapability {
     /// Maximum byte length of a `bodySnippet` in `ChatMessagePush`. Truncation on UTF-8 boundary.
     pub max_snippet_bytes: u64,
     /// Supported Web Push urgency values. MUST include at least `"normal"` and `"high"`.
-    pub supported_urgency_values: Vec<String>,
+    pub supported_urgency_values: Vec<crate::types::PushUrgency>,
     /// Maximum number of `ChatMessageEntry` objects per push payload. Absent = no bound.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_messages_per_push: Option<u64>,
@@ -829,7 +829,10 @@ mod tests {
             .expect("push capability must be present");
 
         assert_eq!(push.max_snippet_bytes, 256);
-        assert_eq!(push.supported_urgency_values, vec!["normal", "high"]);
+        assert_eq!(
+            push.supported_urgency_values,
+            vec![crate::types::PushUrgency::Normal, crate::types::PushUrgency::High]
+        );
         assert_eq!(push.max_messages_per_push, Some(10));
     }
 

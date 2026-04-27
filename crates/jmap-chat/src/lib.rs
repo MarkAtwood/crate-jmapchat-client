@@ -26,3 +26,7 @@ pub use auth::{AuthProvider, BasicAuth, BearerAuth, CustomCaAuth, NoneAuth};
 // JMAP core types
 #[doc(inline)]
 pub use jmap::{Id, Session, UTCDate};
+
+// Commonly-used enum types
+#[doc(inline)]
+pub use types::{ChatStreamDataType, PushUrgency, QuotaScope};

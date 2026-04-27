@@ -274,7 +274,10 @@ async fn send_stream_enable_correct_json_shape() {
     let mut session = client.connect_ws(&url).await.expect("connect_ws");
 
     let enable = ChatStreamEnable::new(
-        vec!["typing".to_string(), "presence".to_string()],
+        vec![
+            jmap_chat::types::ChatStreamDataType::Typing,
+            jmap_chat::types::ChatStreamDataType::Presence,
+        ],
         Some(vec![jmap_chat::jmap::Id::from_trusted("chat-1")]),
         None,
     );
