@@ -1,0 +1,18 @@
+{
+  "methodResponses": [["SpaceInvite/set", {
+    "accountId": "account1",
+    "oldState": "invite-state-001",
+    "newState": "invite-state-002",
+    "created": {
+      "invite-new-1": {
+        "id": "01HV5Z6QKWJ7N3P8R2X4YTMDIB",
+        "code": "DEF456GHI",
+        "spaceId": "01HV5Z6QKWJ7N3P8R2X4YTMD10",
+        "createdBy": "01HV5Z6QKWJ7N3P8R2X4YTMD01",
+        "uses": 0,
+        "createdAt": "2024-01-11T09:00:00Z"
+      }
+    }
+  }, "r1"]],
+  "sessionState": "sess-abc"
+}

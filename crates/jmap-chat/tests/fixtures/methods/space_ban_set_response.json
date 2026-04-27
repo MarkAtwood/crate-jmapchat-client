@@ -1,0 +1,17 @@
+{
+  "methodResponses": [["SpaceBan/set", {
+    "accountId": "account1",
+    "oldState": "ban-state-001",
+    "newState": "ban-state-002",
+    "created": {
+      "ban-new-1": {
+        "id": "01HV5Z6QKWJ7N3P8R2X4YTMDBC",
+        "spaceId": "01HV5Z6QKWJ7N3P8R2X4YTMD10",
+        "userId": "01HV5Z6QKWJ7N3P8R2X4YTMD03",
+        "bannedBy": "01HV5Z6QKWJ7N3P8R2X4YTMD01",
+        "createdAt": "2024-01-15T09:00:00Z"
+      }
+    }
+  }, "r1"]],
+  "sessionState": "sess-abc"
+}
