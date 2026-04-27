@@ -92,11 +92,14 @@ impl crate::client::JmapChatClient {
     /// Pass `properties: None` to return all fields.
     pub async fn chat_get(
         &self,
-        api_url: &str,
-        account_id: &str,
+        session: &crate::jmap::Session,
         ids: Option<&[&str]>,
         properties: Option<&[&str]>,
     ) -> Result<GetResponse<crate::types::Chat>, crate::error::ClientError> {
+        let api_url = &session.api_url;
+        let account_id = session
+            .chat_account_id()
+            .ok_or_else(|| crate::error::ClientError::InvalidSession("no chat account_id"))?;
         let args = serde_json::json!({
             "accountId": account_id,
             "ids": ids,
@@ -115,13 +118,16 @@ impl crate::client::JmapChatClient {
     /// filter object is sent as JSON `null`.
     pub async fn chat_query(
         &self,
-        api_url: &str,
-        account_id: &str,
+        session: &crate::jmap::Session,
         filter_kind: Option<crate::types::ChatKind>,
         filter_muted: Option<bool>,
         position: Option<u64>,
         limit: Option<u64>,
     ) -> Result<QueryResponse, crate::error::ClientError> {
+        let api_url = &session.api_url;
+        let account_id = session
+            .chat_account_id()
+            .ok_or_else(|| crate::error::ClientError::InvalidSession("no chat account_id"))?;
         let mut filter = serde_json::Map::new();
         if let Some(k) = filter_kind {
             let kind_str = serde_json::to_value(&k)
@@ -153,11 +159,14 @@ impl crate::client::JmapChatClient {
     /// as `since_state` until the flag is false.
     pub async fn chat_changes(
         &self,
-        api_url: &str,
-        account_id: &str,
+        session: &crate::jmap::Session,
         since_state: &str,
         max_changes: Option<u64>,
     ) -> Result<ChangesResponse, crate::error::ClientError> {
+        let api_url = &session.api_url;
+        let account_id = session
+            .chat_account_id()
+            .ok_or_else(|| crate::error::ClientError::InvalidSession("no chat account_id"))?;
         let args = serde_json::json!({
             "accountId": account_id,
             "sinceState": since_state,
@@ -174,8 +183,7 @@ impl crate::client::JmapChatClient {
     /// Pass `properties: None` to return all fields.
     pub async fn message_get(
         &self,
-        api_url: &str,
-        account_id: &str,
+        session: &crate::jmap::Session,
         ids: &[&str],
         properties: Option<&[&str]>,
     ) -> Result<GetResponse<crate::types::Message>, crate::error::ClientError> {
@@ -184,6 +192,10 @@ impl crate::client::JmapChatClient {
                 "message_get: ids may not be empty".into(),
             ));
         }
+        let api_url = &session.api_url;
+        let account_id = session
+            .chat_account_id()
+            .ok_or_else(|| crate::error::ClientError::InvalidSession("no chat account_id"))?;
         let args = serde_json::json!({
             "accountId": account_id,
             "ids": ids,
@@ -207,8 +219,7 @@ impl crate::client::JmapChatClient {
     #[allow(clippy::too_many_arguments)]
     pub async fn message_query(
         &self,
-        api_url: &str,
-        account_id: &str,
+        session: &crate::jmap::Session,
         chat_id: Option<&str>,
         has_mention: Option<bool>,
         has_attachment: Option<bool>,
@@ -220,6 +231,10 @@ impl crate::client::JmapChatClient {
                 "message_query: chat_id or has_mention=true must be provided".into(),
             ));
         }
+        let api_url = &session.api_url;
+        let account_id = session
+            .chat_account_id()
+            .ok_or_else(|| crate::error::ClientError::InvalidSession("no chat account_id"))?;
         let mut filter = serde_json::Map::new();
         if let Some(id) = chat_id {
             filter.insert("chatId".into(), id.into());
@@ -250,11 +265,14 @@ impl crate::client::JmapChatClient {
     /// Fetch changes to Message objects since `since_state` (RFC 8620 §5.2 / Message/changes).
     pub async fn message_changes(
         &self,
-        api_url: &str,
-        account_id: &str,
+        session: &crate::jmap::Session,
         since_state: &str,
         max_changes: Option<u64>,
     ) -> Result<ChangesResponse, crate::error::ClientError> {
+        let api_url = &session.api_url;
+        let account_id = session
+            .chat_account_id()
+            .ok_or_else(|| crate::error::ClientError::InvalidSession("no chat account_id"))?;
         let args = serde_json::json!({
             "accountId": account_id,
             "sinceState": since_state,
@@ -273,8 +291,7 @@ impl crate::client::JmapChatClient {
     #[allow(clippy::too_many_arguments)]
     pub async fn message_create(
         &self,
-        api_url: &str,
-        account_id: &str,
+        session: &crate::jmap::Session,
         client_id: &str,
         chat_id: &str,
         body: &str,
@@ -282,6 +299,10 @@ impl crate::client::JmapChatClient {
         sent_at: &str,
         reply_to: Option<&str>,
     ) -> Result<SetResponse, crate::error::ClientError> {
+        let api_url = &session.api_url;
+        let account_id = session
+            .chat_account_id()
+            .ok_or_else(|| crate::error::ClientError::InvalidSession("no chat account_id"))?;
         let mut create_obj = serde_json::json!({
             "chatId": chat_id,
             "body": body,
@@ -305,11 +326,14 @@ impl crate::client::JmapChatClient {
     /// If `ids` is `None`, returns all ChatContacts for the account.
     pub async fn chat_contact_get(
         &self,
-        api_url: &str,
-        account_id: &str,
+        session: &crate::jmap::Session,
         ids: Option<&[&str]>,
         properties: Option<&[&str]>,
     ) -> Result<GetResponse<crate::types::ChatContact>, crate::error::ClientError> {
+        let api_url = &session.api_url;
+        let account_id = session
+            .chat_account_id()
+            .ok_or_else(|| crate::error::ClientError::InvalidSession("no chat account_id"))?;
         let args = serde_json::json!({
             "accountId": account_id,
             "ids": ids,
@@ -326,10 +350,13 @@ impl crate::client::JmapChatClient {
     /// The server creates one ReadPosition per Chat automatically.
     pub async fn read_position_get(
         &self,
-        api_url: &str,
-        account_id: &str,
+        session: &crate::jmap::Session,
         ids: Option<&[&str]>,
     ) -> Result<GetResponse<crate::types::ReadPosition>, crate::error::ClientError> {
+        let api_url = &session.api_url;
+        let account_id = session
+            .chat_account_id()
+            .ok_or_else(|| crate::error::ClientError::InvalidSession("no chat account_id"))?;
         let args = serde_json::json!({
             "accountId": account_id,
             "ids": ids,
@@ -349,11 +376,14 @@ impl crate::client::JmapChatClient {
     /// `create` and `destroy` are forbidden by the spec; only `update` is issued.
     pub async fn read_position_set(
         &self,
-        api_url: &str,
-        account_id: &str,
+        session: &crate::jmap::Session,
         read_position_id: &str,
         last_read_message_id: &str,
     ) -> Result<SetResponse, crate::error::ClientError> {
+        let api_url = &session.api_url;
+        let account_id = session
+            .chat_account_id()
+            .ok_or_else(|| crate::error::ClientError::InvalidSession("no chat account_id"))?;
         let args = serde_json::json!({
             "accountId": account_id,
             "update": {
@@ -371,9 +401,12 @@ impl crate::client::JmapChatClient {
     /// retrieves it.
     pub async fn presence_status_get(
         &self,
-        api_url: &str,
-        account_id: &str,
+        session: &crate::jmap::Session,
     ) -> Result<GetResponse<crate::types::PresenceStatus>, crate::error::ClientError> {
+        let api_url = &session.api_url;
+        let account_id = session
+            .chat_account_id()
+            .ok_or_else(|| crate::error::ClientError::InvalidSession("no chat account_id"))?;
         let args = serde_json::json!({
             "accountId": account_id,
             "ids": serde_json::Value::Null,

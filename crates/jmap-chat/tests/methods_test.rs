@@ -12,6 +12,23 @@ use jmap_chat::methods::GetResponse;
 use wiremock::matchers::method;
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
+fn test_session(api_url: &str) -> jmap_chat::jmap::Session {
+    serde_json::from_value(serde_json::json!({
+        "capabilities": {},
+        "accounts": {},
+        "primaryAccounts": {
+            "urn:ietf:params:jmap:chat": "account1"
+        },
+        "username": "test",
+        "apiUrl": api_url,
+        "downloadUrl": "",
+        "uploadUrl": "",
+        "eventSourceUrl": "",
+        "state": ""
+    }))
+    .unwrap()
+}
+
 fn fixture(name: &str) -> serde_json::Value {
     let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("tests/fixtures/methods")
@@ -41,7 +58,7 @@ async fn chat_get_returns_typed_response() {
 
     let api_url = format!("{}/api", server.uri());
     let result = client
-        .chat_get(&api_url, "account1", None, None)
+        .chat_get(&test_session(&api_url), None, None)
         .await
         .expect("chat_get must succeed");
 
@@ -79,8 +96,7 @@ async fn message_create_returns_typed_response() {
     let api_url = format!("{}/api", server.uri());
     let result = client
         .message_create(
-            &api_url,
-            "account1",
+            &test_session(&api_url),
             "client-ulid-001",
             "01HV5Z6QKWJ7N3P8R2X4YTMD3G",
             "Hello, world!",
@@ -131,8 +147,7 @@ async fn read_position_set_returns_typed_response() {
     let api_url = format!("{}/api", server.uri());
     let result = client
         .read_position_set(
-            &api_url,
-            "account1",
+            &test_session(&api_url),
             "01HV5Z6QKWJ7N3P8R2X4RPOS01",
             "01HV5Z6QKWJ7N3P8R2X4YTMD42",
         )
@@ -176,7 +191,7 @@ async fn chat_get_method_error_returns_client_error() {
 
     let api_url = format!("{}/api", server.uri());
     let err = client
-        .chat_get(&api_url, "account1", None, None)
+        .chat_get(&test_session(&api_url), None, None)
         .await
         .expect_err("error invocation must return Err");
 
@@ -211,8 +226,7 @@ async fn message_query_rejects_invalid_filter() {
     // (a) both None
     let err_none = client
         .message_query(
-            "http://127.0.0.1:1/api",
-            "acct1",
+            &test_session("http://127.0.0.1:1/api"),
             None,
             None,
             None,
@@ -229,8 +243,7 @@ async fn message_query_rejects_invalid_filter() {
     // (b) has_mention=Some(false) — not a valid anchor
     let err_false = client
         .message_query(
-            "http://127.0.0.1:1/api",
-            "acct1",
+            &test_session("http://127.0.0.1:1/api"),
             None,
             Some(false),
             None,
@@ -260,7 +273,7 @@ async fn message_get_rejects_empty_ids() {
         .expect("client construction must succeed");
 
     let err = client
-        .message_get("http://127.0.0.1:1/api", "acct1", &[], None)
+        .message_get(&test_session("http://127.0.0.1:1/api"), &[], None)
         .await
         .expect_err("empty ids must be rejected");
 

@@ -127,6 +127,15 @@ impl UTCDate {
     pub fn as_str(&self) -> &str {
         &self.0
     }
+
+    /// Parse the stored RFC 3339 string as a [`chrono::DateTime<chrono::Utc>`].
+    ///
+    /// Returns `ClientError::Parse` if the stored string is not valid RFC 3339.
+    pub fn parse(&self) -> Result<chrono::DateTime<chrono::Utc>, crate::error::ClientError> {
+        chrono::DateTime::parse_from_rfc3339(&self.0)
+            .map(|dt| dt.to_utc())
+            .map_err(|e| crate::error::ClientError::Parse(e.to_string()))
+    }
 }
 
 impl std::fmt::Display for UTCDate {
@@ -719,5 +728,22 @@ mod tests {
         let session: Session = serde_json::from_value(val).expect("must deserialize");
         let result = session.websocket_capability();
         assert!(matches!(result, Ok(None)));
+    }
+
+    #[test]
+    fn utc_date_parse_valid() {
+        // Oracle: RFC 3339 string "2024-01-02T12:00:00Z" → year=2024, month=1, day=2
+        let d = UTCDate::from_trusted("2024-01-02T12:00:00Z");
+        let dt = d.parse().expect("valid RFC 3339 must parse");
+        use chrono::Datelike;
+        assert_eq!(dt.year(), 2024);
+        assert_eq!(dt.month(), 1);
+        assert_eq!(dt.day(), 2);
+    }
+
+    #[test]
+    fn utc_date_parse_invalid() {
+        let d = UTCDate::from_trusted("not-a-date");
+        assert!(d.parse().is_err());
     }
 }
