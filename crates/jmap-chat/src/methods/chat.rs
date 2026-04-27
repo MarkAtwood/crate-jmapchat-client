@@ -1,7 +1,6 @@
 use super::{
-    AddMemberInput, ChangesResponse, ChatCreateChannelInput, ChatCreateDirectInput,
-    ChatCreateGroupInput, ChatPatch, ChatQueryInput, GetResponse, QueryChangesResponse,
-    QueryResponse, SetResponse, TypingResponse, UpdateMemberRoleInput,
+    AddMemberInput, ChangesResponse, ChatCreateInput, ChatPatch, ChatQueryInput, GetResponse,
+    QueryChangesResponse, QueryResponse, SetResponse, TypingResponse, UpdateMemberRoleInput,
 };
 
 impl crate::client::JmapChatClient {
@@ -142,57 +141,78 @@ impl crate::client::JmapChatClient {
         crate::client::extract_response(resp, call_id)
     }
 
-    /// Create a direct (one-to-one) chat (JMAP Chat §Chat/set create/direct).
+    /// Create a Chat (JMAP Chat §Chat/set create).
     ///
-    /// If a direct chat with `input.contact_id` already exists, the server returns it
-    /// in `SetResponse.updated` rather than `created` (dedup rule per spec).
-    pub async fn chat_create_direct(
+    /// Dispatches to the correct spec `kind` based on the `input` variant:
+    /// `Direct`, `Group`, or `Channel`. When `client_id` inside the variant is
+    /// `None`, a ULID is generated automatically.
+    ///
+    /// For `Direct` chats: if one already exists with the given `contact_id`,
+    /// the server returns it in `SetResponse.updated` rather than `created`
+    /// (dedup rule per spec).
+    pub async fn chat_create(
         &self,
         session: &crate::jmap::Session,
-        input: &ChatCreateDirectInput<'_>,
+        input: &ChatCreateInput<'_>,
     ) -> Result<SetResponse, crate::error::ClientError> {
         let (api_url, account_id) = Self::session_parts(session)?;
         let mut buf = String::new();
-        let client_id = super::resolve_client_id(input.client_id, &mut buf);
-        let create_obj = serde_json::json!({
-            "kind": "direct",
-            "contactId": input.contact_id,
-        });
-        let args = serde_json::json!({
-            "accountId": account_id,
-            "create": { client_id: create_obj },
-        });
-        let (call_id, req) = super::build_request("Chat/set", args);
-        let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
-    }
-
-    /// Create a group chat (JMAP Chat §Chat/set create/group).
-    ///
-    /// The server assigns a ULID as the chat ID and notifies all initial members
-    /// via `Peer/groupUpdate` before any messages are sent.
-    pub async fn chat_create_group(
-        &self,
-        session: &crate::jmap::Session,
-        input: &ChatCreateGroupInput<'_>,
-    ) -> Result<SetResponse, crate::error::ClientError> {
-        let (api_url, account_id) = Self::session_parts(session)?;
-        let mut buf = String::new();
-        let client_id = super::resolve_client_id(input.client_id, &mut buf);
-        let mut create_obj = serde_json::json!({
-            "kind": "group",
-            "name": input.name,
-            "memberIds": input.member_ids,
-        });
-        if let Some(d) = input.description {
-            create_obj["description"] = d.into();
-        }
-        if let Some(b) = input.avatar_blob_id {
-            create_obj["avatarBlobId"] = b.into();
-        }
-        if let Some(s) = input.message_expiry_seconds {
-            create_obj["messageExpirySeconds"] = s.into();
-        }
+        let create_obj;
+        let client_id_opt = match input {
+            ChatCreateInput::Direct {
+                client_id,
+                contact_id,
+            } => {
+                create_obj = serde_json::json!({
+                    "kind": "direct",
+                    "contactId": contact_id,
+                });
+                *client_id
+            }
+            ChatCreateInput::Group {
+                client_id,
+                name,
+                member_ids,
+                description,
+                avatar_blob_id,
+                message_expiry_seconds,
+            } => {
+                let mut obj = serde_json::json!({
+                    "kind": "group",
+                    "name": name,
+                    "memberIds": member_ids,
+                });
+                if let Some(d) = description {
+                    obj["description"] = (*d).into();
+                }
+                if let Some(b) = avatar_blob_id {
+                    obj["avatarBlobId"] = (*b).into();
+                }
+                if let Some(s) = message_expiry_seconds {
+                    obj["messageExpirySeconds"] = (*s).into();
+                }
+                create_obj = obj;
+                *client_id
+            }
+            ChatCreateInput::Channel {
+                client_id,
+                space_id,
+                name,
+                description,
+            } => {
+                let mut obj = serde_json::json!({
+                    "kind": "channel",
+                    "spaceId": space_id,
+                    "name": name,
+                });
+                if let Some(d) = description {
+                    obj["description"] = (*d).into();
+                }
+                create_obj = obj;
+                *client_id
+            }
+        };
+        let client_id = super::resolve_client_id(client_id_opt, &mut buf);
         let args = serde_json::json!({
             "accountId": account_id,
             "create": { client_id: create_obj },
@@ -314,32 +334,6 @@ impl crate::client::JmapChatClient {
         let args = serde_json::json!({
             "accountId": account_id,
             "update": { id: serde_json::Value::Object(patch_map) },
-        });
-        let (call_id, req) = super::build_request("Chat/set", args);
-        let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
-    }
-
-    /// Create a channel chat inside a Space (JMAP Chat §Chat/set create/channel).
-    pub async fn chat_create_channel(
-        &self,
-        session: &crate::jmap::Session,
-        input: &ChatCreateChannelInput<'_>,
-    ) -> Result<SetResponse, crate::error::ClientError> {
-        let (api_url, account_id) = Self::session_parts(session)?;
-        let mut buf = String::new();
-        let client_id = super::resolve_client_id(input.client_id, &mut buf);
-        let mut create_obj = serde_json::json!({
-            "kind": "channel",
-            "spaceId": input.space_id,
-            "name": input.name,
-        });
-        if let Some(d) = input.description {
-            create_obj["description"] = d.into();
-        }
-        let args = serde_json::json!({
-            "accountId": account_id,
-            "create": { client_id: create_obj },
         });
         let (call_id, req) = super::build_request("Chat/set", args);
         let resp = self.call(api_url, &req).await?;
