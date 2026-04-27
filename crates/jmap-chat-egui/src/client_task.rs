@@ -137,12 +137,42 @@ pub async fn run(
         return;
     }
 
+    // Phase 2b: Resolve WebSocket URL (and ephemeral capability) from session.
+    //
+    // Done here — before SessionReady — so `supports_ephemeral` is available for
+    // the event. The WS task is spawned later once SSE is also set up.
+    //
+    // The WS stream carries ephemeral events (typing indicators, presence updates)
+    // per draft-atwood-jmap-chat-wss-00. SSE remains the primary change-notification
+    // transport; WS is additive.
+    let ws_url: Option<String> = match (
+        session.websocket_capability().ok().flatten(),
+        session.supports_chat_websocket(),
+    ) {
+        (None, _) => {
+            tracing::info!("server has no WebSocket capability; ephemeral events unavailable");
+            None
+        }
+        (Some(_), false) => {
+            tracing::warn!(
+                "server advertises jmap:websocket but not jmap:chat:websocket; \
+                 typing/presence unavailable — server may need upgrade"
+            );
+            None
+        }
+        (Some(cap), true) => {
+            tracing::debug!(url = %cap.url, "ephemeral events via WebSocket");
+            Some(cap.url.clone())
+        }
+    };
+
     send_event(
         &tx,
         &ctx,
         AppEvent::SessionReady {
             api_url: session.api_url.clone(),
             account_id: session.chat_account_id().unwrap_or_default().to_string(),
+            supports_ephemeral: ws_url.is_some(),
         },
     );
 
@@ -196,20 +226,10 @@ pub async fn run(
 
     let mut sse_backoff_idx = 0usize;
 
-    // Phase 2b: Spawn WebSocket subtask if the server supports it.
-    //
-    // The WS stream carries ephemeral events (typing indicators, presence updates)
-    // per draft-atwood-jmap-chat-wss-00. SSE remains the primary change-notification
-    // transport; WS is additive.
+    // Spawn WebSocket subtask if the server supports it.
     //
     // A sender clone (_ws_tx_keepalive) is kept alive unconditionally so that
     // ws_notif_rx never closes in the select! when no WS task is running.
-    let ws_url: Option<String> = session
-        .websocket_capability()
-        .ok()
-        .flatten()
-        .filter(|_| session.supports_chat_websocket())
-        .map(|cap| cap.url.clone());
 
     let (ws_notif_tx, mut ws_notif_rx) = tokio::sync::mpsc::unbounded_channel::<WsNotification>();
     let mut ws_handle: Option<tokio::task::JoinHandle<()>> = None;

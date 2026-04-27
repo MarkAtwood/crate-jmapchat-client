@@ -59,6 +59,11 @@ pub struct AppState {
     pub typing_indicators: HashMap<(String, String), Instant>,
     /// Latest known presence state per `contact_id`.
     pub presence: HashMap<String, ContactPresence>,
+    /// Whether the server advertises the chat WebSocket capability.
+    ///
+    /// False until `SessionReady` is received (safe default: features are
+    /// suppressed until the server confirms support).
+    pub supports_ephemeral: bool,
 }
 
 impl Default for AppState {
@@ -76,6 +81,7 @@ impl Default for AppState {
             account_id: String::new(),
             typing_indicators: HashMap::new(),
             presence: HashMap::new(),
+            supports_ephemeral: false,
         }
     }
 }
@@ -96,9 +102,11 @@ impl AppState {
             AppEvent::SessionReady {
                 api_url,
                 account_id,
+                supports_ephemeral,
             } => {
                 self.api_url = api_url;
                 self.account_id = account_id;
+                self.supports_ephemeral = supports_ephemeral;
             }
             AppEvent::ChatsLoaded(chats) => {
                 self.chats = chats;
