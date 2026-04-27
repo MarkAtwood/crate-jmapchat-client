@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use base64::engine::general_purpose::STANDARD as BASE64_STANDARD;
 use base64::Engine as _;
 use reqwest::header::{HeaderName, HeaderValue, AUTHORIZATION};
@@ -175,6 +177,25 @@ impl AuthProvider for CustomCaAuth {
 // AuthProvider implementations. The blanket impl is accepted as the simpler
 // tradeoff for this project's scope.
 impl AuthProvider for Box<dyn AuthProvider> {
+    fn build_client(&self) -> Result<reqwest::Client, ClientError> {
+        (**self).build_client()
+    }
+
+    fn auth_header(&self) -> Option<(HeaderName, HeaderValue)> {
+        (**self).auth_header()
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Blanket impl for Arc<dyn AuthProvider>
+// ---------------------------------------------------------------------------
+//
+// Mirrors the Box<dyn AuthProvider> blanket impl above. Allows
+// `Arc<dyn AuthProvider>` to satisfy `impl AuthProvider + 'static`, enabling
+// `JmapChatClient` to be `Clone` (Arc is Clone; Box is not).
+//
+// Maintenance cost: every method added to `AuthProvider` must be mirrored here.
+impl AuthProvider for Arc<dyn AuthProvider> {
     fn build_client(&self) -> Result<reqwest::Client, ClientError> {
         (**self).build_client()
     }

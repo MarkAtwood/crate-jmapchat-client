@@ -7,6 +7,7 @@ license.workspace = true
 description = "JMAP Chat protocol types and HTTP client (auth-agnostic)"
 
 [dependencies]
+chrono = { workspace = true }
 base64.workspace = true
 futures.workspace = true
 reqwest.workspace = true
