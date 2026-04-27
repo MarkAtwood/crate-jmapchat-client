@@ -109,7 +109,10 @@ async fn quota_get_returns_quota_list() {
 
     assert_eq!(quotas.len(), 2, "fixture has two quota objects");
 
-    let msg_quota = quotas.iter().find(|q| q.id == "quota-msg-1").expect("quota-msg-1 must be present");
+    let msg_quota = quotas
+        .iter()
+        .find(|q| q.id == "quota-msg-1")
+        .expect("quota-msg-1 must be present");
     assert_eq!(msg_quota.name, "Message Storage");
     assert_eq!(msg_quota.scope, "account");
     assert_eq!(msg_quota.data_types, vec!["Message"]);
@@ -118,7 +121,10 @@ async fn quota_get_returns_quota_list() {
     assert_eq!(msg_quota.warn_limit, Some(858993459));
     assert_eq!(msg_quota.soft_limit, None);
 
-    let chat_quota = quotas.iter().find(|q| q.id == "quota-chat-1").expect("quota-chat-1 must be present");
+    let chat_quota = quotas
+        .iter()
+        .find(|q| q.id == "quota-chat-1")
+        .expect("quota-chat-1 must be present");
     assert_eq!(chat_quota.data_types, vec!["Chat", "Space"]);
     assert_eq!(chat_quota.used, 1024);
     assert_eq!(chat_quota.warn_limit, None);

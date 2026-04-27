@@ -474,7 +474,8 @@ impl Session {
     /// When true, [`ResultReference`] values may be used inside batch requests
     /// to chain one method's output into a later method's arguments.
     pub fn supports_refplus(&self) -> bool {
-        self.capabilities.contains_key("urn:ietf:params:jmap:refplus")
+        self.capabilities
+            .contains_key("urn:ietf:params:jmap:refplus")
     }
 
     /// Returns whether the server supports JMAP Quotas.
@@ -483,7 +484,8 @@ impl Session {
     /// When true, [`JmapChatClient::quota_get`](crate::client::JmapChatClient::quota_get)
     /// may be called to retrieve storage quota information.
     pub fn supports_quotas(&self) -> bool {
-        self.capabilities.contains_key("urn:ietf:params:jmap:quotas")
+        self.capabilities
+            .contains_key("urn:ietf:params:jmap:quotas")
     }
 }
 
@@ -893,8 +895,16 @@ mod tests {
             "urn:ietf:params:jmap:core".to_string(),
             "urn:ietf:params:jmap:chat".to_string(),
         ])
-        .add_call("Chat/get", serde_json::json!({"accountId": "a1", "ids": null}), "r1")
-        .add_call("Message/query", serde_json::json!({"accountId": "a1", "chatId": "c1"}), "r2")
+        .add_call(
+            "Chat/get",
+            serde_json::json!({"accountId": "a1", "ids": null}),
+            "r1",
+        )
+        .add_call(
+            "Message/query",
+            serde_json::json!({"accountId": "a1", "chatId": "c1"}),
+            "r2",
+        )
         .build();
 
         assert_eq!(req.using.len(), 2);
@@ -913,7 +923,11 @@ mod tests {
             "urn:ietf:params:jmap:core".to_string(),
             "urn:ietf:params:jmap:chat".to_string(),
         ])
-        .add_call("Chat/get", serde_json::json!({"accountId": "account1", "ids": null}), "r1")
+        .add_call(
+            "Chat/get",
+            serde_json::json!({"accountId": "account1", "ids": null}),
+            "r1",
+        )
         .add_call(
             "Message/query",
             serde_json::json!({"accountId": "account1", "chatId": "chat-001", "limit": 10}),
@@ -948,11 +962,16 @@ mod tests {
         let req: JmapRequest =
             serde_json::from_value(val).expect("batch_refplus.json must parse as JmapRequest");
         assert_eq!(req.using.len(), 3);
-        assert!(req.using.contains(&"urn:ietf:params:jmap:refplus".to_string()));
+        assert!(req
+            .using
+            .contains(&"urn:ietf:params:jmap:refplus".to_string()));
         assert_eq!(req.method_calls.len(), 2);
         // The second call's args must contain the "#chatId" result reference key.
         let second_args = &req.method_calls[1].1;
-        assert!(second_args.get("#chatId").is_some(), "must have #chatId key");
+        assert!(
+            second_args.get("#chatId").is_some(),
+            "must have #chatId key"
+        );
     }
 
     // ---------------------------------------------------------------------------
@@ -964,9 +983,10 @@ mod tests {
     fn session_supports_refplus_when_present() {
         let val = fixture("session.json");
         let mut session: Session = serde_json::from_value(val).expect("must deserialize");
-        session
-            .capabilities
-            .insert("urn:ietf:params:jmap:refplus".to_string(), serde_json::json!({}));
+        session.capabilities.insert(
+            "urn:ietf:params:jmap:refplus".to_string(),
+            serde_json::json!({}),
+        );
         assert!(session.supports_refplus());
     }
 
@@ -983,9 +1003,10 @@ mod tests {
     fn session_supports_quotas_when_present() {
         let val = fixture("session.json");
         let mut session: Session = serde_json::from_value(val).expect("must deserialize");
-        session
-            .capabilities
-            .insert("urn:ietf:params:jmap:quotas".to_string(), serde_json::json!({}));
+        session.capabilities.insert(
+            "urn:ietf:params:jmap:quotas".to_string(),
+            serde_json::json!({}),
+        );
         assert!(session.supports_quotas());
     }
 

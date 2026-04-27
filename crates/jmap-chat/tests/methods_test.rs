@@ -643,8 +643,8 @@ async fn presence_status_get_returns_typed_response() {
 /// Oracle: RFC 8620 §5.2 — ReadPosition/changes response shape: oldState, newState,
 /// hasMoreChanges, updated list. Fixture hand-written from §5.2 /changes response definition.
 ///
-/// Body matcher: verifies sinceState and that maxChanges:null is sent (null is
-/// a valid UnsignedInt|null per RFC 8620 §5.2 — server treats it as no limit).
+/// Body matcher: verifies sinceState is sent and maxChanges key is absent
+/// when None (RFC 8620 §5.2: omit to let the server choose the limit).
 #[tokio::test]
 async fn read_position_changes_returns_typed_response() {
     let server = MockServer::start().await;
@@ -654,8 +654,7 @@ async fn read_position_changes_returns_typed_response() {
             "using": ["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:chat"],
             "methodCalls": [["ReadPosition/changes", {
                 "accountId": "account1",
-                "sinceState": "rp-state-001",
-                "maxChanges": null
+                "sinceState": "rp-state-001"
             }, "r1"]]
         })))
         .respond_with(
@@ -1777,8 +1776,8 @@ async fn chat_set_update_with_add_members_role_serializes_correctly() {
 /// Oracle: RFC 8620 §5.2 — ChatContact/changes response shape: oldState, newState,
 /// hasMoreChanges, updated list. Fixture hand-written from §5.2 /changes definition.
 ///
-/// Body matcher: verifies sinceState and that maxChanges:null is sent when None
-/// (same null-propagation pattern as ReadPosition/changes).
+/// Body matcher: verifies sinceState is sent and maxChanges key is absent
+/// when None (RFC 8620 §5.2: omit to let the server choose the limit).
 #[tokio::test]
 async fn chat_contact_changes_returns_typed_response() {
     let server = MockServer::start().await;
@@ -1788,8 +1787,7 @@ async fn chat_contact_changes_returns_typed_response() {
             "using": ["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:chat"],
             "methodCalls": [["ChatContact/changes", {
                 "accountId": "account1",
-                "sinceState": "contact-state-000",
-                "maxChanges": null
+                "sinceState": "contact-state-000"
             }, "r1"]]
         })))
         .respond_with(
@@ -2014,9 +2012,8 @@ async fn space_get_returns_typed_response() {
 /// Oracle: RFC 8620 §5.2 — Space/changes response: oldState, newState,
 /// hasMoreChanges, created/updated/destroyed lists.
 ///
-/// Body matcher: verifies sinceState is sent and maxChanges is null when None.
-/// RFC 8620 §5.2 defines maxChanges as `UnsignedInt|null` — sending null
-/// means "no limit", which is distinct from omitting the key entirely.
+/// Body matcher: verifies sinceState is sent and maxChanges key is absent
+/// when None (RFC 8620 §5.2: omit to let the server choose the limit).
 #[tokio::test]
 async fn space_changes_returns_typed_response() {
     let server = MockServer::start().await;
@@ -2026,8 +2023,7 @@ async fn space_changes_returns_typed_response() {
             "using": ["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:chat"],
             "methodCalls": [["Space/changes", {
                 "accountId": "account1",
-                "sinceState": "state-space-000",
-                "maxChanges": null
+                "sinceState": "state-space-000"
             }, "r1"]]
         })))
         .respond_with(

@@ -24,7 +24,7 @@ use jmap_chat::client::JmapChatClient;
 use jmap_chat::error::ClientError;
 use jmap_chat::methods::{ChatQueryInput, MessageCreateInput, MessageQueryInput};
 use jmap_chat::sse::SseEvent;
-use jmap_chat::types::{ContactPresence, ChatStreamEnable};
+use jmap_chat::types::{ChatStreamEnable, ContactPresence};
 use jmap_chat::ws::WsFrame;
 
 use crate::event::{AppCommand, AppEvent, ConnectionStatus};
@@ -218,7 +218,11 @@ pub async fn run(
     let mut ws_backoff_idx = 0usize;
 
     if let Some(ref url) = ws_url {
-        ws_handle = Some(spawn_ws_task(Arc::clone(&client), url.clone(), ws_notif_tx.clone()));
+        ws_handle = Some(spawn_ws_task(
+            Arc::clone(&client),
+            url.clone(),
+            ws_notif_tx.clone(),
+        ));
     }
 
     // Phase 3: Main command loop — multiplex commands, SSE notifications, and WS events.

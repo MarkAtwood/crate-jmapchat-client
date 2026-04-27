@@ -266,7 +266,14 @@ async fn download_blob_with_type_substitution() {
     );
 
     let data = client
-        .download_blob(&dl_template, "account1", "blob-img", "photo.png", Some("image/png"), None)
+        .download_blob(
+            &dl_template,
+            "account1",
+            "blob-img",
+            "photo.png",
+            Some("image/png"),
+            None,
+        )
         .await
         .expect("download_blob must succeed with accept_type");
 
