@@ -115,6 +115,14 @@ variant distinguishes cases (e.g., `chat_contact_no_presence` vs
 | `chat_contact_set_response.json` | `ChatContact/set` response (update) — updated map |
 | `chat_contact_query_response.json` | `ChatContact/query` response — ids list |
 | `chat_contact_query_changes_response.json` | `ChatContact/queryChanges` response — one added item |
+| `space_get_response.json` | `Space/get` response — list with one Space object |
+| `space_changes_response.json` | `Space/changes` response — one created id, empty updated/destroyed |
+| `space_set_create_response.json` | `Space/set` response (create) — created map with server-assigned id |
+| `space_set_update_response.json` | `Space/set` response (update) — updated map |
+| `space_set_destroy_response.json` | `Space/set` response (destroy) — destroyed list |
+| `space_query_response.json` | `Space/query` response — ids list |
+| `space_query_changes_response.json` | `Space/queryChanges` response — one added item |
+| `space_join_response.json` | `Space/join` response — accountId and spaceId |
 
 ## When to Commit a Generation Script
 

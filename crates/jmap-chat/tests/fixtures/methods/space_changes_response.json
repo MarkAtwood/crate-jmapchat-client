@@ -1,0 +1,18 @@
+{
+  "methodResponses": [
+    [
+      "Space/changes",
+      {
+        "accountId": "account1",
+        "oldState": "state-space-000",
+        "newState": "state-space-001",
+        "hasMoreChanges": false,
+        "created": ["01HV5Z6QKWJ7N3P8R2X4YTMDSP"],
+        "updated": [],
+        "destroyed": []
+      },
+      "r1"
+    ]
+  ],
+  "sessionState": "sess-abc"
+}
