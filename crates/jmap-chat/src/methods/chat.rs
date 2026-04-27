@@ -19,9 +19,9 @@ impl super::SessionClient<'_> {
             "ids": ids,
             "properties": properties,
         });
-        let (call_id, req) = super::build_request("Chat/get", args, super::USING_CHAT);
+        let req = super::build_request("Chat/get", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Query Chat IDs with optional filter (RFC 8620 §5.5 / JMAP Chat §5 Chat/query).
@@ -56,9 +56,9 @@ impl super::SessionClient<'_> {
         if let Some(l) = input.limit {
             args["limit"] = l.into();
         }
-        let (call_id, req) = super::build_request("Chat/query", args, super::USING_CHAT);
+        let req = super::build_request("Chat/query", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Fetch changes to Chat objects since `since_state` (RFC 8620 §5.2 / Chat/changes).
@@ -78,9 +78,9 @@ impl super::SessionClient<'_> {
         if let Some(mc) = max_changes {
             args["maxChanges"] = mc.into();
         }
-        let (call_id, req) = super::build_request("Chat/changes", args, super::USING_CHAT);
+        let req = super::build_request("Chat/changes", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Send a typing indicator for a Chat (JMAP Chat §Chat/typing).
@@ -108,9 +108,9 @@ impl super::SessionClient<'_> {
             "chatId": chat_id,
             "typing": typing,
         });
-        let (call_id, req) = super::build_request("Chat/typing", args, super::USING_CHAT);
+        let req = super::build_request("Chat/typing", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Fetch query-result changes for Chat since `since_query_state`
@@ -131,9 +131,9 @@ impl super::SessionClient<'_> {
         if let Some(mc) = max_changes {
             args["maxChanges"] = mc.into();
         }
-        let (call_id, req) = super::build_request("Chat/queryChanges", args, super::USING_CHAT);
+        let req = super::build_request("Chat/queryChanges", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Create a Chat (JMAP Chat §Chat/set create).
@@ -210,9 +210,9 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "create": { client_id: create_obj },
         });
-        let (call_id, req) = super::build_request("Chat/set", args, super::USING_CHAT);
+        let req = super::build_request("Chat/set", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Update Chat properties (JMAP Chat §Chat/set update).
@@ -313,9 +313,9 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "update": { id: serde_json::Value::Object(patch_map) },
         });
-        let (call_id, req) = super::build_request("Chat/set", args, super::USING_CHAT);
+        let req = super::build_request("Chat/set", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Destroy Chat objects (RFC 8620 §5.3 / Chat/set destroy).
@@ -336,8 +336,8 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "destroy": ids,
         });
-        let (call_id, req) = super::build_request("Chat/set", args, super::USING_CHAT);
+        let req = super::build_request("Chat/set", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 }

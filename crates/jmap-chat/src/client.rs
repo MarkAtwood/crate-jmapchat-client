@@ -8,6 +8,15 @@ use crate::jmap::{JmapRequest, JmapResponse, Session};
 use crate::sse::{parse_sse_block, SseFrame};
 use futures::StreamExt;
 
+/// Internal state threaded through the `subscribe_events` unfold loop.
+struct SseStreamState<S> {
+    stream: S,
+    buf: String,
+    /// Byte offset from which the next delimiter scan begins.
+    /// Must always be a valid UTF-8 char boundary of `buf`.
+    scan_from: usize,
+}
+
 /// Auth-agnostic JMAP Chat HTTP client.
 ///
 /// Construct with [`JmapChatClient::new`], then call [`fetch_session`] to
@@ -38,6 +47,8 @@ impl JmapChatClient {
             ClientError::InvalidArgument(format!("base_url is not a valid URL: {e}"))
         })?;
         let path = parsed.path();
+        // url::Url::path() returns "/" for root-only URLs (no path segments);
+        // any value other than "/" means the URL contains an explicit path component.
         if path != "/" {
             return Err(ClientError::InvalidArgument(format!(
                 "base_url must not have a path component, got: {path:?}"
@@ -53,7 +64,10 @@ impl JmapChatClient {
                 "base_url must not have a fragment".into(),
             ));
         }
-        // Store without trailing slash
+        // Strip trailing slash here so self.base_url is always slash-free.
+        // fetch_session also trims defensively because the JMAP session document
+        // may contain URL fields that already include a trailing slash, and
+        // RFC 6570 URI templates require a clean base to expand correctly.
         let base_url = base_url.trim_end_matches('/').to_string();
         let http = auth.build_client()?;
         Ok(Self {
@@ -63,8 +77,18 @@ impl JmapChatClient {
         })
     }
 
+    /// Returns `Err(ClientError::AuthFailed)` when the HTTP status indicates an
+    /// authentication or authorization failure.
+    ///
+    /// Specifically handles:
+    /// - 401 Unauthorized (RFC 7235 §3.1) — missing or invalid credentials
+    /// - 403 Forbidden (RFC 7235 §3.2) — credentials present but insufficient
+    ///
+    /// Called before reading the response body on all three HTTP paths
+    /// (`fetch_session`, `call`, `subscribe_events`) so callers can distinguish
+    /// permanent auth failures from transient errors without consuming the body.
     pub(crate) fn check_auth_status(status: reqwest::StatusCode) -> Result<(), ClientError> {
-        if status == 401 || status == 403 {
+        if status == reqwest::StatusCode::UNAUTHORIZED || status == reqwest::StatusCode::FORBIDDEN {
             Err(ClientError::AuthFailed(status.as_u16()))
         } else {
             Ok(())
@@ -87,30 +111,28 @@ impl JmapChatClient {
             req = req.header(name, value);
         }
 
-        let resp = req.send().await.map_err(ClientError::Http)?;
-
-        let status = resp.status();
-        Self::check_auth_status(status)?;
-
-        let resp = resp.error_for_status().map_err(ClientError::Http)?;
+        let resp = {
+            let raw_resp = req.send().await.map_err(ClientError::Http)?;
+            Self::check_auth_status(raw_resp.status())?;
+            raw_resp.error_for_status().map_err(ClientError::Http)?
+        };
 
         let session: Session = resp
             .json()
             .await
             .map_err(|e| ClientError::Parse(e.to_string()))?;
 
-        if session.api_url.is_empty() {
-            return Err(ClientError::InvalidSession("apiUrl is empty"));
-        }
-        if session.event_source_url.is_empty() {
-            return Err(ClientError::InvalidSession("eventSourceUrl is empty"));
-        }
-        if session.upload_url.is_empty() {
-            return Err(ClientError::InvalidSession("uploadUrl is empty"));
-        }
-        if session.download_url.is_empty() {
-            return Err(ClientError::InvalidSession("downloadUrl is empty"));
-        }
+        let require_non_empty = |field: &str, name: &'static str| -> Result<(), ClientError> {
+            if field.is_empty() {
+                Err(ClientError::InvalidSession(name))
+            } else {
+                Ok(())
+            }
+        };
+        require_non_empty(&session.api_url, "apiUrl is empty")?;
+        require_non_empty(&session.event_source_url, "eventSourceUrl is empty")?;
+        require_non_empty(&session.upload_url, "uploadUrl is empty")?;
+        require_non_empty(&session.download_url, "downloadUrl is empty")?;
 
         Ok(session)
     }
@@ -135,12 +157,11 @@ impl JmapChatClient {
 
         builder = builder.timeout(std::time::Duration::from_secs(30));
 
-        let resp = builder.send().await.map_err(ClientError::Http)?;
-
-        let status = resp.status();
-        Self::check_auth_status(status)?;
-
-        let resp = resp.error_for_status().map_err(ClientError::Http)?;
+        let resp = {
+            let raw_resp = builder.send().await.map_err(ClientError::Http)?;
+            Self::check_auth_status(raw_resp.status())?;
+            raw_resp.error_for_status().map_err(ClientError::Http)?
+        };
 
         let jmap_resp: JmapResponse = resp
             .json()
@@ -231,9 +252,17 @@ impl JmapChatClient {
         let byte_stream = resp.bytes_stream();
 
         Ok(futures::stream::unfold(
-            Some((byte_stream, String::new(), 0usize)),
+            Some(SseStreamState {
+                stream: byte_stream,
+                buf: String::new(),
+                scan_from: 0usize,
+            }),
             |state| async move {
-                let (mut stream, mut buf, mut scan_from) = state?;
+                let SseStreamState {
+                    mut stream,
+                    mut buf,
+                    mut scan_from,
+                } = state?;
                 loop {
                     // Search for any double-newline delimiter (LF/CRLF/CR variants).
                     // scan_from is set to old_len.saturating_sub(3) after each append
@@ -268,7 +297,14 @@ impl JmapChatClient {
                         // whole buffer, so cost is O(frame) not O(total buffer).
                         let frame = raw_frame.replace("\r\n", "\n").replace('\r', "\n");
                         let sse_frame = parse_sse_block(&frame);
-                        return Some((Ok(sse_frame), Some((stream, buf, scan_from))));
+                        return Some((
+                            Ok(sse_frame),
+                            Some(SseStreamState {
+                                stream,
+                                buf,
+                                scan_from,
+                            }),
+                        ));
                     }
 
                     // Need more data from the network.
@@ -277,7 +313,11 @@ impl JmapChatClient {
                         Some(Err(e)) => {
                             return Some((
                                 Err(ClientError::Http(e)),
-                                Some((stream, buf, scan_from)),
+                                Some(SseStreamState {
+                                    stream,
+                                    buf,
+                                    scan_from,
+                                }),
                             ));
                         }
                         Some(Ok(bytes)) => {
@@ -333,6 +373,8 @@ pub(crate) fn extract_response<T: serde::de::DeserializeOwned>(
         .find(|inv| inv.call_id == call_id)
         .ok_or_else(|| ClientError::MethodNotFound(call_id.to_string()))?;
 
+    // RFC 8620 §3.6.1: a method name of "error" signals a top-level protocol error
+    // returned by the server for that invocation slot.
     if inv.method == "error" {
         let err_type = inv
             .args

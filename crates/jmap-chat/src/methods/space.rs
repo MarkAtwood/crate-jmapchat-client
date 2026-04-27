@@ -20,9 +20,9 @@ impl super::SessionClient<'_> {
             "ids": ids,
             "properties": properties,
         });
-        let (call_id, req) = super::build_request("Space/get", args, super::USING_CHAT);
+        let req = super::build_request("Space/get", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Fetch changes to Space objects since `since_state` (RFC 8620 §5.2 / Space/changes).
@@ -42,9 +42,9 @@ impl super::SessionClient<'_> {
         if let Some(mc) = max_changes {
             args["maxChanges"] = mc.into();
         }
-        let (call_id, req) = super::build_request("Space/changes", args, super::USING_CHAT);
+        let req = super::build_request("Space/changes", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Destroy Space objects (RFC 8620 §5.3 / Space/set destroy).
@@ -65,9 +65,9 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "destroy": ids,
         });
-        let (call_id, req) = super::build_request("Space/set", args, super::USING_CHAT);
+        let req = super::build_request("Space/set", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Query Space IDs with optional filter (RFC 8620 §5.5 / JMAP Chat §Space/query).
@@ -101,9 +101,9 @@ impl super::SessionClient<'_> {
         if let Some(l) = input.limit {
             args["limit"] = l.into();
         }
-        let (call_id, req) = super::build_request("Space/query", args, super::USING_CHAT);
+        let req = super::build_request("Space/query", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Fetch query-result changes for Space since `since_query_state`
@@ -124,9 +124,9 @@ impl super::SessionClient<'_> {
         if let Some(mc) = max_changes {
             args["maxChanges"] = mc.into();
         }
-        let (call_id, req) = super::build_request("Space/queryChanges", args, super::USING_CHAT);
+        let req = super::build_request("Space/queryChanges", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Create a new Space (JMAP Chat §Space/set create).
@@ -151,9 +151,9 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "create": { client_id: create_obj },
         });
-        let (call_id, req) = super::build_request("Space/set", args, super::USING_CHAT);
+        let req = super::build_request("Space/set", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Join a Space via invite code or direct ID (JMAP Chat §Space/join).
@@ -174,9 +174,9 @@ impl super::SessionClient<'_> {
                 args["spaceId"] = (*sid).into();
             }
         }
-        let (call_id, req) = super::build_request("Space/join", args, super::USING_CHAT);
+        let req = super::build_request("Space/join", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Update Space properties (JMAP Chat §Space/set update).
@@ -306,8 +306,8 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "update": { id: serde_json::Value::Object(patch_map) },
         });
-        let (call_id, req) = super::build_request("Space/set", args, super::USING_CHAT);
+        let req = super::build_request("Space/set", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 }

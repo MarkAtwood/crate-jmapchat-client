@@ -4,6 +4,52 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
+macro_rules! impl_string_newtype {
+    ($t:ident) => {
+        impl std::fmt::Display for $t {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                self.0.fmt(f)
+            }
+        }
+        impl AsRef<str> for $t {
+            fn as_ref(&self) -> &str {
+                &self.0
+            }
+        }
+        impl std::ops::Deref for $t {
+            type Target = str;
+            fn deref(&self) -> &str {
+                &self.0
+            }
+        }
+        impl PartialEq<str> for $t {
+            fn eq(&self, other: &str) -> bool {
+                self.0 == other
+            }
+        }
+        impl PartialEq<&str> for $t {
+            fn eq(&self, other: &&str) -> bool {
+                self.0 == *other
+            }
+        }
+        impl PartialEq<$t> for &str {
+            fn eq(&self, other: &$t) -> bool {
+                *self == other.0
+            }
+        }
+        impl PartialEq<String> for $t {
+            fn eq(&self, other: &String) -> bool {
+                self.0 == *other
+            }
+        }
+        impl PartialEq<$t> for String {
+            fn eq(&self, other: &$t) -> bool {
+                *self == other.0
+            }
+        }
+    };
+}
+
 /// An opaque server-assigned identifier string (RFC 8620 §1.2).
 /// Guaranteed non-empty. Serializes/deserializes transparently as a JSON string.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Serialize)]
@@ -48,54 +94,7 @@ impl Id {
     }
 }
 
-impl std::fmt::Display for Id {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.0.fmt(f)
-    }
-}
-
-impl AsRef<str> for Id {
-    fn as_ref(&self) -> &str {
-        &self.0
-    }
-}
-
-impl std::ops::Deref for Id {
-    type Target = str;
-    fn deref(&self) -> &str {
-        &self.0
-    }
-}
-
-impl PartialEq<str> for Id {
-    fn eq(&self, other: &str) -> bool {
-        self.0 == other
-    }
-}
-
-impl PartialEq<&str> for Id {
-    fn eq(&self, other: &&str) -> bool {
-        self.0 == *other
-    }
-}
-
-impl PartialEq<Id> for &str {
-    fn eq(&self, other: &Id) -> bool {
-        *self == other.0
-    }
-}
-
-impl PartialEq<String> for Id {
-    fn eq(&self, other: &String) -> bool {
-        self.0 == *other
-    }
-}
-
-impl PartialEq<Id> for String {
-    fn eq(&self, other: &Id) -> bool {
-        *self == other.0
-    }
-}
+impl_string_newtype!(Id);
 
 /// An RFC 3339 UTC timestamp string (JMAP UTCDate, RFC 8620 §1.4).
 /// Guaranteed non-empty. Serializes/deserializes transparently as a JSON string.
@@ -154,54 +153,7 @@ impl UTCDate {
     }
 }
 
-impl std::fmt::Display for UTCDate {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.0.fmt(f)
-    }
-}
-
-impl AsRef<str> for UTCDate {
-    fn as_ref(&self) -> &str {
-        &self.0
-    }
-}
-
-impl std::ops::Deref for UTCDate {
-    type Target = str;
-    fn deref(&self) -> &str {
-        &self.0
-    }
-}
-
-impl PartialEq<str> for UTCDate {
-    fn eq(&self, other: &str) -> bool {
-        self.0 == other
-    }
-}
-
-impl PartialEq<&str> for UTCDate {
-    fn eq(&self, other: &&str) -> bool {
-        self.0 == *other
-    }
-}
-
-impl PartialEq<UTCDate> for &str {
-    fn eq(&self, other: &UTCDate) -> bool {
-        *self == other.0
-    }
-}
-
-impl PartialEq<String> for UTCDate {
-    fn eq(&self, other: &String) -> bool {
-        self.0 == *other
-    }
-}
-
-impl PartialEq<UTCDate> for String {
-    fn eq(&self, other: &UTCDate) -> bool {
-        *self == other.0
-    }
-}
+impl_string_newtype!(UTCDate);
 
 /// A single JMAP method call or response: `[methodName, arguments, callId]` (RFC 8620 §3.2).
 ///
@@ -209,13 +161,17 @@ impl PartialEq<UTCDate> for String {
 #[non_exhaustive]
 #[derive(Debug, Clone)]
 pub struct Invocation {
+    /// JMAP method name, e.g. `"Chat/get"`.
     pub method: String,
+    /// Method arguments object.
     pub args: serde_json::Value,
+    /// Client-supplied opaque identifier echoed back in the response.
     pub call_id: String,
 }
 
 impl Invocation {
-    /// Create a new `Invocation`.
+    /// Constructs a method call entry for a [`JmapRequest`].
+    /// `call_id` is echoed back in the response and used to match results (RFC 8620 §3.5).
     pub fn new(
         method: impl Into<String>,
         args: serde_json::Value,

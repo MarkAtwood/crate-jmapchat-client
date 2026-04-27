@@ -16,9 +16,9 @@ impl super::SessionClient<'_> {
             "ids": ids,
             "properties": properties,
         });
-        let (call_id, req) = super::build_request("SpaceInvite/get", args, super::USING_CHAT);
+        let req = super::build_request("SpaceInvite/get", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Fetch changes to SpaceInvite objects since `since_state` (RFC 8620 §5.2 / SpaceInvite/changes).
@@ -38,9 +38,9 @@ impl super::SessionClient<'_> {
         if let Some(mc) = max_changes {
             args["maxChanges"] = mc.into();
         }
-        let (call_id, req) = super::build_request("SpaceInvite/changes", args, super::USING_CHAT);
+        let req = super::build_request("SpaceInvite/changes", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Create a SpaceInvite (RFC 8620 §5.3 / SpaceInvite/set create).
@@ -66,9 +66,9 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "create": { client_id: obj },
         });
-        let (call_id, req) = super::build_request("SpaceInvite/set", args, super::USING_CHAT);
+        let req = super::build_request("SpaceInvite/set", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Destroy SpaceInvite objects (RFC 8620 §5.3 / SpaceInvite/set destroy).
@@ -88,8 +88,8 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "destroy": ids,
         });
-        let (call_id, req) = super::build_request("SpaceInvite/set", args, super::USING_CHAT);
+        let req = super::build_request("SpaceInvite/set", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 }

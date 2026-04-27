@@ -961,8 +961,7 @@ impl SessionClient<'_> {
 // ---------------------------------------------------------------------------
 
 /// The call-id embedded in every single-method JMAP request produced by
-/// [`build_request`]. Returned alongside the request so callers pass it
-/// directly to [`crate::client::extract_response`] — no separate import needed.
+/// [`build_request`]. Pass directly to [`crate::client::extract_response`].
 pub(super) const CALL_ID: &str = "r1";
 
 /// Capability URIs for standard JMAP Chat method calls (RFC 8620 §3.3).
@@ -988,25 +987,22 @@ pub(super) const USING_CHAT_PUSH: &[&str] = &[
 /// [`USING_CORE`] to avoid per-call allocations; all capability URI strings
 /// are static.
 ///
-/// Returns `(call_id, request)`. Pass `call_id` to
-/// `crate::client::extract_response` so the pairing is explicit and
-/// compiler-visible rather than via a shared constant.
+/// The embedded call-id is [`CALL_ID`]; pass it directly to
+/// `crate::client::extract_response`.
 fn build_request(
     method_name: &str,
     args: serde_json::Value,
     using: &[&str],
-) -> (&'static str, crate::jmap::JmapRequest) {
-    let req = crate::jmap::JmapRequest {
+) -> crate::jmap::JmapRequest {
+    crate::jmap::JmapRequest {
         using: using.iter().map(|&s| s.to_string()).collect(),
         method_calls: vec![crate::jmap::Invocation::new(method_name, args, CALL_ID)],
-    };
-    (CALL_ID, req)
+    }
 }
 
 /// Resolve an optional caller-supplied client ID, generating a ULID if absent.
 ///
-/// Returns `Cow::Borrowed(s)` when `id` is `Some(s)`, and `Cow::Owned(ulid)`
-/// when `id` is `None`.
+/// Returns the supplied string unchanged, or a freshly generated ULID when `None`.
 pub(super) fn resolve_client_id(id: Option<&str>) -> std::borrow::Cow<'_, str> {
     match id {
         Some(s) => std::borrow::Cow::Borrowed(s),
