@@ -13,6 +13,7 @@ pub mod contact;
 pub mod custom_emoji;
 pub mod message;
 pub mod misc;
+pub mod space;
 pub mod space_ban;
 pub mod space_invite;
 
@@ -309,6 +310,47 @@ pub struct ChatContactQueryInput<'a> {
     pub sort_ascending: Option<bool>,
 }
 
+/// Input parameters for [`JmapChatClient::space_create`].
+#[derive(Debug)]
+pub struct SpaceCreateInput<'a> {
+    /// Caller-supplied ULID used as the creation key in the JMAP create map.
+    pub client_id: &'a str,
+    /// Display name for the Space.
+    pub name: &'a str,
+    pub description: Option<&'a str>,
+    pub icon_blob_id: Option<&'a str>,
+}
+
+/// Input parameters for [`JmapChatClient::space_query`].
+#[derive(Debug, Default)]
+pub struct SpaceQueryInput<'a> {
+    /// Filter by substring match on Space name.
+    pub filter_name: Option<&'a str>,
+    pub filter_is_public: Option<bool>,
+    pub position: Option<u64>,
+    pub limit: Option<u64>,
+}
+
+/// Input parameters for [`JmapChatClient::space_join`].
+///
+/// Exactly one of `invite_code` or `space_id` must be `Some`.
+/// Supplying both or neither returns `ClientError::InvalidArgument`.
+#[derive(Debug)]
+pub struct SpaceJoinInput<'a> {
+    /// Redeem a SpaceInvite by its `code` field (not `id`).
+    pub invite_code: Option<&'a str>,
+    /// Join a public Space directly by its id.
+    pub space_id: Option<&'a str>,
+}
+
+/// Response to [`JmapChatClient::space_join`] (JMAP Chat §Space/join).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SpaceJoinResponse {
+    pub account_id: String,
+    pub space_id: String,
+}
+
 /// One entry in the `addMembers` patch key for [`JmapChatClient::chat_set_update`].
 #[derive(Debug)]
 pub struct AddMemberInput<'a> {
@@ -386,6 +428,68 @@ pub struct ChatUpdateInput<'a> {
     pub remove_members: &'a [&'a str],
     /// Role changes for existing members (group chats, admin only). Pass `&[]` when unused.
     pub update_member_roles: &'a [UpdateMemberRoleInput<'a>],
+}
+
+/// One member to add in the `addMembers` patch key of [`JmapChatClient::space_set_update`].
+#[derive(Debug)]
+pub struct SpaceAddMemberInput<'a> {
+    /// ChatContact.id of the member to add.
+    pub id: &'a str,
+    /// Initial role IDs for the new member. `None` grants no extra roles beyond `@everyone`.
+    pub role_ids: Option<&'a [&'a str]>,
+}
+
+/// One member update in the `updateMembers` patch key of [`JmapChatClient::space_set_update`].
+#[derive(Debug)]
+pub struct SpaceUpdateMemberInput<'a> {
+    /// ChatContact.id of the member to update.
+    pub id: &'a str,
+    pub role_ids: Option<&'a [&'a str]>,
+    /// `Some(None)` clears the nick; `Some(Some(s))` sets it.
+    pub nick: Option<Option<&'a str>>,
+}
+
+/// One channel to add in the `addChannels` patch key of [`JmapChatClient::space_set_update`].
+#[derive(Debug)]
+pub struct SpaceAddChannelInput<'a> {
+    pub name: &'a str,
+    pub category_id: Option<&'a str>,
+    pub position: Option<u64>,
+    pub topic: Option<&'a str>,
+}
+
+/// Input parameters for [`JmapChatClient::space_set_update`].
+///
+/// All fields except `id` are optional. Absent fields are omitted from the patch.
+/// Nullable fields (`description`, `icon_blob_id`) use `Some(None)` to clear.
+/// Slice fields default to `&[]` when no changes are needed.
+///
+/// Scope: metadata + member + channel management. Role and category management
+/// are out of scope for this epic.
+///
+/// `Default` is intentionally not derived: `id` has no safe default value.
+#[derive(Debug)]
+pub struct SpaceUpdateInput<'a> {
+    /// `Space.id` to update.
+    pub id: &'a str,
+    /// New display name (`manage_space` permission required).
+    pub name: Option<&'a str>,
+    /// `Some(None)` clears; `Some(Some(s))` sets.
+    pub description: Option<Option<&'a str>>,
+    /// `Some(None)` clears; `Some(Some(id))` sets.
+    pub icon_blob_id: Option<Option<&'a str>>,
+    pub is_public: Option<bool>,
+    pub is_publicly_previewable: Option<bool>,
+    /// Members to add (`manage_members` required). Pass `&[]` when unused.
+    pub add_members: &'a [SpaceAddMemberInput<'a>],
+    /// ChatContact.ids to remove (`manage_members` required). Pass `&[]` when unused.
+    pub remove_members: &'a [&'a str],
+    /// Member updates (`manage_members` required). Pass `&[]` when unused.
+    pub update_members: &'a [SpaceUpdateMemberInput<'a>],
+    /// Channels to add (`manage_channels` required). Pass `&[]` when unused.
+    pub add_channels: &'a [SpaceAddChannelInput<'a>],
+    /// Channel Chat ids to remove (`manage_channels` required). Pass `&[]` when unused.
+    pub remove_channels: &'a [&'a str],
 }
 
 // ---------------------------------------------------------------------------

@@ -1,0 +1,41 @@
+{
+  "methodResponses": [
+    [
+      "Space/get",
+      {
+        "accountId": "account1",
+        "state": "state-space-001",
+        "list": [
+          {
+            "id": "01HV5Z6QKWJ7N3P8R2X4YTMDSP",
+            "name": "Engineering",
+            "roles": [
+              {
+                "id": "01HV5Z6QKWJ7N3P8R2X4YTMDRL",
+                "name": "Admin",
+                "permissions": ["manage_space", "manage_members"],
+                "position": 1
+              }
+            ],
+            "members": [
+              {
+                "id": "01HV5Z6QKWJ7N3P8R2X4YTMDMB",
+                "roleIds": ["01HV5Z6QKWJ7N3P8R2X4YTMDRL"],
+                "joinedAt": "2024-01-01T00:00:00Z"
+              }
+            ],
+            "categories": [],
+            "uncategorizedChannelIds": [],
+            "createdAt": "2024-01-01T00:00:00Z",
+            "isPublic": false,
+            "isPubliclyPreviewable": false,
+            "memberCount": 1
+          }
+        ],
+        "notFound": []
+      },
+      "r1"
+    ]
+  ],
+  "sessionState": "sess-abc"
+}

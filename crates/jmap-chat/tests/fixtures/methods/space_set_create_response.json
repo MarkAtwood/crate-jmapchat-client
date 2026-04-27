@@ -1,0 +1,14 @@
+{
+  "methodResponses": [["Space/set", {
+    "accountId": "account1",
+    "oldState": "space-state-000",
+    "newState": "space-state-001",
+    "created": {
+      "client-space-001": {
+        "id": "01HV5Z6QKWJ7N3P8R2X4YTMDSP",
+        "createdAt": "2024-01-02T12:00:00Z"
+      }
+    }
+  }, "r1"]],
+  "sessionState": "sess-abc"
+}

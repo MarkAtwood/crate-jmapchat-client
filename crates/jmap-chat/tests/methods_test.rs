@@ -12,7 +12,8 @@ use jmap_chat::methods::{
     AddMemberInput, ChatContactQueryInput, ChatContactSetInput, ChatCreateDirectInput,
     ChatCreateGroupInput, ChatQueryInput, ChatUpdateInput, GetResponse, MessageCreateInput,
     MessageQueryInput, MessageUpdateInput, PresenceStatusSetInput, ReactionChange,
-    SpaceBanCreateInput, SpaceInviteCreateInput,
+    SpaceBanCreateInput, SpaceCreateInput, SpaceInviteCreateInput, SpaceJoinInput, SpaceQueryInput,
+    SpaceUpdateInput,
 };
 use jmap_chat::types::OwnerPresence;
 use wiremock::matchers::{body_json, method};
@@ -1967,4 +1968,406 @@ async fn chat_contact_query_changes_returns_typed_response() {
     assert!(result.removed.is_empty(), "removed must be empty");
     assert_eq!(result.added.len(), 1, "added must have one entry");
     assert_eq!(result.added[0].id, "01HV5Z6QKWJ7N3P8R2X4YTMDCC");
+}
+
+// ---------------------------------------------------------------------------
+// Test 47: space_get — happy path
+// ---------------------------------------------------------------------------
+
+/// Oracle: JMAP Chat §Space/get response shape: state, list with one Space, notFound empty.
+/// Fixture hand-written from §4.15 Space object definition.
+#[tokio::test]
+async fn space_get_returns_typed_response() {
+    let server = MockServer::start().await;
+
+    Mock::given(method("POST"))
+        .respond_with(
+            ResponseTemplate::new(200).set_body_json(fixture("space_get_response.json")),
+        )
+        .mount(&server)
+        .await;
+
+    let client = JmapChatClient::new(jmap_chat::auth::NoneAuth, &server.uri())
+        .expect("client construction must succeed");
+
+    let api_url = format!("{}/api", server.uri());
+    let result = client
+        .space_get(
+            &test_session(&api_url),
+            Some(&["01HV5Z6QKWJ7N3P8R2X4YTMDSP"]),
+            None,
+        )
+        .await
+        .expect("space_get must succeed");
+
+    // Oracle: space_get_response.json — list has one Space with id and name
+    assert_eq!(result.state, "state-space-001");
+    assert_eq!(result.list.len(), 1);
+    assert_eq!(result.list[0].id.as_str(), "01HV5Z6QKWJ7N3P8R2X4YTMDSP");
+    assert_eq!(result.list[0].name, "Engineering");
+    assert_eq!(result.list[0].member_count, 1);
+    assert!(result.not_found.unwrap_or_default().is_empty());
+}
+
+// ---------------------------------------------------------------------------
+// Test 48: space_changes — happy path
+// ---------------------------------------------------------------------------
+
+/// Oracle: RFC 8620 §5.2 — Space/changes response: oldState, newState,
+/// hasMoreChanges, created/updated/destroyed lists.
+#[tokio::test]
+async fn space_changes_returns_typed_response() {
+    let server = MockServer::start().await;
+
+    Mock::given(method("POST"))
+        .respond_with(
+            ResponseTemplate::new(200).set_body_json(fixture("space_changes_response.json")),
+        )
+        .mount(&server)
+        .await;
+
+    let client = JmapChatClient::new(jmap_chat::auth::NoneAuth, &server.uri())
+        .expect("client construction must succeed");
+
+    let api_url = format!("{}/api", server.uri());
+    let result = client
+        .space_changes(&test_session(&api_url), "state-space-000", None)
+        .await
+        .expect("space_changes must succeed");
+
+    // Oracle: space_changes_response.json — one created id, updated/destroyed empty
+    assert_eq!(result.old_state, "state-space-000");
+    assert_eq!(result.new_state, "state-space-001");
+    assert!(!result.has_more_changes);
+    assert_eq!(result.created.len(), 1);
+    assert_eq!(result.created[0], "01HV5Z6QKWJ7N3P8R2X4YTMDSP");
+    assert!(result.updated.is_empty());
+    assert!(result.destroyed.is_empty());
+}
+
+// ---------------------------------------------------------------------------
+// Test 49: space_create — body shape + happy path
+// ---------------------------------------------------------------------------
+
+/// Oracle: RFC 8620 §5.3 — Space/set create response: created map with server id.
+///
+/// Body matcher: verifies name is sent and optional fields absent when None.
+#[tokio::test]
+async fn space_create_returns_typed_response() {
+    let server = MockServer::start().await;
+
+    Mock::given(method("POST"))
+        .and(body_json(serde_json::json!({
+            "using": ["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:chat"],
+            "methodCalls": [["Space/set", {
+                "accountId": "account1",
+                "create": {
+                    "client-space-001": {
+                        "name": "Engineering"
+                    }
+                }
+            }, "r1"]]
+        })))
+        .respond_with(
+            ResponseTemplate::new(200).set_body_json(fixture("space_set_create_response.json")),
+        )
+        .mount(&server)
+        .await;
+
+    let client = JmapChatClient::new(jmap_chat::auth::NoneAuth, &server.uri())
+        .expect("client construction must succeed");
+
+    let api_url = format!("{}/api", server.uri());
+    let result = client
+        .space_create(
+            &test_session(&api_url),
+            &SpaceCreateInput {
+                client_id: "client-space-001",
+                name: "Engineering",
+                description: None,
+                icon_blob_id: None,
+            },
+        )
+        .await
+        .expect("space_create must succeed");
+
+    // Oracle: space_set_create_response.json — created map has one entry
+    let created = result.created.expect("created must be Some");
+    assert!(created.contains_key("client-space-001"));
+}
+
+// ---------------------------------------------------------------------------
+// Test 50: space_set_update — body shape + happy path
+// ---------------------------------------------------------------------------
+
+/// Oracle: RFC 8620 §5.3 — Space/set update response: updated map.
+///
+/// Body matcher: verifies metadata-only patch (name key only).
+#[tokio::test]
+async fn space_set_update_returns_typed_response() {
+    let server = MockServer::start().await;
+
+    Mock::given(method("POST"))
+        .and(body_json(serde_json::json!({
+            "using": ["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:chat"],
+            "methodCalls": [["Space/set", {
+                "accountId": "account1",
+                "update": {
+                    "01HV5Z6QKWJ7N3P8R2X4YTMDSP": {
+                        "name": "Engineering Team"
+                    }
+                }
+            }, "r1"]]
+        })))
+        .respond_with(
+            ResponseTemplate::new(200).set_body_json(fixture("space_set_update_response.json")),
+        )
+        .mount(&server)
+        .await;
+
+    let client = JmapChatClient::new(jmap_chat::auth::NoneAuth, &server.uri())
+        .expect("client construction must succeed");
+
+    let api_url = format!("{}/api", server.uri());
+    let result = client
+        .space_set_update(
+            &test_session(&api_url),
+            &SpaceUpdateInput {
+                id: "01HV5Z6QKWJ7N3P8R2X4YTMDSP",
+                name: Some("Engineering Team"),
+                description: None,
+                icon_blob_id: None,
+                is_public: None,
+                is_publicly_previewable: None,
+                add_members: &[],
+                remove_members: &[],
+                update_members: &[],
+                add_channels: &[],
+                remove_channels: &[],
+            },
+        )
+        .await
+        .expect("space_set_update must succeed");
+
+    // Oracle: space_set_update_response.json — updated map has one entry
+    let updated = result.updated.expect("updated must be Some");
+    assert!(updated.contains_key("01HV5Z6QKWJ7N3P8R2X4YTMDSP"));
+}
+
+// ---------------------------------------------------------------------------
+// Test 51: space_set_destroy — happy path
+// ---------------------------------------------------------------------------
+
+/// Oracle: RFC 8620 §5.3 — Space/set destroy response: destroyed list.
+#[tokio::test]
+async fn space_set_destroy_returns_typed_response() {
+    let server = MockServer::start().await;
+
+    Mock::given(method("POST"))
+        .respond_with(
+            ResponseTemplate::new(200).set_body_json(fixture("space_set_destroy_response.json")),
+        )
+        .mount(&server)
+        .await;
+
+    let client = JmapChatClient::new(jmap_chat::auth::NoneAuth, &server.uri())
+        .expect("client construction must succeed");
+
+    let api_url = format!("{}/api", server.uri());
+    let result = client
+        .space_set_destroy(
+            &test_session(&api_url),
+            &["01HV5Z6QKWJ7N3P8R2X4YTMDSP"],
+        )
+        .await
+        .expect("space_set_destroy must succeed");
+
+    // Oracle: space_set_destroy_response.json — destroyed list has one id
+    let destroyed = result.destroyed.expect("destroyed must be Some");
+    assert_eq!(destroyed.len(), 1);
+    assert_eq!(destroyed[0], "01HV5Z6QKWJ7N3P8R2X4YTMDSP");
+}
+
+// ---------------------------------------------------------------------------
+// Test 52: space_query — body shape + happy path
+// ---------------------------------------------------------------------------
+
+/// Oracle: RFC 8620 §5.5 — Space/query response: queryState, ids, canCalculateChanges.
+///
+/// Body matcher: verifies filter with isPublic and position.
+#[tokio::test]
+async fn space_query_returns_typed_response() {
+    let server = MockServer::start().await;
+
+    Mock::given(method("POST"))
+        .and(body_json(serde_json::json!({
+            "using": ["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:chat"],
+            "methodCalls": [["Space/query", {
+                "accountId": "account1",
+                "filter": {"isPublic": true},
+                "position": 0,
+                "limit": 10
+            }, "r1"]]
+        })))
+        .respond_with(
+            ResponseTemplate::new(200).set_body_json(fixture("space_query_response.json")),
+        )
+        .mount(&server)
+        .await;
+
+    let client = JmapChatClient::new(jmap_chat::auth::NoneAuth, &server.uri())
+        .expect("client construction must succeed");
+
+    let api_url = format!("{}/api", server.uri());
+    let result = client
+        .space_query(
+            &test_session(&api_url),
+            &SpaceQueryInput {
+                filter_name: None,
+                filter_is_public: Some(true),
+                position: Some(0),
+                limit: Some(10),
+            },
+        )
+        .await
+        .expect("space_query must succeed");
+
+    // Oracle: space_query_response.json — ids has one entry
+    assert_eq!(result.ids.len(), 1);
+    assert_eq!(result.ids[0], "01HV5Z6QKWJ7N3P8R2X4YTMDSP");
+    assert!(result.can_calculate_changes);
+}
+
+// ---------------------------------------------------------------------------
+// Test 53: space_query_changes — maxChanges absent when None
+// ---------------------------------------------------------------------------
+
+/// Oracle: RFC 8620 §5.6 — Space/queryChanges response shape.
+///
+/// Body matcher: verifies sinceQueryState is sent and maxChanges key is absent
+/// when None (omit-when-None pattern).
+#[tokio::test]
+async fn space_query_changes_returns_typed_response() {
+    let server = MockServer::start().await;
+
+    Mock::given(method("POST"))
+        .and(body_json(serde_json::json!({
+            "using": ["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:chat"],
+            "methodCalls": [["Space/queryChanges", {
+                "accountId": "account1",
+                "sinceQueryState": "space-qs-000"
+            }, "r1"]]
+        })))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .set_body_json(fixture("space_query_changes_response.json")),
+        )
+        .mount(&server)
+        .await;
+
+    let client = JmapChatClient::new(jmap_chat::auth::NoneAuth, &server.uri())
+        .expect("client construction must succeed");
+
+    let api_url = format!("{}/api", server.uri());
+    let result = client
+        .space_query_changes(&test_session(&api_url), "space-qs-000", None)
+        .await
+        .expect("space_query_changes must succeed");
+
+    // Oracle: space_query_changes_response.json — removed empty, added has one entry
+    assert_eq!(result.old_query_state, "space-qs-000");
+    assert_eq!(result.new_query_state, "space-qs-001");
+    assert!(result.removed.is_empty());
+    assert_eq!(result.added.len(), 1);
+    assert_eq!(result.added[0].id, "01HV5Z6QKWJ7N3P8R2X4YTMDSP");
+}
+
+// ---------------------------------------------------------------------------
+// Test 54: space_join — invite_code path, body shape
+// ---------------------------------------------------------------------------
+
+/// Oracle: JMAP Chat §Space/join — SpaceJoinResponse with accountId and spaceId.
+///
+/// Body matcher: verifies inviteCode present and spaceId absent (invite path).
+#[tokio::test]
+async fn space_join_by_invite_code() {
+    let server = MockServer::start().await;
+
+    Mock::given(method("POST"))
+        .and(body_json(serde_json::json!({
+            "using": ["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:chat"],
+            "methodCalls": [["Space/join", {
+                "accountId": "account1",
+                "inviteCode": "INVITE-XYZ"
+            }, "r1"]]
+        })))
+        .respond_with(
+            ResponseTemplate::new(200).set_body_json(fixture("space_join_response.json")),
+        )
+        .mount(&server)
+        .await;
+
+    let client = JmapChatClient::new(jmap_chat::auth::NoneAuth, &server.uri())
+        .expect("client construction must succeed");
+
+    let api_url = format!("{}/api", server.uri());
+    let result = client
+        .space_join(
+            &test_session(&api_url),
+            &SpaceJoinInput {
+                invite_code: Some("INVITE-XYZ"),
+                space_id: None,
+            },
+        )
+        .await
+        .expect("space_join must succeed");
+
+    // Oracle: space_join_response.json — accountId and spaceId present
+    assert_eq!(result.account_id, "account1");
+    assert_eq!(result.space_id, "01HV5Z6QKWJ7N3P8R2X4YTMDSP");
+}
+
+// ---------------------------------------------------------------------------
+// Test 55: space_join — guard rejects neither nor both
+// ---------------------------------------------------------------------------
+
+/// Oracle: ClientError::InvalidArgument when both fields are None or both are Some.
+/// No network call is made; wiremock server is unused.
+#[tokio::test]
+async fn space_join_rejects_neither_nor_both() {
+    let client = JmapChatClient::new(jmap_chat::auth::NoneAuth, "http://unused")
+        .expect("client construction must succeed");
+    let session = test_session("http://unused/api");
+
+    // Neither provided
+    let err = client
+        .space_join(
+            &session,
+            &SpaceJoinInput {
+                invite_code: None,
+                space_id: None,
+            },
+        )
+        .await
+        .expect_err("neither must fail");
+    assert!(
+        matches!(err, ClientError::InvalidArgument(_)),
+        "expected InvalidArgument, got {err:?}"
+    );
+
+    // Both provided
+    let err = client
+        .space_join(
+            &session,
+            &SpaceJoinInput {
+                invite_code: Some("CODE"),
+                space_id: Some("01HV5Z6QKWJ7N3P8R2X4YTMDSP"),
+            },
+        )
+        .await
+        .expect_err("both must fail");
+    assert!(
+        matches!(err, ClientError::InvalidArgument(_)),
+        "expected InvalidArgument, got {err:?}"
+    );
 }
