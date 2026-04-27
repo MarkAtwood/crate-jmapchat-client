@@ -641,7 +641,7 @@ pub struct Message {
     /// Message content.
     pub body: String,
     /// MIME type of `body`.
-    pub body_type: String,
+    pub body_type: BodyType,
     /// File attachments.
     pub attachments: Vec<Attachment>,
     /// Structured @mention annotations.
@@ -1224,7 +1224,7 @@ mod tests {
         assert_eq!(msg.id, "01HV5Z6QKWJ7N3P8R2X4YTMD00");
         assert_eq!(msg.sender_id, SenderIdOrSelf::SelfSender);
         assert_eq!(msg.body, "Hello, world!");
-        assert_eq!(msg.body_type, "text/plain");
+        assert_eq!(msg.body_type, BodyType::Plain);
         assert_eq!(msg.delivery_state, DeliveryState::Delivered);
         assert!(msg.attachments.is_empty());
         assert!(msg.mentions.is_empty());
@@ -1241,7 +1241,10 @@ mod tests {
     fn test_message_rich_body_valid_parses_as_string() {
         let json = fixture("message_rich_body_valid.json");
         let msg: Message = serde_json::from_str(&json).expect("valid rich body fixture must parse");
-        assert_eq!(msg.body_type, "application/jmap-chat-rich");
+        assert_eq!(
+            msg.body_type,
+            BodyType::Unknown("application/jmap-chat-rich".to_string())
+        );
         // body is a plain String — callers must call from_str to get RichBody
         assert!(
             msg.body.starts_with('{'),

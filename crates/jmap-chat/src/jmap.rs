@@ -376,16 +376,14 @@ impl Session {
         &self,
         account_id: &str,
     ) -> Result<Option<ChatCapability>, crate::error::ClientError> {
-        let account = match self.accounts.get(account_id) {
-            Some(a) => a,
-            None => return Ok(None),
+        let Some(account) = self.accounts.get(account_id) else {
+            return Ok(None);
         };
-        let raw = match account
+        let Some(raw) = account
             .account_capabilities
             .get("urn:ietf:params:jmap:chat")
-        {
-            Some(r) => r,
-            None => return Ok(None),
+        else {
+            return Ok(None);
         };
         serde_json::from_value::<ChatCapability>(raw.clone())
             .map(Some)
@@ -405,9 +403,8 @@ impl Session {
     pub fn websocket_capability(
         &self,
     ) -> Result<Option<WebSocketCapability>, crate::error::ClientError> {
-        let raw = match self.capabilities.get("urn:ietf:params:jmap:websocket") {
-            Some(r) => r,
-            None => return Ok(None),
+        let Some(raw) = self.capabilities.get("urn:ietf:params:jmap:websocket") else {
+            return Ok(None);
         };
         serde_json::from_value::<WebSocketCapability>(raw.clone())
             .map(Some)
@@ -436,16 +433,14 @@ impl Session {
         &self,
         account_id: &str,
     ) -> Result<Option<ChatPushCapability>, crate::error::ClientError> {
-        let account = match self.accounts.get(account_id) {
-            Some(a) => a,
-            None => return Ok(None),
+        let Some(account) = self.accounts.get(account_id) else {
+            return Ok(None);
         };
-        let raw = match account
+        let Some(raw) = account
             .account_capabilities
             .get("urn:ietf:params:jmap:chat:push")
-        {
-            Some(r) => r,
-            None => return Ok(None),
+        else {
+            return Ok(None);
         };
         serde_json::from_value::<ChatPushCapability>(raw.clone())
             .map(Some)
