@@ -1,0 +1,17 @@
+{
+  "methodResponses": [
+    [
+      "Chat/query",
+      {
+        "accountId": "account1",
+        "queryState": "qstate-chat-001",
+        "canCalculateChanges": true,
+        "position": 0,
+        "ids": ["01HV5Z6QKWJ7N3P8R2X4YTMD3G"],
+        "total": 1
+      },
+      "r1"
+    ]
+  ],
+  "sessionState": "sess-abc"
+}

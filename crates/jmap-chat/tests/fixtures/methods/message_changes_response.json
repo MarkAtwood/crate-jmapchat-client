@@ -1,0 +1,18 @@
+{
+  "methodResponses": [
+    [
+      "Message/changes",
+      {
+        "accountId": "account1",
+        "oldState": "state-msg-000",
+        "newState": "state-msg-001",
+        "hasMoreChanges": false,
+        "created": ["01HV5Z6QKWJ7N3P8R2X4YTMD50"],
+        "updated": [],
+        "destroyed": []
+      },
+      "r1"
+    ]
+  ],
+  "sessionState": "sess-abc"
+}
