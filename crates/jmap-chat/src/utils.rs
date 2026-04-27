@@ -10,7 +10,8 @@ use crate::jmap::UTCDate;
 /// - Same calendar day as now: `"Today"`
 /// - Previous calendar day: `"Yesterday"`
 /// - 2–6 days ago: `"Mon 14:00"` (weekday abbreviation + HH:MM)
-/// - Older: `"Apr 12"` (month abbreviation + day number)
+/// - Same year, older than 6 days: `"Apr 12"` (month abbreviation + day number)
+/// - Different year: `"Apr 12 2023"` (month + day + year)
 ///
 /// **UTC dates only.** Both `dt` and the implicit current time are treated as
 /// UTC wall-clock dates. Callers in non-UTC time zones that need local-day
@@ -73,7 +74,11 @@ pub fn format_receipt_timestamp_at(dt: &UTCDate, now: DateTime<Utc>) -> String {
                 11 => "Nov",
                 _ => "Dec",
             };
-            format!("{} {}", month, parsed.day())
+            if parsed.year() != now.year() {
+                format!("{} {} {}", month, parsed.day(), parsed.year())
+            } else {
+                format!("{} {}", month, parsed.day())
+            }
         }
     }
 }
@@ -134,6 +139,14 @@ mod tests {
             "Today",
             "future timestamp must display as Today, not as a past date"
         );
+    }
+
+    /// Oracle: date from a prior year includes the year (2023-01-15 vs now 2024-03-20).
+    #[test]
+    fn test_prior_year_date_includes_year() {
+        let dt = UTCDate::from_trusted("2023-01-15T09:00:00Z");
+        let result = format_receipt_timestamp_at(&dt, now());
+        assert_eq!(result, "Jan 15 2023");
     }
 
     /// Oracle: seconds precision is never exposed in any output format.
