@@ -111,6 +111,10 @@ variant distinguishes cases (e.g., `chat_contact_no_presence` vs
 | `chat_set_update_response.json` | `Chat/set` response (update) — updated map |
 | `chat_typing_response.json` | `Chat/typing` response — accountId only |
 | `chat_query_changes_response.json` | `Chat/queryChanges` response — one added item |
+| `chat_contact_changes_response.json` | `ChatContact/changes` response — one updated id |
+| `chat_contact_set_response.json` | `ChatContact/set` response (update) — updated map |
+| `chat_contact_query_response.json` | `ChatContact/query` response — ids list |
+| `chat_contact_query_changes_response.json` | `ChatContact/queryChanges` response — one added item |
 
 ## When to Commit a Generation Script
 

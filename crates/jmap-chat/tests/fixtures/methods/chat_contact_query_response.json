@@ -1,0 +1,10 @@
+{
+  "methodResponses": [["ChatContact/query", {
+    "accountId": "account1",
+    "queryState": "contact-qs-001",
+    "canCalculateChanges": true,
+    "position": 0,
+    "ids": ["01HV5Z6QKWJ7N3P8R2X4YTMDCC"]
+  }, "r1"]],
+  "sessionState": "sess-abc"
+}

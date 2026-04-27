@@ -43,3 +43,6 @@
 [08:29:21] COORDINATOR: phase1 done — 4 beads created, wave0=1s0.1, wave1=1s0.2+1s0.3, wave2=1s0.4
 [08:38:53] COORDINATOR: phase2 done — 1s0.1/2/3/4 all closed, 41 tests passing
 [08:38:59] COORDINATOR: review round 1, epic jmap-chat-tui-3bs
+[08:43:54] COORDINATOR: claimed epic jmap-chat-tui-yov (ChatContact methods)
+[08:45:35] COORDINATOR: phase1 done — yov.1/2/3 created
+[08:50:43] COORDINATOR: review round 1, epic jmap-chat-tui-y8g

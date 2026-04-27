@@ -1,0 +1,11 @@
+{
+  "methodResponses": [["ChatContact/set", {
+    "accountId": "account1",
+    "oldState": "contact-state-001",
+    "newState": "contact-state-002",
+    "updated": {
+      "01HV5Z6QKWJ7N3P8R2X4YTMDCC": null
+    }
+  }, "r1"]],
+  "sessionState": "sess-abc"
+}
