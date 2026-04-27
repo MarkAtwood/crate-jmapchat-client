@@ -2332,7 +2332,7 @@ async fn space_join_by_space_id() {
 }
 
 // ---------------------------------------------------------------------------
-// Test 56: push_subscription_set — body shape + happy path
+// Test 56: push_subscription_create — body shape + happy path
 // ---------------------------------------------------------------------------
 
 /// Oracle: RFC 8620 §7.2 — PushSubscription/set response with created map.
@@ -2341,7 +2341,7 @@ async fn space_join_by_space_id() {
 /// Body matcher: verifies the `using` array includes `urn:ietf:params:jmap:chat:push`,
 /// `chatPush` is present with the correct account id key, and urgency is included.
 #[tokio::test]
-async fn push_subscription_set_returns_typed_response() {
+async fn push_subscription_create_returns_typed_response() {
     let server = MockServer::start().await;
 
     Mock::given(method("POST"))
@@ -2383,7 +2383,7 @@ async fn push_subscription_set_returns_typed_response() {
     };
     let result = client
         .with_session(&test_session(&api_url))
-        .push_subscription_set(&PushSubscriptionCreateInput {
+        .push_subscription_create(&PushSubscriptionCreateInput {
             client_id: Some("client-push-001"),
             device_client_id: "device-abc",
             url: "https://push.example.com/endpoint",
@@ -2392,7 +2392,7 @@ async fn push_subscription_set_returns_typed_response() {
             chat_push: Some(&[("account1", push_config)]),
         })
         .await
-        .expect("push_subscription_set must succeed");
+        .expect("push_subscription_create must succeed");
 
     // Oracle: push_subscription_set_response.json — created map has one entry; accountId null
     let created = result.created.expect("created must be Some");

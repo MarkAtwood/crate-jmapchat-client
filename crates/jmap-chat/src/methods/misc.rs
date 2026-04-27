@@ -156,7 +156,7 @@ impl super::SessionClient<'_> {
     /// those are not yet implemented.
     ///
     /// When `input.client_id` is `None`, a ULID is generated automatically.
-    pub async fn push_subscription_set(
+    pub async fn push_subscription_create(
         &self,
         input: &PushSubscriptionCreateInput<'_>,
     ) -> Result<PushSubscriptionSetResponse, crate::error::ClientError> {
@@ -184,7 +184,7 @@ impl super::SessionClient<'_> {
             for (account_id, _) in cp {
                 if !seen.insert(*account_id) {
                     return Err(crate::error::ClientError::InvalidArgument(format!(
-                        "push_subscription_set: duplicate accountId '{}' in chat_push",
+                        "push_subscription_create: duplicate accountId '{}' in chat_push",
                         account_id
                     )));
                 }
