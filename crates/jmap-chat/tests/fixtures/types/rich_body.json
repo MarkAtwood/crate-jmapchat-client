@@ -1,0 +1,11 @@
+{
+  "spans": [
+    {"type": "text", "text": "Hello "},
+    {"type": "bold", "text": "world"},
+    {"type": "text", "text": "! Check out "},
+    {"type": "link", "text": "this link", "uri": "https://example.com"},
+    {"type": "text", "text": ". Code: "},
+    {"type": "codeblock", "text": "fn main() {}", "lang": "rust"},
+    {"type": "mention", "text": "@alice", "userId": "user:alice@example.com"}
+  ]
+}

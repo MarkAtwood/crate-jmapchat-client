@@ -268,6 +268,80 @@ impl Session {
                 crate::error::ClientError::Parse(format!("malformed chat capability: {e}"))
             })
     }
+
+    /// Returns the parsed `WebSocketCapability` for the JMAP WebSocket transport, if present.
+    ///
+    /// Reads from `capabilities["urn:ietf:params:jmap:websocket"]` (RFC 8887).
+    /// This capability provides the `url` for WebSocket connections.
+    ///
+    /// - `Ok(None)` — server does not advertise JMAP WebSocket support.
+    /// - `Ok(Some(...))` — WebSocket is supported; use `result.url` to connect.
+    /// - `Err(ClientError::Parse(...))` — capability present but malformed.
+    pub fn websocket_capability(
+        &self,
+    ) -> Result<Option<WebSocketCapability>, crate::error::ClientError> {
+        let raw = match self.capabilities.get("urn:ietf:params:jmap:websocket") {
+            Some(r) => r,
+            None => return Ok(None),
+        };
+        serde_json::from_value::<WebSocketCapability>(raw.clone())
+            .map(Some)
+            .map_err(|e| {
+                crate::error::ClientError::Parse(format!("malformed websocket capability: {e}"))
+            })
+    }
+
+    /// Returns whether the server supports JMAP Chat WebSocket ephemeral events.
+    ///
+    /// Checks for presence of `capabilities["urn:ietf:params:jmap:chat:websocket"]`.
+    /// Use [`Session::websocket_capability`] to get the actual WebSocket URL.
+    pub fn supports_chat_websocket(&self) -> bool {
+        self.capabilities
+            .contains_key("urn:ietf:params:jmap:chat:websocket")
+    }
+
+    /// Returns the parsed `ChatPushCapability` for the given account, if present.
+    ///
+    /// Reads from `accounts[account_id].accountCapabilities["urn:ietf:params:jmap:chat:push"]`.
+    ///
+    /// - `Ok(None)` — account exists but has no chat push capability.
+    /// - `Ok(Some(...))` — chat push is supported for this account.
+    /// - `Err(ClientError::Parse(...))` — capability present but malformed.
+    pub fn chat_push_capability(
+        &self,
+        account_id: &str,
+    ) -> Result<Option<ChatPushCapability>, crate::error::ClientError> {
+        let account = match self.accounts.get(account_id) {
+            Some(a) => a,
+            None => return Ok(None),
+        };
+        let raw = match account
+            .account_capabilities
+            .get("urn:ietf:params:jmap:chat:push")
+        {
+            Some(r) => r,
+            None => return Ok(None),
+        };
+        serde_json::from_value::<ChatPushCapability>(raw.clone())
+            .map(Some)
+            .map_err(|e| {
+                crate::error::ClientError::Parse(format!("malformed chat push capability: {e}"))
+            })
+    }
+
+    /// Returns the VAPID public key advertised by the server, if present.
+    ///
+    /// The VAPID key lives at `capabilities["urn:ietf:params:jmap:webpush-vapid"]["vapidPublicKey"]`.
+    /// It is a base64url-encoded P-256 public key to pass to the platform push service
+    /// when registering a `PushSubscription` endpoint.
+    ///
+    /// Returns `None` if the capability is absent or if `vapidPublicKey` is missing/not a string.
+    pub fn vapid_public_key(&self) -> Option<&str> {
+        self.capabilities
+            .get("urn:ietf:params:jmap:webpush-vapid")?
+            .get("vapidPublicKey")?
+            .as_str()
+    }
 }
 
 /// Per-account metadata in a JMAP Session (RFC 8620 §2).
@@ -310,6 +384,43 @@ pub struct ChatCapability {
     pub supported_body_types: Vec<String>,
     /// Whether the server supports the optional thread model.
     pub supports_threads: bool,
+}
+
+/// Capability fields from `capabilities["urn:ietf:params:jmap:websocket"]` (RFC 8887).
+///
+/// The WebSocket URL for JMAP Chat ephemeral push (typing, presence) comes from this
+/// standard JMAP WebSocket capability, NOT from the chat-specific WebSocket capability.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WebSocketCapability {
+    /// The WebSocket endpoint URL (`wss://`).
+    pub url: String,
+    /// Whether the server supports push over this WebSocket connection.
+    #[serde(default)]
+    pub supports_push: bool,
+}
+
+/// Capability object for `"urn:ietf:params:jmap:chat:websocket"`.
+///
+/// Per draft-atwood-jmap-chat-wss-00, this capability value is an empty JSON object `{}`.
+/// Its presence signals support for `ChatStreamEnable`, `ChatStreamDisable`,
+/// `ChatTypingEvent`, and `ChatPresenceEvent` over the WebSocket from `WebSocketCapability.url`.
+#[derive(Debug, Clone, Deserialize)]
+pub struct ChatWebSocketCapability {}
+
+/// Account-level capability for `"urn:ietf:params:jmap:chat:push"`.
+///
+/// Spec: draft-atwood-jmap-chat-push-00
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ChatPushCapability {
+    /// Maximum byte length of a `bodySnippet` in `ChatMessagePush`. Truncation on UTF-8 boundary.
+    pub max_snippet_bytes: u64,
+    /// Supported Web Push urgency values. MUST include at least `"normal"` and `"high"`.
+    pub supported_urgency_values: Vec<String>,
+    /// Maximum number of `ChatMessageEntry` objects per push payload. Absent = no bound.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_messages_per_push: Option<u64>,
 }
 
 #[cfg(test)]
@@ -530,5 +641,83 @@ mod tests {
 
         session.primary_accounts.remove("urn:ietf:params:jmap:chat");
         assert!(session.chat_account_id().is_none());
+    }
+
+    // Oracle: RFC 8887 + WSS spec — websocket_capability() parses url and supportsPush.
+    #[test]
+    fn session_websocket_capability_parses_correctly() {
+        let val = fixture("session_with_ws_and_push.json");
+        let session: Session = serde_json::from_value(val).expect("must deserialize");
+
+        let ws = session
+            .websocket_capability()
+            .expect("must not error")
+            .expect("websocket capability must be present");
+
+        assert_eq!(ws.url, "wss://jmap.example.com/ws");
+        assert!(ws.supports_push);
+    }
+
+    // Oracle: WSS spec — supports_chat_websocket() true when capability key present.
+    #[test]
+    fn session_supports_chat_websocket_when_capability_present() {
+        let val = fixture("session_with_ws_and_push.json");
+        let session: Session = serde_json::from_value(val).expect("must deserialize");
+        assert!(session.supports_chat_websocket());
+    }
+
+    // Oracle: WSS spec — supports_chat_websocket() false when capability key absent.
+    #[test]
+    fn session_supports_chat_websocket_false_when_absent() {
+        let val = fixture("session.json");
+        let session: Session = serde_json::from_value(val).expect("must deserialize");
+        assert!(!session.supports_chat_websocket());
+    }
+
+    // Oracle: push spec — chat_push_capability() parses maxSnippetBytes, urgency values, maxMessagesPerPush.
+    #[test]
+    fn session_chat_push_capability_parses_correctly() {
+        let val = fixture("session_with_ws_and_push.json");
+        let session: Session = serde_json::from_value(val).expect("must deserialize");
+
+        let push = session
+            .chat_push_capability("account1")
+            .expect("must not error")
+            .expect("push capability must be present");
+
+        assert_eq!(push.max_snippet_bytes, 256);
+        assert_eq!(push.supported_urgency_values, vec!["normal", "high"]);
+        assert_eq!(push.max_messages_per_push, Some(10));
+    }
+
+    // Oracle: VAPID spec — vapid_public_key() returns the key string.
+    #[test]
+    fn session_vapid_public_key_returns_key() {
+        let val = fixture("session_with_ws_and_push.json");
+        let session: Session = serde_json::from_value(val).expect("must deserialize");
+        let key = session
+            .vapid_public_key()
+            .expect("vapid key must be present");
+        assert_eq!(
+            key,
+            "BNNOfS9lCWcSqcNFxf8GaDJb0JnrIq4z7VDchBNJYEFXP3kUEzixdOMU6VFZX2pGmREFzQ=="
+        );
+    }
+
+    // Oracle: vapid_public_key() returns None when capability absent.
+    #[test]
+    fn session_vapid_public_key_absent_returns_none() {
+        let val = fixture("session.json");
+        let session: Session = serde_json::from_value(val).expect("must deserialize");
+        assert!(session.vapid_public_key().is_none());
+    }
+
+    // Oracle: websocket_capability() returns Ok(None) when key absent.
+    #[test]
+    fn session_websocket_capability_absent_returns_ok_none() {
+        let val = fixture("session.json");
+        let session: Session = serde_json::from_value(val).expect("must deserialize");
+        let result = session.websocket_capability();
+        assert!(matches!(result, Ok(None)));
     }
 }

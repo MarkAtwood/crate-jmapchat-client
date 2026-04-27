@@ -4,6 +4,32 @@ use serde::{Deserialize, Serialize};
 
 pub use crate::jmap::{Id, UTCDate};
 
+/// Serde default helper returning `true`. Used for boolean fields whose absent/default value is `true`.
+pub(crate) fn default_true() -> bool {
+    true
+}
+
+/// Deserializes an optionally-present, nullable string field into `Option<Option<String>>`.
+///
+/// - Field absent  → `None`           (no change; serde uses `#[serde(default)]`)
+/// - Field `null`  → `Some(None)`     (explicit clear)
+/// - Field `"s"`   → `Some(Some(s))`  (update)
+pub(crate) fn deserialize_optional_nullable_string<'de, D>(
+    deserializer: D,
+) -> Result<Option<Option<String>>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    let v: serde_json::Value = serde::Deserialize::deserialize(deserializer)?;
+    match v {
+        serde_json::Value::Null => Ok(Some(None)),
+        serde_json::Value::String(s) => Ok(Some(Some(s))),
+        other => Err(serde::de::Error::custom(format!(
+            "expected null or string, got {other:?}"
+        ))),
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Attachment
 // ---------------------------------------------------------------------------
@@ -26,8 +52,139 @@ pub struct Attachment {
 }
 
 // ---------------------------------------------------------------------------
+// Rich Body
+// ---------------------------------------------------------------------------
+
+/// The type of a rich body span.
+/// Spec: draft-atwood-jmap-chat-00 §Rich Body Format
+#[non_exhaustive]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum SpanType {
+    Text,
+    Bold,
+    Italic,
+    BoldItalic,
+    Code,
+    Codeblock,
+    Blockquote,
+    Mention,
+    Link,
+    /// Catch-all for unrecognized span types. Clients MUST render `Span.text` as plain text.
+    #[serde(other)]
+    Unknown,
+}
+
+/// A single styled or annotated run of text in a rich message body.
+/// Spec: draft-atwood-jmap-chat-00 §Rich Body Format
+///
+/// `text` is present on ALL span types and MUST be rendered as plain text fallback for unknown types.
+/// Type-specific fields are absent when not applicable to the span type.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Span {
+    /// Span type discriminator.
+    #[serde(rename = "type")]
+    pub span_type: SpanType,
+    /// Plaintext content. Present on all span types; serves as fallback for unknown types.
+    pub text: String,
+    /// Language hint for syntax highlighting. Present only when `span_type` is `Codeblock`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lang: Option<String>,
+    /// The mentioned user's ChatContact.id. Present only when `span_type` is `Mention`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<Id>,
+    /// Link URI. Present only when `span_type` is `Link`. MUST be treated as untrusted.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub uri: Option<String>,
+}
+
+/// Parsed content of a `body` field when `bodyType` is `"application/jmap-chat-rich"`.
+///
+/// # Parsing
+///
+/// Per spec (IMPROVEMENTS.md §13), `Message.body` for rich messages is a JSON-encoded *string*
+/// (not an embedded object). Parse with:
+/// ```rust,no_run
+/// # use jmap_chat::types::RichBody;
+/// # let message_body = String::new();
+/// let rich: RichBody = serde_json::from_str(&message_body).unwrap();
+/// ```
+///
+/// # Security
+///
+/// `body` originates from a remote user. Validate length before calling `from_str`
+/// and cap at `ChatCapability.max_body_bytes`. Unknown span types MUST render `Span.text`
+/// as plain text without additional interpretation.
+///
+/// Spec: draft-atwood-jmap-chat-00 §Rich Body Format
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RichBody {
+    /// Ordered array of text spans, left to right.
+    pub spans: Vec<Span>,
+}
+
+// ---------------------------------------------------------------------------
 // Endpoint
 // ---------------------------------------------------------------------------
+
+/// Known `type` URI values for an [`Endpoint`].
+///
+/// `Endpoint.endpoint_type` is typed as `String` on the wire to accept future extension types.
+/// Use this enum to match against known values without losing forward compatibility.
+///
+/// Spec: draft-atwood-jmap-chat-00 §4.2
+#[non_exhaustive]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum EndpointType {
+    /// Video/voice teleconference (`urn:jmap:chat:cap:vtc`).
+    Vtc,
+    /// Payment receiving endpoint (`urn:jmap:chat:cap:payment`).
+    Payment,
+    /// Out-of-band file transfer endpoint (`urn:jmap:chat:cap:blob`).
+    Blob,
+    /// Calendar event link or meeting invite (`urn:jmap:chat:cap:calendar-event`).
+    CalendarEvent,
+    /// Free/busy availability lookup (`urn:jmap:chat:cap:availability`).
+    Availability,
+    /// Task/to-do item link (`urn:jmap:chat:cap:task`).
+    Task,
+    /// File storage node link (`urn:jmap:chat:cap:filenode`).
+    Filenode,
+    /// Any other type URI not recognized by this client.
+    Other(String),
+}
+
+impl EndpointType {
+    /// The canonical URI for this endpoint type, or the raw string for `Other`.
+    pub fn as_uri(&self) -> &str {
+        match self {
+            Self::Vtc => "urn:jmap:chat:cap:vtc",
+            Self::Payment => "urn:jmap:chat:cap:payment",
+            Self::Blob => "urn:jmap:chat:cap:blob",
+            Self::CalendarEvent => "urn:jmap:chat:cap:calendar-event",
+            Self::Availability => "urn:jmap:chat:cap:availability",
+            Self::Task => "urn:jmap:chat:cap:task",
+            Self::Filenode => "urn:jmap:chat:cap:filenode",
+            Self::Other(s) => s.as_str(),
+        }
+    }
+
+    /// Parse from the raw URI string in `Endpoint.endpoint_type`.
+    pub fn from_uri(s: &str) -> Self {
+        match s {
+            "urn:jmap:chat:cap:vtc" => Self::Vtc,
+            "urn:jmap:chat:cap:payment" => Self::Payment,
+            "urn:jmap:chat:cap:blob" => Self::Blob,
+            "urn:jmap:chat:cap:calendar-event" => Self::CalendarEvent,
+            "urn:jmap:chat:cap:availability" => Self::Availability,
+            "urn:jmap:chat:cap:task" => Self::Task,
+            "urn:jmap:chat:cap:filenode" => Self::Filenode,
+            other => Self::Other(other.to_string()),
+        }
+    }
+}
 
 /// An out-of-band capability endpoint advertised on a ChatContact or Session.
 /// Spec: draft-atwood-jmap-chat-00 §4.2
@@ -146,11 +303,18 @@ pub struct ChatContact {
     pub first_seen_at: UTCDate,
     /// Time of most recent interaction with this ChatContact's mailbox.
     pub last_seen_at: UTCDate,
-    /// Last known presence state.
-    pub presence: ContactPresence,
+    /// Last known presence state. Absent when the server has no presence data for this contact.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub presence: Option<ContactPresence>,
     /// Time the ChatContact was last observed to be active.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_active_at: Option<UTCDate>,
+    /// Short custom status message set by the contact.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status_text: Option<String>,
+    /// Single emoji or shortcode representing the contact's status.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status_emoji: Option<String>,
     /// Out-of-band capability endpoints advertised by this ChatContact.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub endpoints: Option<Vec<Endpoint>>,
@@ -166,7 +330,11 @@ pub struct ChatContact {
 pub enum ContactPresence {
     Online,
     Away,
+    Busy,
+    Invisible,
     Offline,
+    /// Catch-all for any unrecognized wire value, including legacy `"unknown"` from old servers.
+    #[serde(other)]
     Unknown,
 }
 
@@ -292,6 +460,14 @@ pub struct Chat {
     pub permission_overrides: Option<Vec<ChannelPermission>>,
 
     // --- all kinds ---
+    /// Per-chat preference: when `false`, server silently drops typing push events for this chat.
+    /// Spec: draft-atwood-jmap-chat-00 §4.9 (default: true)
+    #[serde(default = "default_true")]
+    pub receive_typing_indicators: bool,
+    /// Per-chat override of `PresenceStatus.receiptSharing`. When absent, account-level applies.
+    /// Spec: draft-atwood-jmap-chat-00 §4.9
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub receipt_sharing: Option<bool>,
     /// Time this chat was first recorded on this mailbox.
     pub created_at: UTCDate,
     /// Received time of the most recent message.
@@ -333,6 +509,10 @@ pub enum ChatKind {
 pub struct DeliveryReceipt {
     /// Time the message was delivered to this recipient, or null.
     pub delivered_at: Option<UTCDate>,
+    /// Device-level delivery confirmation (APNs/FCM). Absent if platform cannot confirm.
+    /// Spec: draft-atwood-jmap-chat-00 §4.10 (IMPROVEMENTS.md §4.1)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub device_delivered_at: Option<UTCDate>,
     /// Time this recipient read the message, or null.
     pub read_at: Option<UTCDate>,
 }
@@ -652,6 +832,10 @@ pub struct PresenceStatus {
     /// If set, clear `statusText`/`statusEmoji` and reset `presence` at this time.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expires_at: Option<UTCDate>,
+    /// When `false`, server MUST NOT invoke Peer/receipt on behalf of this account.
+    /// Opt-out is bidirectional. Spec: draft-atwood-jmap-chat-00 §4.20 (default: true)
+    #[serde(default = "default_true")]
+    pub receipt_sharing: bool,
     /// Time the owner last updated this record.
     pub updated_at: UTCDate,
 }
@@ -667,6 +851,126 @@ pub enum OwnerPresence {
     Busy,
     Invisible,
     Offline,
+}
+
+// ---------------------------------------------------------------------------
+// WebSocket message types (draft-atwood-jmap-chat-wss-00)
+// ---------------------------------------------------------------------------
+// These types are used over the RFC 8887 WebSocket transport when the server
+// advertises `urn:ietf:params:jmap:chat:websocket` capability.
+// The `@type` field is the JSON discriminator; clients dispatch on it manually.
+// ---------------------------------------------------------------------------
+
+/// Sent by the client to subscribe to ephemeral typing and presence events.
+/// Spec: draft-atwood-jmap-chat-wss-00
+///
+/// A subsequent `ChatStreamEnable` replaces the prior subscription entirely.
+/// Must be re-sent after every WebSocket reconnect (subscriptions are session-scoped).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ChatStreamEnable {
+    /// Discriminator. Always `"ChatStreamEnable"` on the wire.
+    #[serde(rename = "@type")]
+    pub msg_type: String,
+    /// Which event categories to receive: `"typing"` and/or `"presence"`.
+    /// Unrecognized values alongside recognized ones are silently ignored by the server.
+    pub data_types: Vec<String>,
+    /// Chat IDs to receive typing events for. `None` = all member chats.
+    /// Only relevant when `"typing"` is in `data_types`.
+    pub chat_ids: Option<Vec<Id>>,
+    /// Contact IDs to receive presence events for. `None` = all known contacts.
+    /// Only relevant when `"presence"` is in `data_types`.
+    pub contact_ids: Option<Vec<Id>>,
+}
+
+impl ChatStreamEnable {
+    /// Construct a new `ChatStreamEnable` message.
+    pub fn new(
+        data_types: Vec<String>,
+        chat_ids: Option<Vec<Id>>,
+        contact_ids: Option<Vec<Id>>,
+    ) -> Self {
+        Self {
+            msg_type: "ChatStreamEnable".to_string(),
+            data_types,
+            chat_ids,
+            contact_ids,
+        }
+    }
+}
+
+/// Sent by the client to stop all ephemeral event delivery.
+/// Spec: draft-atwood-jmap-chat-wss-00
+///
+/// Server MUST stop delivery silently even if no subscription is active.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ChatStreamDisable {
+    /// Discriminator. Always `"ChatStreamDisable"` on the wire.
+    #[serde(rename = "@type")]
+    pub msg_type: String,
+}
+
+impl Default for ChatStreamDisable {
+    fn default() -> Self {
+        Self {
+            msg_type: "ChatStreamDisable".to_string(),
+        }
+    }
+}
+
+/// Pushed by the server when a participant in a subscribed chat is typing.
+/// Spec: draft-atwood-jmap-chat-wss-00
+///
+/// If no event is received for a `(chat_id, sender_id)` pair within 10 seconds,
+/// the client MUST hide the typing indicator regardless (decay timer).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ChatTypingEvent {
+    /// Discriminator. Always `"ChatTypingEvent"` on the wire.
+    #[serde(rename = "@type")]
+    pub msg_type: String,
+    /// The chat in which typing occurred.
+    pub chat_id: Id,
+    /// ChatContact.id of the user who is typing. MUST NOT be `"self"`.
+    pub sender_id: Id,
+    /// `true` = typing; `false` = stopped.
+    pub typing: bool,
+}
+
+/// Pushed by the server when a subscribed contact's presence state changes.
+/// Spec: draft-atwood-jmap-chat-wss-00
+///
+/// Partial update semantics: absent optional fields mean "no change to that field."
+/// `null` explicitly clears `status_text` or `status_emoji`.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ChatPresenceEvent {
+    /// Discriminator. Always `"ChatPresenceEvent"` on the wire.
+    #[serde(rename = "@type")]
+    pub msg_type: String,
+    /// The ChatContact whose presence changed.
+    pub contact_id: Id,
+    /// Updated presence state.
+    pub presence: ContactPresence,
+    /// Updated last-active timestamp, if known.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_active_at: Option<UTCDate>,
+    /// Updated status text. Outer `None` = absent (no change). `Some(None)` = explicit null (clear).
+    /// `Some(Some(s))` = update to new value.
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "deserialize_optional_nullable_string"
+    )]
+    pub status_text: Option<Option<String>>,
+    /// Updated status emoji. Same null/absent semantics as `status_text`.
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "deserialize_optional_nullable_string"
+    )]
+    pub status_emoji: Option<Option<String>>,
 }
 
 // ---------------------------------------------------------------------------
@@ -808,5 +1112,222 @@ mod tests {
             "lastReadMessageId must be None when absent from JSON"
         );
         assert_eq!(rp.chat_id, "01HV5Z6QKWJ7N3P8R2X4YTMD3G");
+    }
+
+    /// Oracle: spec §ChatContact — absent presence field deserializes to None.
+    #[test]
+    fn test_chat_contact_absent_presence_is_none() {
+        let json = fixture("chat_contact_no_presence.json");
+        let contact: ChatContact = serde_json::from_str(&json).expect("must parse");
+        assert!(
+            contact.presence.is_none(),
+            "absent presence must be None, not Offline"
+        );
+        assert!(contact.status_text.is_none());
+        assert!(contact.status_emoji.is_none());
+    }
+
+    /// Oracle: spec §ChatContact — presence, statusText, statusEmoji all present.
+    #[test]
+    fn test_chat_contact_with_status_fields() {
+        let json = fixture("chat_contact_with_status.json");
+        let contact: ChatContact = serde_json::from_str(&json).expect("must parse");
+        assert_eq!(contact.presence, Some(ContactPresence::Busy));
+        assert_eq!(contact.status_text.as_deref(), Some("In a meeting"));
+        assert_eq!(contact.status_emoji.as_deref(), Some("🗓️"));
+    }
+
+    /// Oracle: spec ContactPresence — Busy and Invisible deserialize from wire strings.
+    #[test]
+    fn test_contact_presence_busy_invisible_deserialize() {
+        let busy: ContactPresence = serde_json::from_str("\"busy\"").unwrap();
+        let invisible: ContactPresence = serde_json::from_str("\"invisible\"").unwrap();
+        assert_eq!(busy, ContactPresence::Busy);
+        assert_eq!(invisible, ContactPresence::Invisible);
+    }
+
+    /// Oracle: spec ContactPresence — unrecognized wire value deserializes to Unknown (catch-all).
+    #[test]
+    fn test_contact_presence_unknown_catch_all() {
+        let unknown: ContactPresence = serde_json::from_str("\"some-future-value\"").unwrap();
+        assert_eq!(unknown, ContactPresence::Unknown);
+        // Legacy "unknown" wire value also maps to Unknown
+        let legacy: ContactPresence = serde_json::from_str("\"unknown\"").unwrap();
+        assert_eq!(legacy, ContactPresence::Unknown);
+    }
+
+    /// Oracle: spec §Chat — absent receiveTypingIndicators defaults to true.
+    #[test]
+    fn test_chat_receive_typing_indicators_defaults_true() {
+        // Use the existing chat.json fixture which does not include this field
+        let json = fixture("chat.json");
+        let chat: Chat = serde_json::from_str(&json).expect("must parse");
+        assert!(
+            chat.receive_typing_indicators,
+            "absent field must default to true"
+        );
+        assert!(
+            chat.receipt_sharing.is_none(),
+            "absent receipt_sharing must be None"
+        );
+    }
+
+    /// Oracle: spec §RichBody — spans array with multiple span types.
+    #[test]
+    fn test_rich_body_fixture_parses_correctly() {
+        let json = fixture("rich_body.json");
+        let rb: RichBody = serde_json::from_str(&json).expect("must parse");
+        assert_eq!(rb.spans.len(), 7);
+        assert_eq!(rb.spans[0].span_type, SpanType::Text);
+        assert_eq!(rb.spans[0].text, "Hello ");
+        assert_eq!(rb.spans[1].span_type, SpanType::Bold);
+        assert_eq!(rb.spans[3].span_type, SpanType::Link);
+        assert_eq!(rb.spans[3].uri.as_deref(), Some("https://example.com"));
+        assert_eq!(rb.spans[5].span_type, SpanType::Codeblock);
+        assert_eq!(rb.spans[5].lang.as_deref(), Some("rust"));
+        assert_eq!(rb.spans[6].span_type, SpanType::Mention);
+        assert_eq!(
+            rb.spans[6].user_id.as_deref(),
+            Some("user:alice@example.com")
+        );
+    }
+
+    /// Oracle: spec §RichBody — unknown span type deserializes to SpanType::Unknown with text preserved.
+    #[test]
+    fn test_rich_body_unknown_span_type_uses_text_fallback() {
+        let json = r#"{"spans": [{"type": "future-type", "text": "fallback text"}]}"#;
+        let rb: RichBody = serde_json::from_str(json).expect("must parse");
+        assert_eq!(rb.spans[0].span_type, SpanType::Unknown);
+        assert_eq!(rb.spans[0].text, "fallback text");
+    }
+
+    /// Oracle: spec §ChatTypingEvent — fixture round-trip.
+    #[test]
+    fn test_chat_typing_event_deserializes() {
+        let json = fixture("chat_typing_event.json");
+        let evt: ChatTypingEvent = serde_json::from_str(&json).expect("must parse");
+        assert_eq!(evt.chat_id, "01HV5Z6QKWJ7N3P8R2X4YTMD3G");
+        assert_eq!(evt.sender_id, "user:bob@example.com");
+        assert!(evt.typing);
+    }
+
+    /// Oracle: spec §ChatPresenceEvent — fixture with statusText and statusEmoji.
+    #[test]
+    fn test_chat_presence_event_deserializes() {
+        let json = fixture("chat_presence_event.json");
+        let evt: ChatPresenceEvent = serde_json::from_str(&json).expect("must parse");
+        assert_eq!(evt.contact_id, "user:carol@example.com");
+        assert_eq!(evt.presence, ContactPresence::Busy);
+        assert_eq!(evt.status_text, Some(Some("Do not disturb".to_string())));
+        assert_eq!(evt.status_emoji, Some(Some("🔕".to_string())));
+    }
+
+    /// Oracle: spec §ChatPresenceEvent — null statusText/statusEmoji means explicit clear.
+    #[test]
+    fn test_chat_presence_event_null_clears_status() {
+        let json = fixture("chat_presence_event_clear_status.json");
+        let evt: ChatPresenceEvent = serde_json::from_str(&json).expect("must parse");
+        assert_eq!(evt.presence, ContactPresence::Online);
+        assert_eq!(
+            evt.status_text,
+            Some(None),
+            "null in JSON must become Some(None)"
+        );
+        assert_eq!(
+            evt.status_emoji,
+            Some(None),
+            "null in JSON must become Some(None)"
+        );
+    }
+
+    /// Oracle: spec §ChatPresenceEvent — absent statusText/statusEmoji means no change.
+    #[test]
+    fn test_chat_presence_event_absent_status_means_no_change() {
+        let json =
+            r#"{"@type":"ChatPresenceEvent","contactId":"user:x@example.com","presence":"online"}"#;
+        let evt: ChatPresenceEvent = serde_json::from_str(json).expect("must parse");
+        assert!(
+            evt.status_text.is_none(),
+            "absent means no change (outer None)"
+        );
+        assert!(
+            evt.status_emoji.is_none(),
+            "absent means no change (outer None)"
+        );
+    }
+
+    /// Oracle: spec §ChatStreamEnable — fixture serializes/deserializes correctly.
+    #[test]
+    fn test_chat_stream_enable_round_trip() {
+        let json = fixture("chat_stream_enable.json");
+        let msg: ChatStreamEnable = serde_json::from_str(&json).expect("must parse");
+        assert_eq!(msg.msg_type, "ChatStreamEnable");
+        assert_eq!(msg.data_types, vec!["typing", "presence"]);
+        assert!(msg.contact_ids.is_none());
+        // Test constructor
+        let constructed = ChatStreamEnable::new(
+            vec!["typing".to_string(), "presence".to_string()],
+            Some(vec![Id::from_trusted("01HV5Z6QKWJ7N3P8R2X4YTMD3G")]),
+            None,
+        );
+        assert_eq!(constructed.msg_type, "ChatStreamEnable");
+    }
+
+    /// Oracle: EndpointType::from_uri parses all known spec URIs correctly.
+    #[test]
+    fn test_endpoint_type_from_uri() {
+        assert_eq!(
+            EndpointType::from_uri("urn:jmap:chat:cap:vtc"),
+            EndpointType::Vtc
+        );
+        assert_eq!(
+            EndpointType::from_uri("urn:jmap:chat:cap:payment"),
+            EndpointType::Payment
+        );
+        assert_eq!(
+            EndpointType::from_uri("urn:jmap:chat:cap:blob"),
+            EndpointType::Blob
+        );
+        assert_eq!(
+            EndpointType::from_uri("urn:jmap:chat:cap:calendar-event"),
+            EndpointType::CalendarEvent
+        );
+        assert_eq!(
+            EndpointType::from_uri("urn:jmap:chat:cap:availability"),
+            EndpointType::Availability
+        );
+        assert_eq!(
+            EndpointType::from_uri("urn:jmap:chat:cap:task"),
+            EndpointType::Task
+        );
+        assert_eq!(
+            EndpointType::from_uri("urn:jmap:chat:cap:filenode"),
+            EndpointType::Filenode
+        );
+        assert_eq!(
+            EndpointType::from_uri("urn:example:custom"),
+            EndpointType::Other("urn:example:custom".to_string())
+        );
+    }
+
+    /// Oracle: EndpointType::as_uri round-trips through from_uri for all known types.
+    #[test]
+    fn test_endpoint_type_as_uri_round_trips() {
+        for et in [
+            EndpointType::Vtc,
+            EndpointType::Payment,
+            EndpointType::Blob,
+            EndpointType::CalendarEvent,
+            EndpointType::Availability,
+            EndpointType::Task,
+            EndpointType::Filenode,
+        ] {
+            let uri = et.as_uri();
+            assert_eq!(
+                EndpointType::from_uri(uri),
+                et,
+                "round-trip failed for {uri}"
+            );
+        }
     }
 }
