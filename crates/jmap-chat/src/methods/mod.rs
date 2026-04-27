@@ -375,9 +375,13 @@ pub struct ChatContactQueryInput {
     pub filter_blocked: Option<bool>,
     /// Filter to contacts with this exact presence state.
     ///
-    /// Passing `Some(ContactPresence::Unknown)` is rejected at call time with
-    /// `ClientError::InvalidArgument` — `Unknown` is a deserialization catch-all
-    /// and has no meaning as a filter value.
+    /// # Errors
+    ///
+    /// [`JmapChatClient::chat_contact_query`] returns
+    /// `Err(ClientError::InvalidArgument)` if this field is
+    /// `Some(ContactPresence::Unknown)`. `Unknown` is a deserialization
+    /// catch-all for unrecognized wire values; it has no defined filter
+    /// semantics and must never be sent to the server.
     pub filter_presence: Option<crate::types::ContactPresence>,
     pub position: Option<u64>,
     pub limit: Option<u64>,

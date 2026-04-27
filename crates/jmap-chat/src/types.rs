@@ -258,7 +258,7 @@ pub struct MessageRevision {
     /// The prior body text.
     pub body: String,
     /// The prior MIME type.
-    pub body_type: String,
+    pub body_type: BodyType,
     /// The time this version was superseded by an edit.
     pub edited_at: UTCDate,
 }
@@ -516,9 +516,9 @@ pub enum ChatKind {
 
 /// MIME type for a message body.
 ///
-/// The spec defines two well-known values (`text/plain`, `text/markdown`).
-/// `Unknown(String)` preserves any unrecognized value from a future spec
-/// version or a non-standard server extension.
+/// The spec defines three well-known values (`text/plain`, `text/markdown`,
+/// `application/jmap-chat-rich`). `Unknown(String)` preserves any unrecognized
+/// value from a future spec version or a non-standard server extension.
 ///
 /// Spec: draft-atwood-jmap-chat-00 §4.5
 #[non_exhaustive]
@@ -528,6 +528,9 @@ pub enum BodyType {
     Plain,
     /// `"text/markdown"` — CommonMark-formatted text.
     Markdown,
+    /// `"application/jmap-chat-rich"` — structured rich text (spans array).
+    /// Parse `Message.body` as [`RichBody`] with `serde_json::from_str(&message.body)`.
+    Rich,
     /// Any unrecognized MIME type string, preserved as-is.
     Unknown(String),
 }
@@ -537,6 +540,7 @@ impl serde::Serialize for BodyType {
         match self {
             BodyType::Plain => s.serialize_str("text/plain"),
             BodyType::Markdown => s.serialize_str("text/markdown"),
+            BodyType::Rich => s.serialize_str("application/jmap-chat-rich"),
             BodyType::Unknown(v) => s.serialize_str(v),
         }
     }
@@ -548,8 +552,20 @@ impl<'de> serde::Deserialize<'de> for BodyType {
         Ok(match raw.as_str() {
             "text/plain" => BodyType::Plain,
             "text/markdown" => BodyType::Markdown,
+            "application/jmap-chat-rich" => BodyType::Rich,
             _ => BodyType::Unknown(raw),
         })
+    }
+}
+
+impl std::fmt::Display for BodyType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            BodyType::Plain => f.write_str("text/plain"),
+            BodyType::Markdown => f.write_str("text/markdown"),
+            BodyType::Rich => f.write_str("application/jmap-chat-rich"),
+            BodyType::Unknown(v) => f.write_str(v),
+        }
     }
 }
 
@@ -1241,10 +1257,7 @@ mod tests {
     fn test_message_rich_body_valid_parses_as_string() {
         let json = fixture("message_rich_body_valid.json");
         let msg: Message = serde_json::from_str(&json).expect("valid rich body fixture must parse");
-        assert_eq!(
-            msg.body_type,
-            BodyType::Unknown("application/jmap-chat-rich".to_string())
-        );
+        assert_eq!(msg.body_type, BodyType::Rich);
         // body is a plain String — callers must call from_str to get RichBody
         assert!(
             msg.body.starts_with('{'),
