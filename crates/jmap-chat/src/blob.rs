@@ -1,5 +1,6 @@
 // Blob upload/download operations and supporting types (RFC 8620 §6.1, §6.2)
 
+use crate::jmap::Id;
 use reqwest::header::{HeaderValue, CONTENT_TYPE};
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
@@ -10,9 +11,9 @@ use sha2::{Digest, Sha256};
 #[serde(rename_all = "camelCase")]
 pub struct BlobUploadResponse {
     /// The account the blob was uploaded to.
-    pub account_id: String,
+    pub account_id: Id,
     /// Server-assigned opaque blob identifier.
-    pub blob_id: String,
+    pub blob_id: Id,
     /// Media type of the uploaded blob as determined by the server.
     #[serde(rename = "type")]
     pub content_type: String,
