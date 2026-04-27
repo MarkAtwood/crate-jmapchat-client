@@ -13,7 +13,11 @@ use jmap_chat::{Chat, ContactPresence, Message};
 #[non_exhaustive]
 pub enum AppEvent {
     /// JMAP session bootstrapped successfully.
-    SessionReady { api_url: String, account_id: String },
+    SessionReady {
+        api_url: String,
+        account_id: String,
+        supports_ephemeral: bool,
+    },
     /// Full chat list loaded or refreshed (initial load or after `has_more_changes`).
     ChatsLoaded(Vec<Chat>),
     /// Incremental update from Chat/changes: chats to add/replace and IDs to remove.

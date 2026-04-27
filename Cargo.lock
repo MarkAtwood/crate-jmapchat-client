@@ -4503,6 +4503,7 @@ dependencies = [
  "jmap-chat",
  "serde_json",
  "tokio",
+ "tracing",
  "ulid",
 ]
 
