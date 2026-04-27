@@ -61,8 +61,7 @@ impl super::SessionClient<'_> {
         if let Some(mu) = input.max_uses {
             obj["maxUses"] = mu.into();
         }
-        let mut buf = String::new();
-        let client_id = super::resolve_client_id(input.client_id, &mut buf);
+        let client_id = super::resolve_client_id(input.client_id);
         let args = serde_json::json!({
             "accountId": account_id,
             "create": { client_id: obj },

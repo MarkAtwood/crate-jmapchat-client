@@ -129,8 +129,8 @@ impl super::SessionClient<'_> {
         input: &MessageCreateInput<'_>,
     ) -> Result<SetResponse, crate::error::ClientError> {
         let (api_url, account_id) = self.session_parts()?;
-        let mut buf = String::new();
-        let client_id = super::resolve_client_id(input.client_id, &mut buf);
+        let client_id = super::resolve_client_id(input.client_id);
+        let client_id_str: &str = &client_id;
         let mut create_obj = serde_json::json!({
             "chatId": input.chat_id,
             "body": input.body,
@@ -142,13 +142,13 @@ impl super::SessionClient<'_> {
         }
         let args = serde_json::json!({
             "accountId": account_id,
-            "create": { client_id: create_obj },
+            "create": { client_id_str: create_obj },
         });
         let (call_id, req) = super::build_request("Message/set", args);
         let resp = self.call(api_url, &req).await?;
         let set_resp: SetResponse = crate::client::extract_response(resp, call_id)?;
         if let Some(not_created) = &set_resp.not_created {
-            if let Some(err) = not_created.get(client_id) {
+            if let Some(err) = not_created.get(client_id_str) {
                 if err.error_type == "rateLimited" {
                     let retry_after = err.server_retry_after.clone().ok_or_else(|| {
                         crate::error::ClientError::Parse(
