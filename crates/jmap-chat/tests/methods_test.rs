@@ -9,9 +9,10 @@
 use jmap_chat::client::JmapChatClient;
 use jmap_chat::error::ClientError;
 use jmap_chat::methods::{
-    AddMemberInput, ChatCreateDirectInput, ChatCreateGroupInput, ChatQueryInput, ChatUpdateInput,
-    GetResponse, MessageCreateInput, MessageQueryInput, MessageUpdateInput, PresenceStatusSetInput,
-    ReactionChange, SpaceBanCreateInput, SpaceInviteCreateInput,
+    AddMemberInput, ChatContactQueryInput, ChatContactSetInput, ChatCreateDirectInput,
+    ChatCreateGroupInput, ChatQueryInput, ChatUpdateInput, GetResponse, MessageCreateInput,
+    MessageQueryInput, MessageUpdateInput, PresenceStatusSetInput, ReactionChange,
+    SpaceBanCreateInput, SpaceInviteCreateInput,
 };
 use jmap_chat::types::OwnerPresence;
 use wiremock::matchers::{body_json, method};
@@ -1766,4 +1767,204 @@ async fn chat_set_update_with_add_members_role_serializes_correctly() {
 
     // Oracle: chat_set_update_response.json — newState is "chat-state-002"
     assert_eq!(result.new_state, "chat-state-002");
+}
+
+// ---------------------------------------------------------------------------
+// Test 43: chat_contact_changes — happy path
+// ---------------------------------------------------------------------------
+
+/// Oracle: RFC 8620 §5.2 — ChatContact/changes response shape: oldState, newState,
+/// hasMoreChanges, updated list. Fixture hand-written from §5.2 /changes definition.
+///
+/// Body matcher: verifies sinceState and that maxChanges:null is sent when None
+/// (same null-propagation pattern as ReadPosition/changes).
+#[tokio::test]
+async fn chat_contact_changes_returns_typed_response() {
+    let server = MockServer::start().await;
+
+    Mock::given(method("POST"))
+        .and(body_json(serde_json::json!({
+            "using": ["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:chat"],
+            "methodCalls": [["ChatContact/changes", {
+                "accountId": "account1",
+                "sinceState": "contact-state-000",
+                "maxChanges": null
+            }, "r1"]]
+        })))
+        .respond_with(
+            ResponseTemplate::new(200).set_body_json(fixture("chat_contact_changes_response.json")),
+        )
+        .mount(&server)
+        .await;
+
+    let client = JmapChatClient::new(jmap_chat::auth::NoneAuth, &server.uri())
+        .expect("client construction must succeed");
+
+    let api_url = format!("{}/api", server.uri());
+    let result = client
+        .chat_contact_changes(&test_session(&api_url), "contact-state-000", None)
+        .await
+        .expect("chat_contact_changes must succeed");
+
+    // Oracle: RFC 8620 §5.2 — states echoed, updated has one entry
+    assert_eq!(result.old_state, "contact-state-000");
+    assert_eq!(result.new_state, "contact-state-001");
+    assert!(!result.has_more_changes);
+    assert_eq!(result.updated.len(), 1);
+    assert_eq!(result.updated[0], "01HV5Z6QKWJ7N3P8R2X4YTMDCC");
+}
+
+// ---------------------------------------------------------------------------
+// Test 44: chat_contact_set — update blocked flag
+// ---------------------------------------------------------------------------
+
+/// Oracle: JMAP Chat §ChatContact/set — update patch must contain only the
+/// fields supplied; with display_name:None only blocked appears in the patch.
+/// Fixture hand-written from §5.3 /set response definition.
+///
+/// Body matcher: verifies patch contains only {"blocked": true}, no displayName key.
+#[tokio::test]
+async fn chat_contact_set_blocked_returns_typed_response() {
+    let server = MockServer::start().await;
+
+    Mock::given(method("POST"))
+        .and(body_json(serde_json::json!({
+            "using": ["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:chat"],
+            "methodCalls": [["ChatContact/set", {
+                "accountId": "account1",
+                "update": {
+                    "01HV5Z6QKWJ7N3P8R2X4YTMDCC": {"blocked": true}
+                }
+            }, "r1"]]
+        })))
+        .respond_with(
+            ResponseTemplate::new(200).set_body_json(fixture("chat_contact_set_response.json")),
+        )
+        .mount(&server)
+        .await;
+
+    let client = JmapChatClient::new(jmap_chat::auth::NoneAuth, &server.uri())
+        .expect("client construction must succeed");
+
+    let api_url = format!("{}/api", server.uri());
+    let result = client
+        .chat_contact_set(
+            &test_session(&api_url),
+            &ChatContactSetInput {
+                id: "01HV5Z6QKWJ7N3P8R2X4YTMDCC",
+                blocked: Some(true),
+                display_name: None,
+            },
+        )
+        .await
+        .expect("chat_contact_set must succeed");
+
+    // Oracle: chat_contact_set_response.json — newState updated, id present in updated map
+    assert_eq!(result.new_state, "contact-state-002");
+    assert!(
+        result
+            .updated
+            .as_ref()
+            .unwrap()
+            .contains_key("01HV5Z6QKWJ7N3P8R2X4YTMDCC"),
+        "updated map must contain the patched id"
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Test 45: chat_contact_query — filter + sort
+// ---------------------------------------------------------------------------
+
+/// Oracle: RFC 8620 §5.5 — ChatContact/query response shape: queryState, ids.
+/// Fixture hand-written from §5.5 /query response definition.
+///
+/// Body matcher: verifies filter has {"blocked": false}, sort has lastSeenAt
+/// ascending, and position/limit keys are absent when None.
+#[tokio::test]
+async fn chat_contact_query_filters_returns_typed_response() {
+    let server = MockServer::start().await;
+
+    Mock::given(method("POST"))
+        .and(body_json(serde_json::json!({
+            "using": ["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:chat"],
+            "methodCalls": [["ChatContact/query", {
+                "accountId": "account1",
+                "filter": {"blocked": false},
+                "sort": [{"property": "lastSeenAt", "isAscending": true}]
+            }, "r1"]]
+        })))
+        .respond_with(
+            ResponseTemplate::new(200).set_body_json(fixture("chat_contact_query_response.json")),
+        )
+        .mount(&server)
+        .await;
+
+    let client = JmapChatClient::new(jmap_chat::auth::NoneAuth, &server.uri())
+        .expect("client construction must succeed");
+
+    let api_url = format!("{}/api", server.uri());
+    let result = client
+        .chat_contact_query(
+            &test_session(&api_url),
+            &ChatContactQueryInput {
+                filter_blocked: Some(false),
+                filter_presence: None,
+                position: None,
+                limit: None,
+                sort_property: Some("lastSeenAt"),
+                sort_ascending: Some(true),
+            },
+        )
+        .await
+        .expect("chat_contact_query must succeed");
+
+    // Oracle: chat_contact_query_response.json — ids has one entry
+    assert_eq!(result.ids.len(), 1);
+    assert_eq!(result.ids[0], "01HV5Z6QKWJ7N3P8R2X4YTMDCC");
+}
+
+// ---------------------------------------------------------------------------
+// Test 46: chat_contact_query_changes — happy path
+// ---------------------------------------------------------------------------
+
+/// Oracle: RFC 8620 §5.6 — ChatContact/queryChanges response shape:
+/// oldQueryState, newQueryState, removed, added. Fixture hand-written from
+/// §5.6 definition.
+///
+/// Body matcher: verifies sinceQueryState is sent and maxChanges key is absent
+/// when None (omit-when-None pattern, same as Chat/queryChanges).
+#[tokio::test]
+async fn chat_contact_query_changes_returns_typed_response() {
+    let server = MockServer::start().await;
+
+    Mock::given(method("POST"))
+        .and(body_json(serde_json::json!({
+            "using": ["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:chat"],
+            "methodCalls": [["ChatContact/queryChanges", {
+                "accountId": "account1",
+                "sinceQueryState": "contact-qs-000"
+            }, "r1"]]
+        })))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .set_body_json(fixture("chat_contact_query_changes_response.json")),
+        )
+        .mount(&server)
+        .await;
+
+    let client = JmapChatClient::new(jmap_chat::auth::NoneAuth, &server.uri())
+        .expect("client construction must succeed");
+
+    let api_url = format!("{}/api", server.uri());
+    let result = client
+        .chat_contact_query_changes(&test_session(&api_url), "contact-qs-000", None)
+        .await
+        .expect("chat_contact_query_changes must succeed");
+
+    // Oracle: RFC 8620 §5.6 — states echoed, removed empty, added has one entry
+    assert_eq!(result.old_query_state, "contact-qs-000");
+    assert_eq!(result.new_query_state, "contact-qs-001");
+    assert!(result.removed.is_empty(), "removed must be empty");
+    assert_eq!(result.added.len(), 1, "added must have one entry");
+    assert_eq!(result.added[0].id, "01HV5Z6QKWJ7N3P8R2X4YTMDCC");
 }

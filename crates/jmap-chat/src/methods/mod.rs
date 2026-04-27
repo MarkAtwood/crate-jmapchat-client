@@ -279,6 +279,36 @@ pub struct SpaceBanCreateInput<'a> {
     pub expires_at: Option<&'a crate::jmap::UTCDate>,
 }
 
+/// Input parameters for [`JmapChatClient::chat_contact_set`].
+///
+/// Only `id` is required; absent fields are omitted from the patch. For the
+/// nullable `display_name` field, use `Some(None)` to clear and `Some(Some(s))`
+/// to set. `Default` is intentionally not derived: `id` has no safe default.
+#[derive(Debug)]
+pub struct ChatContactSetInput<'a> {
+    /// `ChatContact.id` to update.
+    pub id: &'a str,
+    pub blocked: Option<bool>,
+    /// `Some(None)` clears `displayName`; `Some(Some(s))` sets it.
+    pub display_name: Option<Option<&'a str>>,
+}
+
+/// Input parameters for [`JmapChatClient::chat_contact_query`].
+///
+/// All fields are optional; an empty filter shows all contacts.
+#[derive(Debug, Default)]
+pub struct ChatContactQueryInput<'a> {
+    pub filter_blocked: Option<bool>,
+    /// Filter to contacts with this exact presence state string.
+    pub filter_presence: Option<&'a str>,
+    pub position: Option<u64>,
+    pub limit: Option<u64>,
+    /// Sort property: `"lastSeenAt"`, `"login"`, or `"lastActiveAt"`.
+    pub sort_property: Option<&'a str>,
+    /// When `Some(false)` or `None`, sort descending. `Some(true)` sorts ascending.
+    pub sort_ascending: Option<bool>,
+}
+
 /// One entry in the `addMembers` patch key for [`JmapChatClient::chat_set_update`].
 #[derive(Debug)]
 pub struct AddMemberInput<'a> {
