@@ -63,8 +63,8 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "ids": serde_json::Value::Null,
         });
-        let (call_id, req) = super::build_request("Quota/get", args, super::USING_QUOTAS);
+        let req = super::build_request("Quota/get", args, super::USING_QUOTAS);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 }

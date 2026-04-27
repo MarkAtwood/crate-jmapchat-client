@@ -18,9 +18,9 @@ impl super::SessionClient<'_> {
             "ids": ids,
             "properties": properties,
         });
-        let (call_id, req) = super::build_request("CustomEmoji/get", args, super::USING_CHAT);
+        let req = super::build_request("CustomEmoji/get", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Fetch changes to CustomEmoji objects since `since_state` (RFC 8620 §5.2 / CustomEmoji/changes).
@@ -37,9 +37,9 @@ impl super::SessionClient<'_> {
         if let Some(mc) = max_changes {
             args["maxChanges"] = mc.into();
         }
-        let (call_id, req) = super::build_request("CustomEmoji/changes", args, super::USING_CHAT);
+        let req = super::build_request("CustomEmoji/changes", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Create a CustomEmoji (RFC 8620 §5.3 / CustomEmoji/set create).
@@ -62,9 +62,9 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "create": { client_id: create_obj },
         });
-        let (call_id, req) = super::build_request("CustomEmoji/set", args, super::USING_CHAT);
+        let req = super::build_request("CustomEmoji/set", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Destroy CustomEmoji objects (RFC 8620 §5.3 / CustomEmoji/set destroy).
@@ -84,9 +84,9 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "destroy": ids,
         });
-        let (call_id, req) = super::build_request("CustomEmoji/set", args, super::USING_CHAT);
+        let req = super::build_request("CustomEmoji/set", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Query CustomEmoji IDs (RFC 8620 §5.5 / CustomEmoji/query).
@@ -107,9 +107,9 @@ impl super::SessionClient<'_> {
         if let Some(l) = input.limit {
             args["limit"] = l.into();
         }
-        let (call_id, req) = super::build_request("CustomEmoji/query", args, super::USING_CHAT);
+        let req = super::build_request("CustomEmoji/query", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Fetch query-result changes for CustomEmoji since `since_query_state`
@@ -127,9 +127,8 @@ impl super::SessionClient<'_> {
         if let Some(mc) = max_changes {
             args["maxChanges"] = mc.into();
         }
-        let (call_id, req) =
-            super::build_request("CustomEmoji/queryChanges", args, super::USING_CHAT);
+        let req = super::build_request("CustomEmoji/queryChanges", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 }

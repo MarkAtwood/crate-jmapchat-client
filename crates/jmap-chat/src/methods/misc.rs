@@ -17,9 +17,9 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "ids": ids,
         });
-        let (call_id, req) = super::build_request("ReadPosition/get", args, super::USING_CHAT);
+        let req = super::build_request("ReadPosition/get", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Update the read position for a Chat (JMAP Chat §5 ReadPosition/set).
@@ -42,9 +42,9 @@ impl super::SessionClient<'_> {
                 read_position_id: { "lastReadMessageId": last_read_message_id }
             },
         });
-        let (call_id, req) = super::build_request("ReadPosition/set", args, super::USING_CHAT);
+        let req = super::build_request("ReadPosition/set", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Fetch the singleton PresenceStatus record (JMAP Chat §5 PresenceStatus/get).
@@ -59,9 +59,9 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "ids": None::<&[&str]>,
         });
-        let (call_id, req) = super::build_request("PresenceStatus/get", args, super::USING_CHAT);
+        let req = super::build_request("PresenceStatus/get", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Fetch changes to ReadPosition records since `since_state` (JMAP Chat §5 ReadPosition/changes).
@@ -80,9 +80,9 @@ impl super::SessionClient<'_> {
         if let Some(mc) = max_changes {
             args["maxChanges"] = mc.into();
         }
-        let (call_id, req) = super::build_request("ReadPosition/changes", args, super::USING_CHAT);
+        let req = super::build_request("ReadPosition/changes", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Update the PresenceStatus record (JMAP Chat §5 PresenceStatus/set).
@@ -116,9 +116,9 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "update": { id: serde_json::Value::Object(patch_map) },
         });
-        let (call_id, req) = super::build_request("PresenceStatus/set", args, super::USING_CHAT);
+        let req = super::build_request("PresenceStatus/set", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Fetch changes to PresenceStatus records since `since_state` (JMAP Chat §5 PresenceStatus/changes).
@@ -137,10 +137,9 @@ impl super::SessionClient<'_> {
         if let Some(mc) = max_changes {
             args["maxChanges"] = mc.into();
         }
-        let (call_id, req) =
-            super::build_request("PresenceStatus/changes", args, super::USING_CHAT);
+        let req = super::build_request("PresenceStatus/changes", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Create a PushSubscription with the optional `chatPush` extension
@@ -204,8 +203,8 @@ impl super::SessionClient<'_> {
         } else {
             super::USING_CORE
         };
-        let (call_id, req) = super::build_request("PushSubscription/set", args, using);
+        let req = super::build_request("PushSubscription/set", args, using);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 }

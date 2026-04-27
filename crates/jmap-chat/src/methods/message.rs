@@ -24,9 +24,9 @@ impl super::SessionClient<'_> {
             "ids": ids,
             "properties": properties,
         });
-        let (call_id, req) = super::build_request("Message/get", args, super::USING_CHAT);
+        let req = super::build_request("Message/get", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Query Message IDs within a Chat (RFC 8620 §5.5 / JMAP Chat §5 Message/query).
@@ -95,9 +95,9 @@ impl super::SessionClient<'_> {
         if let Some(l) = input.limit {
             args["limit"] = l.into();
         }
-        let (call_id, req) = super::build_request("Message/query", args, super::USING_CHAT);
+        let req = super::build_request("Message/query", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Fetch changes to Message objects since `since_state` (RFC 8620 §5.2 / Message/changes).
@@ -114,9 +114,9 @@ impl super::SessionClient<'_> {
         if let Some(mc) = max_changes {
             args["maxChanges"] = mc.into();
         }
-        let (call_id, req) = super::build_request("Message/changes", args, super::USING_CHAT);
+        let req = super::build_request("Message/changes", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Create (send) a new Message (RFC 8620 §5.3 / JMAP Chat §5 Message/set).
@@ -130,6 +130,7 @@ impl super::SessionClient<'_> {
     ) -> Result<SetResponse, crate::error::ClientError> {
         let (api_url, account_id) = self.session_parts()?;
         let client_id = super::resolve_client_id(input.client_id);
+        // Used twice: as the json! key and for not_created.get() lookup — borrow from Cow to avoid double-move.
         let client_id_str: &str = &client_id;
         let mut create_obj = serde_json::json!({
             "chatId": input.chat_id,
@@ -144,9 +145,9 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "create": { client_id_str: create_obj },
         });
-        let (call_id, req) = super::build_request("Message/set", args, super::USING_CHAT);
+        let req = super::build_request("Message/set", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        let set_resp: SetResponse = crate::client::extract_response(resp, call_id)?;
+        let set_resp: SetResponse = crate::client::extract_response(resp, super::CALL_ID)?;
         if let Some(not_created) = &set_resp.not_created {
             if let Some(err) = not_created.get(client_id_str) {
                 if err.error_type == "rateLimited" {
@@ -218,9 +219,9 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "update": { id: serde_json::Value::Object(patch_map) },
         });
-        let (call_id, req) = super::build_request("Message/set", args, super::USING_CHAT);
+        let req = super::build_request("Message/set", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Destroy Message objects (RFC 8620 §5.3 / Message/set destroy).
@@ -241,9 +242,9 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "destroy": ids,
         });
-        let (call_id, req) = super::build_request("Message/set", args, super::USING_CHAT);
+        let req = super::build_request("Message/set", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Fetch query-result changes for Message since `since_query_state`
@@ -264,8 +265,8 @@ impl super::SessionClient<'_> {
         if let Some(mc) = max_changes {
             args["maxChanges"] = mc.into();
         }
-        let (call_id, req) = super::build_request("Message/queryChanges", args, super::USING_CHAT);
+        let req = super::build_request("Message/queryChanges", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 }

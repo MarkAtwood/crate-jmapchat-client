@@ -18,9 +18,9 @@ impl super::SessionClient<'_> {
             "ids": ids,
             "properties": properties,
         });
-        let (call_id, req) = super::build_request("ChatContact/get", args, super::USING_CHAT);
+        let req = super::build_request("ChatContact/get", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Fetch changes to ChatContact objects since `since_state` (RFC 8620 §5.2).
@@ -37,9 +37,9 @@ impl super::SessionClient<'_> {
         if let Some(mc) = max_changes {
             args["maxChanges"] = mc.into();
         }
-        let (call_id, req) = super::build_request("ChatContact/changes", args, super::USING_CHAT);
+        let req = super::build_request("ChatContact/changes", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Update ChatContact properties (JMAP Chat §ChatContact/set).
@@ -63,9 +63,9 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "update": { id: serde_json::Value::Object(patch_map) },
         });
-        let (call_id, req) = super::build_request("ChatContact/set", args, super::USING_CHAT);
+        let req = super::build_request("ChatContact/set", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Query ChatContact IDs with optional filter (JMAP Chat §ChatContact/query).
@@ -106,9 +106,9 @@ impl super::SessionClient<'_> {
         if let Some(l) = input.limit {
             args["limit"] = l.into();
         }
-        let (call_id, req) = super::build_request("ChatContact/query", args, super::USING_CHAT);
+        let req = super::build_request("ChatContact/query", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 
     /// Fetch query-result changes for ChatContact since `since_query_state`
@@ -126,9 +126,8 @@ impl super::SessionClient<'_> {
         if let Some(mc) = max_changes {
             args["maxChanges"] = mc.into();
         }
-        let (call_id, req) =
-            super::build_request("ChatContact/queryChanges", args, super::USING_CHAT);
+        let req = super::build_request("ChatContact/queryChanges", args, super::USING_CHAT);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, call_id)
+        crate::client::extract_response(resp, super::CALL_ID)
     }
 }

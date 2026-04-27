@@ -159,7 +159,7 @@ pub struct RichBody {
 /// Known `type` URI values for an [`Endpoint`].
 ///
 /// Serializes as the canonical URI string (e.g. `"urn:jmap:chat:cap:vtc"`).
-/// Unknown URIs round-trip via the `Other(String)` variant.
+/// Unknown URIs round-trip via the `Unknown(String)` variant.
 ///
 /// Spec: draft-atwood-jmap-chat-00 §4.2
 #[non_exhaustive]
@@ -180,12 +180,12 @@ pub enum EndpointType {
     /// File storage node link (`urn:jmap:chat:cap:filenode`).
     Filenode,
     /// Any other type URI not recognized by this client.
-    Other(String),
+    Unknown(String),
 }
 
 impl EndpointType {
-    /// The canonical URI for this endpoint type, or the raw string for `Other`.
-    pub fn as_uri(&self) -> &str {
+    /// The canonical URI for this endpoint type, or the raw string for `Unknown`.
+    pub fn as_str(&self) -> &str {
         match self {
             Self::Vtc => "urn:jmap:chat:cap:vtc",
             Self::Payment => "urn:jmap:chat:cap:payment",
@@ -194,7 +194,7 @@ impl EndpointType {
             Self::Availability => "urn:jmap:chat:cap:availability",
             Self::Task => "urn:jmap:chat:cap:task",
             Self::Filenode => "urn:jmap:chat:cap:filenode",
-            Self::Other(s) => s.as_str(),
+            Self::Unknown(s) => s.as_str(),
         }
     }
 
@@ -208,14 +208,20 @@ impl EndpointType {
             "urn:jmap:chat:cap:availability" => Self::Availability,
             "urn:jmap:chat:cap:task" => Self::Task,
             "urn:jmap:chat:cap:filenode" => Self::Filenode,
-            other => Self::Other(other.to_string()),
+            other => Self::Unknown(other.to_string()),
         }
+    }
+}
+
+impl std::fmt::Display for EndpointType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
     }
 }
 
 impl serde::Serialize for EndpointType {
     fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
-        s.serialize_str(self.as_uri())
+        s.serialize_str(self.as_str())
     }
 }
 
@@ -2030,13 +2036,13 @@ mod tests {
         );
         assert_eq!(
             EndpointType::from_uri("urn:example:custom"),
-            EndpointType::Other("urn:example:custom".to_string())
+            EndpointType::Unknown("urn:example:custom".to_string())
         );
     }
 
-    /// Oracle: EndpointType::as_uri round-trips through from_uri for all known types.
+    /// Oracle: EndpointType::as_str round-trips through from_uri for all known types.
     #[test]
-    fn test_endpoint_type_as_uri_round_trips() {
+    fn test_endpoint_type_as_str_round_trips() {
         for et in [
             EndpointType::Vtc,
             EndpointType::Payment,
@@ -2046,7 +2052,7 @@ mod tests {
             EndpointType::Task,
             EndpointType::Filenode,
         ] {
-            let uri = et.as_uri();
+            let uri = et.as_str();
             assert_eq!(
                 EndpointType::from_uri(uri),
                 et,
