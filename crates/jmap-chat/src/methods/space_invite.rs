@@ -16,7 +16,7 @@ impl super::SessionClient<'_> {
             "ids": ids,
             "properties": properties,
         });
-        let (call_id, req) = super::build_request("SpaceInvite/get", args);
+        let (call_id, req) = super::build_request("SpaceInvite/get", args, &["urn:ietf:params:jmap:chat"]);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -38,7 +38,7 @@ impl super::SessionClient<'_> {
         if let Some(mc) = max_changes {
             args["maxChanges"] = mc.into();
         }
-        let (call_id, req) = super::build_request("SpaceInvite/changes", args);
+        let (call_id, req) = super::build_request("SpaceInvite/changes", args, &["urn:ietf:params:jmap:chat"]);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -66,7 +66,7 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "create": { client_id: obj },
         });
-        let (call_id, req) = super::build_request("SpaceInvite/set", args);
+        let (call_id, req) = super::build_request("SpaceInvite/set", args, &["urn:ietf:params:jmap:chat"]);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -88,7 +88,7 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "destroy": ids,
         });
-        let (call_id, req) = super::build_request("SpaceInvite/set", args);
+        let (call_id, req) = super::build_request("SpaceInvite/set", args, &["urn:ietf:params:jmap:chat"]);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }

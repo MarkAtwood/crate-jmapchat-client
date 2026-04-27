@@ -18,7 +18,7 @@ impl super::SessionClient<'_> {
             "ids": ids,
             "properties": properties,
         });
-        let (call_id, req) = super::build_request("CustomEmoji/get", args);
+        let (call_id, req) = super::build_request("CustomEmoji/get", args, &["urn:ietf:params:jmap:chat"]);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -37,7 +37,7 @@ impl super::SessionClient<'_> {
         if let Some(mc) = max_changes {
             args["maxChanges"] = mc.into();
         }
-        let (call_id, req) = super::build_request("CustomEmoji/changes", args);
+        let (call_id, req) = super::build_request("CustomEmoji/changes", args, &["urn:ietf:params:jmap:chat"]);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -62,7 +62,7 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "create": { client_id: create_obj },
         });
-        let (call_id, req) = super::build_request("CustomEmoji/set", args);
+        let (call_id, req) = super::build_request("CustomEmoji/set", args, &["urn:ietf:params:jmap:chat"]);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -84,7 +84,7 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "destroy": ids,
         });
-        let (call_id, req) = super::build_request("CustomEmoji/set", args);
+        let (call_id, req) = super::build_request("CustomEmoji/set", args, &["urn:ietf:params:jmap:chat"]);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -107,7 +107,7 @@ impl super::SessionClient<'_> {
         if let Some(l) = input.limit {
             args["limit"] = l.into();
         }
-        let (call_id, req) = super::build_request("CustomEmoji/query", args);
+        let (call_id, req) = super::build_request("CustomEmoji/query", args, &["urn:ietf:params:jmap:chat"]);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
@@ -127,7 +127,7 @@ impl super::SessionClient<'_> {
         if let Some(mc) = max_changes {
             args["maxChanges"] = mc.into();
         }
-        let (call_id, req) = super::build_request("CustomEmoji/queryChanges", args);
+        let (call_id, req) = super::build_request("CustomEmoji/queryChanges", args, &["urn:ietf:params:jmap:chat"]);
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }

@@ -6,7 +6,8 @@
 
 use jmap_chat::client::JmapChatClient;
 use jmap_chat::jmap::JmapRequestBuilder;
-use wiremock::matchers::method;
+use jmap_chat::methods::PushSubscriptionCreateInput;
+use wiremock::matchers::{body_json, method};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
 fn test_session(api_url: &str) -> jmap_chat::jmap::Session {
@@ -133,4 +134,81 @@ async fn quota_get_returns_quota_list() {
     assert_eq!(chat_quota.used, 1024);
     assert_eq!(chat_quota.warn_limit, None);
     assert_eq!(chat_quota.description, None);
+}
+
+// ---------------------------------------------------------------------------
+// capability tests — RFC 8620 §3.3: `using` must declare only the capabilities
+// required by the methods in each request.
+// ---------------------------------------------------------------------------
+
+/// Oracle: RFC 8621 §2 — Quota/get requires `urn:ietf:params:jmap:quotas`,
+/// NOT `urn:ietf:params:jmap:chat`.  The body_json matcher rejects any request
+/// that sends the wrong capability set, so this test fails if the wrong caps
+/// are declared.
+#[tokio::test]
+async fn quota_get_uses_quotas_capability_not_chat() {
+    let server = MockServer::start().await;
+    let fixture = method_fixture("quota_get.json");
+    Mock::given(method("POST"))
+        .and(body_json(serde_json::json!({
+            "using": ["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:quotas"],
+            "methodCalls": [["Quota/get", {
+                "accountId": "account1",
+                "ids": null
+            }, "r1"]]
+        })))
+        .respond_with(ResponseTemplate::new(200).set_body_json(&fixture))
+        .mount(&server)
+        .await;
+
+    let client = JmapChatClient::new(jmap_chat::auth::NoneAuth, &server.uri()).unwrap();
+    let session = test_session(&server.uri());
+
+    client
+        .with_session(&session)
+        .quota_get()
+        .await
+        .expect("quota_get must succeed when using array is correct");
+}
+
+/// Oracle: RFC 8620 §7.2 — PushSubscription/set requires only
+/// `urn:ietf:params:jmap:core` when no `chatPush` extension is present.
+/// The body_json matcher rejects any request that includes `jmap:chat`,
+/// so this test fails if the wrong caps are declared.
+#[tokio::test]
+async fn push_subscription_create_without_chat_push_uses_core_only() {
+    let server = MockServer::start().await;
+    let fixture = method_fixture("push_subscription_set_response.json");
+    Mock::given(method("POST"))
+        .and(body_json(serde_json::json!({
+            "using": ["urn:ietf:params:jmap:core"],
+            "methodCalls": [["PushSubscription/set", {
+                "create": {
+                    "client-push-001": {
+                        "deviceClientId": "device-abc",
+                        "url": "https://push.example.com/endpoint"
+                    }
+                }
+            }, "r1"]]
+        })))
+        .respond_with(ResponseTemplate::new(200).set_body_json(&fixture))
+        .mount(&server)
+        .await;
+
+    let client = JmapChatClient::new(jmap_chat::auth::NoneAuth, &server.uri()).unwrap();
+    let api_url = format!("{}/api", server.uri());
+    let session = test_session(&api_url);
+
+    client
+        .with_session(&session)
+        .push_subscription_create(&PushSubscriptionCreateInput {
+            client_id: Some("client-push-001"),
+            device_client_id: "device-abc",
+            url: "https://push.example.com/endpoint",
+            expires: None,
+            types: None,
+            chat_push: None,
+        })
+        .await
+        .expect("push_subscription_create without chatPush must succeed");
 }

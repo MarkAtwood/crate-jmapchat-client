@@ -690,18 +690,26 @@ const CALL_ID: &str = "r1";
 
 /// Build a single-method JMAP request.
 ///
+/// `extra_caps` is appended to `["urn:ietf:params:jmap:core"]` in the
+/// `using` array. Pass `&["urn:ietf:params:jmap:chat"]` for all JMAP Chat
+/// methods. Pass `&[]` when `jmap:core` alone is sufficient (e.g. for future
+/// non-chat wrappers that should not declare unused capabilities per
+/// RFC 8620 §3.3).
+///
 /// Returns `(call_id, request)`. Pass `call_id` to
 /// `crate::client::extract_response` so the pairing is explicit and
 /// compiler-visible rather than via a shared constant.
 fn build_request(
     method_name: &str,
     args: serde_json::Value,
+    extra_caps: &[&str],
 ) -> (&'static str, crate::jmap::JmapRequest) {
+    let mut using = vec!["urn:ietf:params:jmap:core".to_string()];
+    for cap in extra_caps {
+        using.push((*cap).to_string());
+    }
     let req = crate::jmap::JmapRequest {
-        using: vec![
-            "urn:ietf:params:jmap:core".to_string(),
-            "urn:ietf:params:jmap:chat".to_string(),
-        ],
+        using,
         method_calls: vec![(method_name.to_string(), args, CALL_ID.to_string())],
     };
     (CALL_ID, req)
