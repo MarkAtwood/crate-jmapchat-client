@@ -63,4 +63,9 @@ pub enum ClientError {
     /// after this error. Indicates a misbehaving or hostile server.
     #[error("SSE frame too large (limit: 1 MiB)")]
     SseFrameTooLarge,
+
+    /// A WebSocket transport error (connection, framing, or TLS). May be
+    /// retriable (transient network failure) or permanent (TLS config error).
+    #[error("WebSocket error: {0}")]
+    WebSocket(#[from] tokio_tungstenite::tungstenite::Error),
 }

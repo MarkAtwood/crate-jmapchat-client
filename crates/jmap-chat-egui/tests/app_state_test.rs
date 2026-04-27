@@ -1,3 +1,4 @@
+use jmap_chat::types::ContactPresence;
 use jmap_chat_egui::app::AppState;
 use jmap_chat_egui::event::{AppEvent, ConnectionStatus};
 
@@ -116,4 +117,99 @@ fn tick_clears_no_error_without_panic() {
     state.tick_error_timeout();
     assert!(state.error.is_none());
     assert!(state.error_since.is_none());
+}
+
+// ---------------------------------------------------------------------------
+// TypingIndicator tests
+// ---------------------------------------------------------------------------
+
+/// Oracle: draft-atwood-jmap-chat-wss-00 — typing=true inserts into the map;
+/// active_typers_in_chat must include the sender.
+#[test]
+fn apply_typing_indicator_true_adds_typer() {
+    let mut state = AppState::default();
+    state.apply_event(AppEvent::TypingIndicator {
+        chat_id: "chat-1".to_string(),
+        sender_id: "user-a".to_string(),
+        typing: true,
+    });
+
+    let typers = state.active_typers_in_chat("chat-1");
+    assert_eq!(typers, vec!["user-a"]);
+}
+
+/// Oracle: typing=false removes from the map; active_typers_in_chat must be empty.
+#[test]
+fn apply_typing_indicator_false_removes_typer() {
+    let mut state = AppState::default();
+    state.apply_event(AppEvent::TypingIndicator {
+        chat_id: "chat-1".to_string(),
+        sender_id: "user-a".to_string(),
+        typing: true,
+    });
+    state.apply_event(AppEvent::TypingIndicator {
+        chat_id: "chat-1".to_string(),
+        sender_id: "user-a".to_string(),
+        typing: false,
+    });
+
+    let typers = state.active_typers_in_chat("chat-1");
+    assert!(typers.is_empty(), "typing=false must remove the indicator");
+}
+
+/// Oracle: typing indicators in one chat must not appear in another.
+#[test]
+fn typing_indicators_are_chat_scoped() {
+    let mut state = AppState::default();
+    state.apply_event(AppEvent::TypingIndicator {
+        chat_id: "chat-1".to_string(),
+        sender_id: "user-a".to_string(),
+        typing: true,
+    });
+
+    assert!(
+        state.active_typers_in_chat("chat-2").is_empty(),
+        "typing indicator in chat-1 must not appear in chat-2"
+    );
+}
+
+// ---------------------------------------------------------------------------
+// PresenceUpdate tests
+// ---------------------------------------------------------------------------
+
+/// Oracle: draft-atwood-jmap-chat-wss-00 — PresenceUpdate stores the latest
+/// presence for the contact_id.
+#[test]
+fn apply_presence_update_stores_presence() {
+    let mut state = AppState::default();
+    state.apply_event(AppEvent::PresenceUpdate {
+        contact_id: "user-b".to_string(),
+        presence: ContactPresence::Busy,
+    });
+
+    assert_eq!(
+        state.presence.get("user-b"),
+        Some(&ContactPresence::Busy),
+        "presence must be stored for contact_id"
+    );
+}
+
+/// Oracle: subsequent PresenceUpdate replaces the previous value.
+#[test]
+fn apply_presence_update_replaces_previous() {
+    let mut state = AppState::default();
+    state.apply_event(AppEvent::PresenceUpdate {
+        contact_id: "user-b".to_string(),
+        presence: ContactPresence::Online,
+    });
+    state.apply_event(AppEvent::PresenceUpdate {
+        contact_id: "user-b".to_string(),
+        presence: ContactPresence::Away,
+    });
+
+    assert_eq!(
+        state.presence.get("user-b"),
+        Some(&ContactPresence::Away),
+        "second presence update must replace the first"
+    );
 }

@@ -24,6 +24,8 @@ use jmap_chat::client::JmapChatClient;
 use jmap_chat::error::ClientError;
 use jmap_chat::methods::{ChatQueryInput, MessageCreateInput, MessageQueryInput};
 use jmap_chat::sse::SseEvent;
+use jmap_chat::types::{ContactPresence, ChatStreamEnable};
+use jmap_chat::ws::WsFrame;
 
 use crate::event::{AppCommand, AppEvent, ConnectionStatus};
 
@@ -34,7 +36,7 @@ use crate::event::{AppCommand, AppEvent, ConnectionStatus};
 type EventSender = tokio::sync::mpsc::UnboundedSender<AppEvent>;
 
 // ---------------------------------------------------------------------------
-// Internal SSE notification type
+// Internal notification types
 // ---------------------------------------------------------------------------
 
 /// What the SSE subtask reports back to the command loop.
@@ -45,6 +47,25 @@ enum SseNotification {
     /// seen in the stream so the reconnect can send `Last-Event-ID` per RFC 8620 §7.3.
     StreamEnded { last_event_id: Option<String> },
     /// Permanent auth failure from `subscribe_events` — do not reconnect.
+    AuthFailed,
+}
+
+/// What the WebSocket subtask reports back to the command loop.
+enum WsNotification {
+    /// A typing indicator event arrived.
+    TypingIndicator {
+        chat_id: String,
+        sender_id: String,
+        typing: bool,
+    },
+    /// A presence update event arrived.
+    PresenceUpdate {
+        contact_id: String,
+        presence: ContactPresence,
+    },
+    /// Stream ended (disconnect or transport error) — reconnect with backoff.
+    StreamEnded,
+    /// Permanent auth failure during WebSocket handshake — do not reconnect.
     AuthFailed,
 }
 
@@ -177,11 +198,35 @@ pub async fn run(
 
     let mut sse_backoff_idx = 0usize;
 
-    // Phase 3: Main command loop — multiplex commands and SSE notifications.
+    // Phase 2b: Spawn WebSocket subtask if the server supports it.
+    //
+    // The WS stream carries ephemeral events (typing indicators, presence updates)
+    // per draft-atwood-jmap-chat-wss-00. SSE remains the primary change-notification
+    // transport; WS is additive.
+    //
+    // A sender clone (_ws_tx_keepalive) is kept alive unconditionally so that
+    // ws_notif_rx never closes in the select! when no WS task is running.
+    let ws_url: Option<String> = session
+        .websocket_capability()
+        .ok()
+        .flatten()
+        .filter(|_| session.supports_chat_websocket())
+        .map(|cap| cap.url.clone());
+
+    let (ws_notif_tx, mut ws_notif_rx) = tokio::sync::mpsc::unbounded_channel::<WsNotification>();
+    let mut ws_handle: Option<tokio::task::JoinHandle<()>> = None;
+    let mut ws_backoff_idx = 0usize;
+
+    if let Some(ref url) = ws_url {
+        ws_handle = Some(spawn_ws_task(Arc::clone(&client), url.clone(), ws_notif_tx.clone()));
+    }
+
+    // Phase 3: Main command loop — multiplex commands, SSE notifications, and WS events.
     let mut current_chat: Option<String> = None;
-    // `sse_needs_restart` is set inside select! arms where we cannot sleep directly;
-    // the actual reconnect (abort + sleep + re-spawn) happens at the top of the loop.
+    // `sse_needs_restart` and `ws_needs_restart` are set inside select! arms where we
+    // cannot sleep directly; the actual reconnect happens at the top of the loop.
     let mut sse_needs_restart = false;
+    let mut ws_needs_restart = false;
 
     loop {
         if sse_needs_restart {
@@ -200,7 +245,68 @@ pub async fn run(
             sse_rx = new_rx;
         }
 
+        if ws_needs_restart {
+            ws_needs_restart = false;
+            if let Some(ref url) = ws_url {
+                ws_handle = Some(
+                    reconnect_ws(
+                        ws_handle,
+                        &mut ws_backoff_idx,
+                        Arc::clone(&client),
+                        url,
+                        ws_notif_tx.clone(),
+                    )
+                    .await,
+                );
+            }
+        }
+
         tokio::select! {
+            // WebSocket notification from the ephemeral-events subtask.
+            ws_msg = ws_notif_rx.recv() => {
+                match ws_msg {
+                    None => {} // ws_notif_tx in scope; channel cannot close normally
+                    Some(WsNotification::StreamEnded) => {
+                        ws_needs_restart = true;
+                    }
+                    Some(WsNotification::AuthFailed) => {
+                        send_event(
+                            &tx,
+                            &ctx,
+                            AppEvent::Error(
+                                "WebSocket authentication failed — ephemeral events disabled"
+                                    .to_string(),
+                            ),
+                        );
+                        // Auth failure is permanent; drop the handle and stop reconnecting.
+                        if let Some(h) = ws_handle.take() {
+                            h.abort();
+                        }
+                    }
+                    Some(WsNotification::TypingIndicator {
+                        chat_id,
+                        sender_id,
+                        typing,
+                    }) => {
+                        send_event(
+                            &tx,
+                            &ctx,
+                            AppEvent::TypingIndicator { chat_id, sender_id, typing },
+                        );
+                    }
+                    Some(WsNotification::PresenceUpdate {
+                        contact_id,
+                        presence,
+                    }) => {
+                        send_event(
+                            &tx,
+                            &ctx,
+                            AppEvent::PresenceUpdate { contact_id, presence },
+                        );
+                    }
+                }
+            }
+
             // SSE notification from the push stream subtask.
             sse_msg = sse_rx.recv() => {
                 match sse_msg {
@@ -927,4 +1033,100 @@ fn send_event(tx: &EventSender, ctx: &egui::Context, event: AppEvent) {
 /// Current UTC time formatted as RFC 3339 with second precision.
 fn now_rfc3339() -> String {
     chrono::Utc::now().format("%Y-%m-%dT%H:%M:%SZ").to_string()
+}
+
+// ---------------------------------------------------------------------------
+// WebSocket subtask
+// ---------------------------------------------------------------------------
+
+/// Abort the current WS handle (if any), wait out exponential backoff, and
+/// spawn a fresh WS task.
+async fn reconnect_ws(
+    old_handle: Option<tokio::task::JoinHandle<()>>,
+    backoff_idx: &mut usize,
+    client: Arc<JmapChatClient>,
+    ws_url: &str,
+    ws_tx: tokio::sync::mpsc::UnboundedSender<WsNotification>,
+) -> tokio::task::JoinHandle<()> {
+    const BACKOFF: &[u64] = &[1, 2, 4, 8, 16, 30];
+    if let Some(h) = old_handle {
+        h.abort();
+    }
+    let delay = BACKOFF
+        .get(*backoff_idx)
+        .copied()
+        .unwrap_or(*BACKOFF.last().unwrap());
+    *backoff_idx = backoff_idx.saturating_add(1);
+    tokio::time::sleep(Duration::from_secs(delay)).await;
+    spawn_ws_task(client, ws_url.to_string(), ws_tx)
+}
+
+/// Spawn a tokio task that drives the WebSocket stream and forwards notifications.
+fn spawn_ws_task(
+    client: Arc<JmapChatClient>,
+    ws_url: String,
+    ws_tx: tokio::sync::mpsc::UnboundedSender<WsNotification>,
+) -> tokio::task::JoinHandle<()> {
+    tokio::spawn(async move {
+        run_ws_stream(client, &ws_url, &ws_tx).await;
+    })
+}
+
+async fn run_ws_stream(
+    client: Arc<JmapChatClient>,
+    ws_url: &str,
+    ws_tx: &tokio::sync::mpsc::UnboundedSender<WsNotification>,
+) {
+    let mut session = match client.connect_ws(ws_url).await {
+        Ok(s) => s,
+        Err(ClientError::AuthFailed(_)) => {
+            let _ = ws_tx.send(WsNotification::AuthFailed);
+            return;
+        }
+        Err(_) => {
+            let _ = ws_tx.send(WsNotification::StreamEnded);
+            return;
+        }
+    };
+
+    // Subscribe to all typing and presence events for all chats and contacts.
+    let enable = ChatStreamEnable::new(
+        vec!["typing".to_string(), "presence".to_string()],
+        None, // all chats
+        None, // all contacts
+    );
+    if session.send_stream_enable(&enable).await.is_err() {
+        let _ = ws_tx.send(WsNotification::StreamEnded);
+        return;
+    }
+
+    loop {
+        match session.next_frame().await {
+            None => {
+                let _ = ws_tx.send(WsNotification::StreamEnded);
+                return;
+            }
+            Some(Err(_)) => {
+                let _ = ws_tx.send(WsNotification::StreamEnded);
+                return;
+            }
+            Some(Ok(WsFrame::ChatTyping(evt))) => {
+                let _ = ws_tx.send(WsNotification::TypingIndicator {
+                    chat_id: evt.chat_id.to_string(),
+                    sender_id: evt.sender_id.to_string(),
+                    typing: evt.typing,
+                });
+            }
+            Some(Ok(WsFrame::ChatPresence(evt))) => {
+                let _ = ws_tx.send(WsNotification::PresenceUpdate {
+                    contact_id: evt.contact_id.to_string(),
+                    presence: evt.presence,
+                });
+            }
+            Some(Ok(_)) => {
+                // StateChange, Response, Unknown — SSE handles state changes;
+                // unknown types are silently ignored per forward-compat rules.
+            }
+        }
+    }
 }

@@ -1,6 +1,7 @@
-use std::time::Instant;
+use std::collections::HashMap;
+use std::time::{Duration, Instant};
 
-use jmap_chat::types::{Chat, ChatKind, Message};
+use jmap_chat::types::{Chat, ChatKind, ContactPresence, Message};
 
 use crate::event::{AppEvent, ConnectionStatus};
 
@@ -50,6 +51,14 @@ pub struct AppState {
     pub error_since: Option<Instant>,
     pub api_url: String,
     pub account_id: String,
+    /// Active typing indicators: `(chat_id, sender_id)` → time of last `typing: true` event.
+    ///
+    /// Entries are removed when `typing: false` arrives or when they decay
+    /// (use [`active_typers_in_chat`](AppState::active_typers_in_chat) to read,
+    /// which filters out entries older than 10 s).
+    pub typing_indicators: HashMap<(String, String), Instant>,
+    /// Latest known presence state per `contact_id`.
+    pub presence: HashMap<String, ContactPresence>,
 }
 
 impl Default for AppState {
@@ -65,6 +74,8 @@ impl Default for AppState {
             error_since: None,
             api_url: String::new(),
             account_id: String::new(),
+            typing_indicators: HashMap::new(),
+            presence: HashMap::new(),
         }
     }
 }
@@ -133,7 +144,39 @@ impl AppState {
                 self.error = Some(msg);
                 self.error_since = Some(Instant::now());
             }
+            AppEvent::TypingIndicator {
+                chat_id,
+                sender_id,
+                typing,
+            } => {
+                if typing {
+                    self.typing_indicators
+                        .insert((chat_id, sender_id), Instant::now());
+                } else {
+                    self.typing_indicators.remove(&(chat_id, sender_id));
+                }
+            }
+            AppEvent::PresenceUpdate {
+                contact_id,
+                presence,
+            } => {
+                self.presence.insert(contact_id, presence);
+            }
         }
+    }
+
+    /// Return the sender IDs of contacts who are currently typing in `chat_id`.
+    ///
+    /// Filters out entries older than 10 s, implementing the decay rule from
+    /// draft-atwood-jmap-chat-wss-00: if no `ChatTypingEvent` with `typing: true`
+    /// arrives within 10 s, the indicator is suppressed.
+    pub fn active_typers_in_chat<'a>(&'a self, chat_id: &str) -> Vec<&'a str> {
+        let threshold = Duration::from_secs(10);
+        self.typing_indicators
+            .iter()
+            .filter(|((cid, _sid), ts)| cid == chat_id && ts.elapsed() < threshold)
+            .map(|((_, sid), _)| sid.as_str())
+            .collect()
     }
 
     /// Clear transient error if it has been displayed for 5 seconds.
