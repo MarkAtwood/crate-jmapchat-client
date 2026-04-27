@@ -63,14 +63,8 @@ impl super::SessionClient<'_> {
             "accountId": account_id,
             "ids": serde_json::Value::Null,
         });
-        let req = crate::jmap::JmapRequestBuilder::new(vec![
-            "urn:ietf:params:jmap:core".to_string(),
-            "urn:ietf:params:jmap:quotas".to_string(),
-        ])
-        .add_call("Quota/get", args, "r1")
-        .build();
-
+        let (call_id, req) = super::build_request("Quota/get", args, super::USING_QUOTAS);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, "r1")
+        crate::client::extract_response(resp, call_id)
     }
 }

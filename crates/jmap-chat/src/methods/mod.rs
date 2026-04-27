@@ -686,15 +686,31 @@ impl SessionClient<'_> {
 /// The call-id embedded in every single-method JMAP request produced by
 /// [`build_request`]. Returned alongside the request so callers pass it
 /// directly to [`crate::client::extract_response`] — no separate import needed.
-const CALL_ID: &str = "r1";
+pub(super) const CALL_ID: &str = "r1";
+
+/// Capability URIs for standard JMAP Chat method calls (RFC 8620 §3.3).
+pub(super) const USING_CHAT: &[&str] = &[
+    "urn:ietf:params:jmap:core",
+    "urn:ietf:params:jmap:chat",
+];
+
+/// Capability URIs for Quota method calls.
+pub(super) const USING_QUOTAS: &[&str] = &[
+    "urn:ietf:params:jmap:core",
+    "urn:ietf:params:jmap:quotas",
+];
+
+/// Capability URIs for PushSubscription method calls (RFC 8620 §7.2).
+pub(super) const USING_CORE: &[&str] = &[
+    "urn:ietf:params:jmap:core",
+];
 
 /// Build a single-method JMAP request.
 ///
-/// `extra_caps` is appended to `["urn:ietf:params:jmap:core"]` in the
-/// `using` array. Pass `&["urn:ietf:params:jmap:chat"]` for all JMAP Chat
-/// methods. Pass `&[]` when `jmap:core` alone is sufficient (e.g. for future
-/// non-chat wrappers that should not declare unused capabilities per
-/// RFC 8620 §3.3).
+/// `using` is the complete `using` array for the request (RFC 8620 §3.3).
+/// Use the pre-defined constants [`USING_CHAT`], [`USING_QUOTAS`], or
+/// [`USING_CORE`] to avoid per-call allocations; all capability URI strings
+/// are static.
 ///
 /// Returns `(call_id, request)`. Pass `call_id` to
 /// `crate::client::extract_response` so the pairing is explicit and
@@ -702,14 +718,10 @@ const CALL_ID: &str = "r1";
 fn build_request(
     method_name: &str,
     args: serde_json::Value,
-    extra_caps: &[&str],
+    using: &[&str],
 ) -> (&'static str, crate::jmap::JmapRequest) {
-    let mut using = vec!["urn:ietf:params:jmap:core".to_string()];
-    for cap in extra_caps {
-        using.push((*cap).to_string());
-    }
     let req = crate::jmap::JmapRequest {
-        using,
+        using: using.iter().map(|&s| s.to_string()).collect(),
         method_calls: vec![crate::jmap::Invocation::new(method_name, args, CALL_ID)],
     };
     (CALL_ID, req)

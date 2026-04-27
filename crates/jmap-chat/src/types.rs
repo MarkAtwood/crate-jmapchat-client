@@ -194,8 +194,17 @@ impl serde::Serialize for EndpointType {
 
 impl<'de> serde::Deserialize<'de> for EndpointType {
     fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
-        let raw = String::deserialize(d)?;
-        Ok(Self::from_uri(&raw))
+        struct EndpointTypeVisitor;
+        impl<'de> serde::de::Visitor<'de> for EndpointTypeVisitor {
+            type Value = EndpointType;
+            fn expecting(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                write!(f, "an endpoint type URI string")
+            }
+            fn visit_str<E: serde::de::Error>(self, v: &str) -> Result<EndpointType, E> {
+                Ok(EndpointType::from_uri(v))
+            }
+        }
+        d.deserialize_str(EndpointTypeVisitor)
     }
 }
 
