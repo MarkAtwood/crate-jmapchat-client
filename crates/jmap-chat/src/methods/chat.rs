@@ -1,4 +1,4 @@
-use super::{ChangesResponse, ChatQueryInput, GetResponse, QueryResponse, CALL_ID};
+use super::{ChangesResponse, ChatQueryInput, GetResponse, QueryResponse};
 
 impl crate::client::JmapChatClient {
     /// Fetch Chat objects by IDs (RFC 8620 §5.1 / JMAP Chat §5 Chat/get).
@@ -17,9 +17,9 @@ impl crate::client::JmapChatClient {
             "ids": ids,
             "properties": properties,
         });
-        let req = super::build_request("Chat/get", args);
+        let (call_id, req) = super::build_request("Chat/get", args);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, CALL_ID)
+        crate::client::extract_response(resp, call_id)
     }
 
     /// Query Chat IDs with optional filter (RFC 8620 §5.5 / JMAP Chat §5 Chat/query).
@@ -45,15 +45,19 @@ impl crate::client::JmapChatClient {
         } else {
             serde_json::Value::Object(filter)
         };
-        let args = serde_json::json!({
+        let mut args = serde_json::json!({
             "accountId": account_id,
             "filter": filter_val,
-            "position": input.position,
-            "limit": input.limit,
         });
-        let req = super::build_request("Chat/query", args);
+        if let Some(p) = input.position {
+            args["position"] = p.into();
+        }
+        if let Some(l) = input.limit {
+            args["limit"] = l.into();
+        }
+        let (call_id, req) = super::build_request("Chat/query", args);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, CALL_ID)
+        crate::client::extract_response(resp, call_id)
     }
 
     /// Fetch changes to Chat objects since `since_state` (RFC 8620 §5.2 / Chat/changes).
@@ -72,8 +76,8 @@ impl crate::client::JmapChatClient {
             "sinceState": since_state,
             "maxChanges": max_changes,
         });
-        let req = super::build_request("Chat/changes", args);
+        let (call_id, req) = super::build_request("Chat/changes", args);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, CALL_ID)
+        crate::client::extract_response(resp, call_id)
     }
 }
