@@ -84,7 +84,7 @@ pub struct SetResponse<T = serde_json::Value> {
     pub not_destroyed: Option<HashMap<String, SetError>>,
 }
 
-/// Response to [`JmapChatClient::push_subscription_set`] (RFC 8620 §7.2).
+/// Response to [`JmapChatClient::push_subscription_create`] (RFC 8620 §7.2).
 ///
 /// `account_id` is always `null` for PushSubscription objects (they are not
 /// account-scoped). `Option<String>` handles both the null case and servers
@@ -558,7 +558,7 @@ pub struct SpacePatch<'a> {
     pub remove_channels: Option<&'a [&'a str]>,
 }
 
-/// Input parameters for [`JmapChatClient::push_subscription_set`].
+/// Input parameters for [`JmapChatClient::push_subscription_create`].
 ///
 /// Creates a PushSubscription (RFC 8620 §7.2) with the optional `chatPush`
 /// extension (draft-atwood-jmap-chat-push-00 §3.1).
@@ -593,9 +593,16 @@ pub struct PushSubscriptionCreateInput<'a> {
 /// methods are available on this type without needing to pass `&Session` on
 /// every call.
 ///
-/// ```rust,ignore
+/// ```rust,no_run
+/// # use jmap_chat::client::JmapChatClient;
+/// # use jmap_chat::auth::NoneAuth;
+/// # async fn example() -> Result<(), jmap_chat::error::ClientError> {
+/// # let client = JmapChatClient::new(NoneAuth, "http://localhost").unwrap();
+/// # let session: jmap_chat::jmap::Session = todo!();
 /// let sc = client.with_session(&session);
 /// let chats = sc.chat_get(None, None).await?;
+/// # Ok(())
+/// # }
 /// ```
 pub struct SessionClient<'s> {
     client: &'s crate::client::JmapChatClient,
@@ -618,7 +625,9 @@ impl SessionClient<'_> {
     ///
     /// Returns `Err(InvalidSession)` if there is no primary account for
     /// `urn:ietf:params:jmap:chat`.
-    pub(super) fn session_parts(&self) -> Result<(&str, &str), crate::error::ClientError> {
+    pub(in crate::methods) fn session_parts(
+        &self,
+    ) -> Result<(&str, &str), crate::error::ClientError> {
         let api_url = self.session.api_url.as_str();
         let account_id = self.session.chat_account_id().ok_or_else(|| {
             crate::error::ClientError::InvalidSession(
@@ -629,12 +638,12 @@ impl SessionClient<'_> {
     }
 
     /// The JMAP API URL from the bound session.
-    pub(super) fn api_url(&self) -> &str {
+    pub(in crate::methods) fn api_url(&self) -> &str {
         self.session.api_url.as_str()
     }
 
     /// Forward a JMAP request to the underlying HTTP client.
-    pub(super) async fn call(
+    pub(in crate::methods) async fn call(
         &self,
         api_url: &str,
         req: &crate::jmap::JmapRequest,
