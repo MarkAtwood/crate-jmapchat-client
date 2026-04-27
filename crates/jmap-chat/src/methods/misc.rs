@@ -63,4 +63,95 @@ impl crate::client::JmapChatClient {
         let resp = self.call(api_url, &req).await?;
         crate::client::extract_response(resp, call_id)
     }
+
+    /// Fetch changes to ReadPosition records since `since_state` (JMAP Chat §5 ReadPosition/changes).
+    ///
+    /// `max_changes` may be `None` to let the server choose the limit (RFC 8620 §5.2).
+    pub async fn read_position_changes(
+        &self,
+        session: &crate::jmap::Session,
+        since_state: &str,
+        max_changes: Option<u64>,
+    ) -> Result<super::ChangesResponse, crate::error::ClientError> {
+        let (api_url, account_id) = Self::session_parts(session)?;
+        let args = serde_json::json!({
+            "accountId": account_id,
+            "sinceState": since_state,
+            "maxChanges": max_changes,
+        });
+        let (call_id, req) = super::build_request("ReadPosition/changes", args);
+        let resp = self.call(api_url, &req).await?;
+        crate::client::extract_response(resp, call_id)
+    }
+
+    /// Update the PresenceStatus record (JMAP Chat §5 PresenceStatus/set).
+    ///
+    /// Only `update` is issued; `create` and `destroy` are forbidden by the spec.
+    /// Fields absent from `input` are omitted from the patch and left unchanged
+    /// server-side.
+    pub async fn presence_status_set(
+        &self,
+        session: &crate::jmap::Session,
+        input: &super::PresenceStatusSetInput<'_>,
+    ) -> Result<SetResponse, crate::error::ClientError> {
+        let (api_url, account_id) = Self::session_parts(session)?;
+        let mut patch = serde_json::Map::new();
+        if let Some(p) = &input.presence {
+            patch.insert(
+                "presence".into(),
+                serde_json::to_value(p).map_err(crate::error::ClientError::Serialize)?,
+            );
+        }
+        if let Some(st) = &input.status_text {
+            patch.insert(
+                "statusText".into(),
+                st.map(serde_json::Value::from)
+                    .unwrap_or(serde_json::Value::Null),
+            );
+        }
+        if let Some(se) = &input.status_emoji {
+            patch.insert(
+                "statusEmoji".into(),
+                se.map(serde_json::Value::from)
+                    .unwrap_or(serde_json::Value::Null),
+            );
+        }
+        if let Some(ea) = &input.expires_at {
+            patch.insert(
+                "expiresAt".into(),
+                ea.map(|d| serde_json::Value::from(d.as_str()))
+                    .unwrap_or(serde_json::Value::Null),
+            );
+        }
+        if let Some(rs) = input.receipt_sharing {
+            patch.insert("receiptSharing".into(), rs.into());
+        }
+        let args = serde_json::json!({
+            "accountId": account_id,
+            "update": { input.id: serde_json::Value::Object(patch) },
+        });
+        let (call_id, req) = super::build_request("PresenceStatus/set", args);
+        let resp = self.call(api_url, &req).await?;
+        crate::client::extract_response(resp, call_id)
+    }
+
+    /// Fetch changes to PresenceStatus records since `since_state` (JMAP Chat §5 PresenceStatus/changes).
+    ///
+    /// `max_changes` may be `None` to let the server choose the limit (RFC 8620 §5.2).
+    pub async fn presence_status_changes(
+        &self,
+        session: &crate::jmap::Session,
+        since_state: &str,
+        max_changes: Option<u64>,
+    ) -> Result<super::ChangesResponse, crate::error::ClientError> {
+        let (api_url, account_id) = Self::session_parts(session)?;
+        let args = serde_json::json!({
+            "accountId": account_id,
+            "sinceState": since_state,
+            "maxChanges": max_changes,
+        });
+        let (call_id, req) = super::build_request("PresenceStatus/changes", args);
+        let resp = self.call(api_url, &req).await?;
+        crate::client::extract_response(resp, call_id)
+    }
 }

@@ -1,0 +1,12 @@
+{
+  "methodResponses": [["SpaceInvite/changes", {
+    "accountId": "account1",
+    "oldState": "invite-state-000",
+    "newState": "invite-state-001",
+    "hasMoreChanges": false,
+    "created": ["01HV5Z6QKWJ7N3P8R2X4YTMDIA"],
+    "updated": [],
+    "destroyed": []
+  }, "r1"]],
+  "sessionState": "sess-abc"
+}

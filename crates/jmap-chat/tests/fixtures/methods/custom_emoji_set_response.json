@@ -1,0 +1,17 @@
+{
+  "methodResponses": [["CustomEmoji/set", {
+    "accountId": "account1",
+    "oldState": "emoji-state-001",
+    "newState": "emoji-state-002",
+    "created": {
+      "emoji-new-1": {
+        "id": "01HV5Z6QKWJ7N3P8R2X4YTMDCC",
+        "name": "partyparrot",
+        "blobId": "01HV5Z6QKWJ7N3P8R2X4YTMDDD",
+        "createdBy": "01HV5Z6QKWJ7N3P8R2X4YTMD01",
+        "createdAt": "2024-01-02T10:00:00Z"
+      }
+    }
+  }, "r1"]],
+  "sessionState": "sess-abc"
+}

@@ -1,0 +1,12 @@
+{
+  "methodResponses": [["PresenceStatus/changes", {
+    "accountId": "account1",
+    "oldState": "ps-state-001",
+    "newState": "ps-state-002",
+    "hasMoreChanges": false,
+    "created": [],
+    "updated": ["01HV5Z6QKWJ7N3P8R2X4YTMD99"],
+    "destroyed": []
+  }, "r1"]],
+  "sessionState": "sess-abc"
+}

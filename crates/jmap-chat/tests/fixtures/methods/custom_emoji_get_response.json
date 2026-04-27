@@ -1,0 +1,15 @@
+{
+  "methodResponses": [["CustomEmoji/get", {
+    "accountId": "account1",
+    "state": "emoji-state-001",
+    "list": [{
+      "id": "01HV5Z6QKWJ7N3P8R2X4YTMDAA",
+      "name": "catjam",
+      "blobId": "01HV5Z6QKWJ7N3P8R2X4YTMDBB",
+      "createdBy": "01HV5Z6QKWJ7N3P8R2X4YTMD01",
+      "createdAt": "2024-01-01T12:00:00Z"
+    }],
+    "notFound": []
+  }, "r1"]],
+  "sessionState": "sess-abc"
+}

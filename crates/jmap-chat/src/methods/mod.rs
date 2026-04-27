@@ -10,8 +10,11 @@ use serde::Deserialize;
 
 pub mod chat;
 pub mod contact;
+pub mod custom_emoji;
 pub mod message;
 pub mod misc;
+pub mod space_ban;
+pub mod space_invite;
 
 // ---------------------------------------------------------------------------
 // Response types
@@ -86,6 +89,30 @@ pub struct SetError {
     pub description: Option<String>,
 }
 
+/// RFC 8620 §5.6 — /queryChanges response.
+///
+/// Reports which IDs were removed from and added to a query result set since
+/// `old_query_state`. Used by `custom_emoji_query_changes` and any future
+/// /queryChanges implementations.
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct QueryChangesResponse {
+    pub account_id: String,
+    pub old_query_state: String,
+    pub new_query_state: String,
+    pub total: Option<u64>,
+    pub removed: Vec<String>,
+    pub added: Vec<AddedItem>,
+}
+
+/// A single item added to a query result set (RFC 8620 §5.6).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AddedItem {
+    pub id: String,
+    pub index: u64,
+}
+
 // ---------------------------------------------------------------------------
 // Input types for methods with many optional parameters
 // ---------------------------------------------------------------------------
@@ -126,6 +153,70 @@ pub struct MessageCreateInput<'a> {
     /// RFC 3339 timestamp (e.g. from `chrono::Utc::now().to_rfc3339()`).
     pub sent_at: &'a crate::jmap::UTCDate,
     pub reply_to: Option<&'a str>,
+}
+
+/// Input parameters for [`JmapChatClient::presence_status_set`].
+///
+/// All fields except `id` are optional. A field that is `None` is omitted from
+/// the patch, leaving the server value unchanged. For nullable spec fields
+/// (`status_text`, `status_emoji`, `expires_at`) use `Some(None)` to clear
+/// the field and `Some(Some(value))` to set it.
+#[derive(Debug, Default)]
+pub struct PresenceStatusSetInput<'a> {
+    /// The PresenceStatus.id to update (from `presence_status_get`).
+    pub id: &'a str,
+    pub presence: Option<crate::types::OwnerPresence>,
+    pub status_text: Option<Option<&'a str>>,
+    pub status_emoji: Option<Option<&'a str>>,
+    /// Set or clear the auto-clear deadline. `Some(None)` removes any deadline.
+    pub expires_at: Option<Option<&'a crate::jmap::UTCDate>>,
+    pub receipt_sharing: Option<bool>,
+}
+
+/// Input parameters for [`JmapChatClient::custom_emoji_query`].
+#[derive(Debug, Default)]
+pub struct CustomEmojiQueryInput {
+    /// Filter to a specific Space's custom emojis. `None` returns all emojis
+    /// visible to the account (Space-specific + server-global).
+    pub filter_space_id: Option<String>,
+    pub position: Option<u64>,
+    pub limit: Option<u64>,
+}
+
+/// Parameters for creating one CustomEmoji via [`JmapChatClient::custom_emoji_set`].
+#[derive(Debug)]
+pub struct CustomEmojiCreateInput<'a> {
+    /// Caller-supplied ULID used as the creation key in the JMAP create map.
+    pub client_id: &'a str,
+    /// Shortcode name without colons (e.g., `catjam`).
+    pub name: &'a str,
+    /// blobId of the emoji image (already uploaded).
+    pub blob_id: &'a str,
+    /// If `Some`, limits the emoji to the given Space. `None` = server-global.
+    pub space_id: Option<&'a str>,
+}
+
+/// Parameters for creating one SpaceInvite via [`JmapChatClient::space_invite_set`].
+#[derive(Debug)]
+pub struct SpaceInviteCreateInput<'a> {
+    /// Caller-supplied ULID used as the creation key.
+    pub client_id: &'a str,
+    pub space_id: &'a str,
+    pub default_channel_id: Option<&'a str>,
+    pub expires_at: Option<&'a crate::jmap::UTCDate>,
+    pub max_uses: Option<u64>,
+}
+
+/// Parameters for creating one SpaceBan via [`JmapChatClient::space_ban_set`].
+#[derive(Debug)]
+pub struct SpaceBanCreateInput<'a> {
+    /// Caller-supplied ULID used as the creation key.
+    pub client_id: &'a str,
+    pub space_id: &'a str,
+    /// ChatContact.id of the user to ban.
+    pub user_id: &'a str,
+    pub reason: Option<&'a str>,
+    pub expires_at: Option<&'a crate::jmap::UTCDate>,
 }
 
 // ---------------------------------------------------------------------------
