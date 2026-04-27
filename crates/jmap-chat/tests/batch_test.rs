@@ -108,9 +108,11 @@ async fn quota_get_returns_quota_list() {
         .await
         .expect("quota_get must succeed");
 
-    assert_eq!(quotas.len(), 2, "fixture has two quota objects");
+    assert_eq!(quotas.state, "quota-s1", "fixture state must be preserved");
+    assert_eq!(quotas.list.len(), 2, "fixture has two quota objects");
 
     let msg_quota = quotas
+        .list
         .iter()
         .find(|q| q.id == "quota-msg-1")
         .expect("quota-msg-1 must be present");
@@ -123,6 +125,7 @@ async fn quota_get_returns_quota_list() {
     assert_eq!(msg_quota.soft_limit, None);
 
     let chat_quota = quotas
+        .list
         .iter()
         .find(|q| q.id == "quota-chat-1")
         .expect("quota-chat-1 must be present");

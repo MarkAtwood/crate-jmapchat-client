@@ -24,7 +24,7 @@ pub mod space_invite;
 // ---------------------------------------------------------------------------
 
 /// RFC 8620 §5.1 — /get response.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GetResponse<T> {
     pub account_id: String,
@@ -34,7 +34,7 @@ pub struct GetResponse<T> {
 }
 
 /// RFC 8620 §5.5 — /query response.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryResponse {
     pub account_id: String,
@@ -47,7 +47,7 @@ pub struct QueryResponse {
 }
 
 /// RFC 8620 §5.2 — /changes response.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ChangesResponse {
     pub account_id: String,
@@ -69,7 +69,7 @@ pub struct ChangesResponse {
 /// The type parameter `T` is the shape of each created/updated object.
 /// Defaults to `serde_json::Value` so callers that don't need typed objects
 /// can use `SetResponse` without a type argument.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[serde(bound(deserialize = "T: serde::de::DeserializeOwned"))]
 pub struct SetResponse<T = serde_json::Value> {
@@ -89,9 +89,9 @@ pub struct SetResponse<T = serde_json::Value> {
 /// `account_id` is always `null` for PushSubscription objects (they are not
 /// account-scoped). `Option<String>` handles both the null case and servers
 /// that echo the session accountId anyway.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct PushSubscriptionSetResponse {
+pub struct PushSubscriptionCreateResponse {
     #[serde(default)]
     pub account_id: Option<String>,
     pub created: Option<HashMap<String, serde_json::Value>>,
@@ -100,7 +100,7 @@ pub struct PushSubscriptionSetResponse {
 }
 
 /// A /set operation failure for a single object (RFC 8620 §5.3).
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SetError {
     #[serde(rename = "type")]
@@ -108,7 +108,6 @@ pub struct SetError {
     pub description: Option<String>,
     /// Present only when `error_type == "rateLimited"` (JMAP Chat slow-mode).
     /// Callers should wait until this time before retrying.
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub server_retry_after: Option<crate::jmap::UTCDate>,
 }
 
@@ -117,7 +116,7 @@ pub struct SetError {
 /// Reports which IDs were removed from and added to a query result set since
 /// `old_query_state`. Used by `custom_emoji_query_changes` and any future
 /// /queryChanges implementations.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryChangesResponse {
     pub account_id: String,
@@ -129,7 +128,7 @@ pub struct QueryChangesResponse {
 }
 
 /// A single item added to a query result set (RFC 8620 §5.6).
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AddedItem {
     pub id: String,
@@ -139,7 +138,7 @@ pub struct AddedItem {
 /// Response to a [`JmapChatClient::chat_typing`] call (JMAP Chat §Chat/typing).
 ///
 /// The server echoes only `accountId`. No state token or object list is returned.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TypingResponse {
     pub account_id: String,
@@ -157,7 +156,7 @@ pub struct TypingResponse {
 ///
 /// Use `Patch::from(v)` or `.into()` to construct `Set(v)`. Use `Default::default()`
 /// or `Patch::Keep` to leave the field unchanged.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone, PartialEq)]
 pub enum Patch<T> {
     #[default]
     Keep,
@@ -400,7 +399,7 @@ pub enum SpaceJoinInput<'a> {
 }
 
 /// Response to [`JmapChatClient::space_join`] (JMAP Chat §Space/join).
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SpaceJoinResponse {
     pub account_id: String,
