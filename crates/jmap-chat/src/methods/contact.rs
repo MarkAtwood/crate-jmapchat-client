@@ -82,9 +82,9 @@ impl super::SessionClient<'_> {
             filter.insert("blocked".into(), b.into());
         }
         if let Some(p) = &input.filter_presence {
-            if *p == crate::types::OwnerPresence::Unknown {
+            if *p == crate::types::ContactPresence::Unknown {
                 return Err(crate::error::ClientError::InvalidArgument(
-                    "filter_presence: OwnerPresence::Unknown is not a valid filter value".into(),
+                    "filter_presence: ContactPresence::Unknown is not a valid filter value".into(),
                 ));
             }
             filter.insert("presence".into(), serde_json::to_value(p)?);

@@ -375,10 +375,10 @@ pub struct ChatContactQueryInput {
     pub filter_blocked: Option<bool>,
     /// Filter to contacts with this exact presence state.
     ///
-    /// Passing `Some(OwnerPresence::Unknown)` is rejected at call time with
+    /// Passing `Some(ContactPresence::Unknown)` is rejected at call time with
     /// `ClientError::InvalidArgument` — `Unknown` is a deserialization catch-all
     /// and has no meaning as a filter value.
-    pub filter_presence: Option<crate::types::OwnerPresence>,
+    pub filter_presence: Option<crate::types::ContactPresence>,
     pub position: Option<u64>,
     pub limit: Option<u64>,
     /// Sort property: [`ContactSortProperty::LastSeenAt`], [`ContactSortProperty::Login`], or [`ContactSortProperty::LastActiveAt`].
