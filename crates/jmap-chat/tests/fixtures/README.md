@@ -116,6 +116,8 @@ access, no dependencies on the Rust code under test.
 3. If you used a script, commit the script alongside the fixture.
 4. Add a row to the table in this file.
 5. Write (or extend) a test in `crates/jmap-chat/tests/` that loads the
-   fixture with `include_str!` and asserts round-trip equality against a
-   hand-constructed Rust value, or asserts a specific deserialization error
-   for rejection cases.
+   fixture using the `fixture(name)` helper (which calls `fs::read_to_string`
+   at runtime) and asserts the deserialized value against a hand-constructed
+   Rust value, or asserts a specific deserialization error for rejection cases.
+   For method-wrapper tests, mount the fixture as a wiremock response body and
+   add a `body_json` matcher to verify the outgoing request shape.

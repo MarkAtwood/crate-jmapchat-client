@@ -9,7 +9,7 @@
 use jmap_chat::client::JmapChatClient;
 use jmap_chat::error::ClientError;
 use jmap_chat::methods::{ChatQueryInput, GetResponse, MessageCreateInput, MessageQueryInput};
-use wiremock::matchers::method;
+use wiremock::matchers::{body_json, method};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
 fn test_session(api_url: &str) -> jmap_chat::jmap::Session {
@@ -319,11 +319,21 @@ fn get_response_empty_list_deserializes() {
 
 /// Oracle: RFC 8620 §5.5 — Chat/query response shape: queryState, ids, position.
 /// Fixture hand-written from §5.5 /query response definition.
+///
+/// Body matcher: verifies accountId, filter null, and limit sent as integer (not null).
 #[tokio::test]
 async fn chat_query_returns_typed_response() {
     let server = MockServer::start().await;
 
     Mock::given(method("POST"))
+        .and(body_json(serde_json::json!({
+            "using": ["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:chat"],
+            "methodCalls": [["Chat/query", {
+                "accountId": "account1",
+                "filter": null,
+                "limit": 50
+            }, "r1"]]
+        })))
         .respond_with(
             ResponseTemplate::new(200).set_body_json(fixture("chat_query_response.json")),
         )
@@ -422,11 +432,22 @@ async fn message_get_returns_typed_response() {
 
 /// Oracle: RFC 8620 §5.5 — Message/query response shape: queryState, ids, position.
 /// Fixture hand-written from §5.5 /query response definition.
+///
+/// Body matcher: verifies chatId filter, sort direction (isAscending: false),
+/// and that position/limit are absent (not null) when not provided.
 #[tokio::test]
 async fn message_query_returns_typed_response() {
     let server = MockServer::start().await;
 
     Mock::given(method("POST"))
+        .and(body_json(serde_json::json!({
+            "using": ["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:chat"],
+            "methodCalls": [["Message/query", {
+                "accountId": "account1",
+                "filter": {"chatId": "01HV5Z6QKWJ7N3P8R2X4YTMD3G"},
+                "sort": [{"property": "sentAt", "isAscending": false}]
+            }, "r1"]]
+        })))
         .respond_with(
             ResponseTemplate::new(200).set_body_json(fixture("message_query_response.json")),
         )
@@ -490,11 +511,21 @@ async fn message_changes_returns_typed_response() {
 
 /// Oracle: JMAP Chat §5 — ChatContact/get response shape: list with one ChatContact.
 /// Fixture hand-written from §5.1 /get response definition.
+///
+/// Body matcher: verifies accountId and that ids/properties are null when not provided.
 #[tokio::test]
 async fn chat_contact_get_returns_typed_response() {
     let server = MockServer::start().await;
 
     Mock::given(method("POST"))
+        .and(body_json(serde_json::json!({
+            "using": ["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:chat"],
+            "methodCalls": [["ChatContact/get", {
+                "accountId": "account1",
+                "ids": null,
+                "properties": null
+            }, "r1"]]
+        })))
         .respond_with(
             ResponseTemplate::new(200).set_body_json(fixture("chat_contact_get_response.json")),
         )
@@ -520,11 +551,21 @@ async fn chat_contact_get_returns_typed_response() {
 
 /// Oracle: JMAP Chat §5 — ReadPosition/get response shape: list with one ReadPosition.
 /// Fixture hand-written from §5.1 /get response definition.
+///
+/// Body matcher: verifies accountId and ids:null (the spec-correct way to
+/// fetch all ReadPositions).
 #[tokio::test]
 async fn read_position_get_returns_typed_response() {
     let server = MockServer::start().await;
 
     Mock::given(method("POST"))
+        .and(body_json(serde_json::json!({
+            "using": ["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:chat"],
+            "methodCalls": [["ReadPosition/get", {
+                "accountId": "account1",
+                "ids": null
+            }, "r1"]]
+        })))
         .respond_with(
             ResponseTemplate::new(200).set_body_json(fixture("read_position_get_response.json")),
         )

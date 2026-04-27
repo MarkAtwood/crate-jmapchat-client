@@ -1,4 +1,4 @@
-use super::{GetResponse, CALL_ID};
+use super::GetResponse;
 
 impl crate::client::JmapChatClient {
     /// Fetch ChatContact objects by IDs (JMAP Chat §5 ChatContact/get).
@@ -16,8 +16,8 @@ impl crate::client::JmapChatClient {
             "ids": ids,
             "properties": properties,
         });
-        let req = super::build_request("ChatContact/get", args);
+        let (call_id, req) = super::build_request("ChatContact/get", args);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, CALL_ID)
+        crate::client::extract_response(resp, call_id)
     }
 }

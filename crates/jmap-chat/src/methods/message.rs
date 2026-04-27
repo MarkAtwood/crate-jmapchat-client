@@ -1,4 +1,4 @@
-use super::{ChangesResponse, GetResponse, MessageCreateInput, MessageQueryInput, QueryResponse, SetResponse, CALL_ID};
+use super::{ChangesResponse, GetResponse, MessageCreateInput, MessageQueryInput, QueryResponse, SetResponse};
 
 impl crate::client::JmapChatClient {
     /// Fetch Message objects by IDs (RFC 8620 §5.1 / JMAP Chat §5 Message/get).
@@ -22,9 +22,9 @@ impl crate::client::JmapChatClient {
             "ids": ids,
             "properties": properties,
         });
-        let req = super::build_request("Message/get", args);
+        let (call_id, req) = super::build_request("Message/get", args);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, CALL_ID)
+        crate::client::extract_response(resp, call_id)
     }
 
     /// Query Message IDs within a Chat (RFC 8620 §5.5 / JMAP Chat §5 Message/query).
@@ -32,11 +32,10 @@ impl crate::client::JmapChatClient {
     /// Per spec, either `chat_id` or `has_mention: Some(true)` must be provided.
     /// Servers MUST return `unsupportedFilter` if neither condition holds.
     ///
-    /// Results are sorted by `sentAt` descending (RFC 8620 §5.5 Comparator).
-    /// Descending order ensures that `position:0, limit:N` returns the N most
-    /// recent message IDs. Callers that display messages chronologically must
-    /// reverse or re-sort ascending after fetching. Without an explicit sort,
-    /// result order is undefined by the spec.
+    /// Sort order is controlled by `input.sort_ascending` (default `false` =
+    /// newest first). With `position:0, limit:N` and `sort_ascending:false`, the
+    /// server returns the N most recent message IDs. Callers displaying messages
+    /// chronologically should set `sort_ascending:true` or reverse after fetching.
     pub async fn message_query(
         &self,
         session: &crate::jmap::Session,
@@ -70,16 +69,20 @@ impl crate::client::JmapChatClient {
         } else {
             serde_json::Value::Object(filter)
         };
-        let args = serde_json::json!({
+        let mut args = serde_json::json!({
             "accountId": account_id,
             "filter": filter_val,
-            "sort": [{"property": "sentAt", "isAscending": false}],
-            "position": input.position,
-            "limit": input.limit,
+            "sort": [{"property": "sentAt", "isAscending": input.sort_ascending}],
         });
-        let req = super::build_request("Message/query", args);
+        if let Some(p) = input.position {
+            args["position"] = p.into();
+        }
+        if let Some(l) = input.limit {
+            args["limit"] = l.into();
+        }
+        let (call_id, req) = super::build_request("Message/query", args);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, CALL_ID)
+        crate::client::extract_response(resp, call_id)
     }
 
     /// Fetch changes to Message objects since `since_state` (RFC 8620 §5.2 / Message/changes).
@@ -95,9 +98,9 @@ impl crate::client::JmapChatClient {
             "sinceState": since_state,
             "maxChanges": max_changes,
         });
-        let req = super::build_request("Message/changes", args);
+        let (call_id, req) = super::build_request("Message/changes", args);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, CALL_ID)
+        crate::client::extract_response(resp, call_id)
     }
 
     /// Create (send) a new Message (RFC 8620 §5.3 / JMAP Chat §5 Message/set).
@@ -124,8 +127,8 @@ impl crate::client::JmapChatClient {
             "accountId": account_id,
             "create": { input.client_id: create_obj },
         });
-        let req = super::build_request("Message/set", args);
+        let (call_id, req) = super::build_request("Message/set", args);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, CALL_ID)
+        crate::client::extract_response(resp, call_id)
     }
 }

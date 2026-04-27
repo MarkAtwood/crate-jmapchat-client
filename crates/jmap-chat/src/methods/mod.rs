@@ -107,6 +107,10 @@ pub struct MessageQueryInput<'a> {
     pub has_attachment: Option<bool>,
     pub position: Option<u64>,
     pub limit: Option<u64>,
+    /// Sort by `sentAt` ascending (oldest first) when `true`.
+    /// Defaults to `false` (descending, newest first), so `position:0, limit:N`
+    /// returns the N most recent messages.
+    pub sort_ascending: bool,
 }
 
 /// Input parameters for [`JmapChatClient::message_create`].
@@ -125,18 +129,22 @@ pub struct MessageCreateInput<'a> {
 // Private helpers (accessible to child modules via super::)
 // ---------------------------------------------------------------------------
 
-/// The call-id used in every single-method JMAP request built by this module.
-/// `extract_response` searches for this id. Do not change without updating both.
+/// The call-id embedded in every single-method JMAP request produced by
+/// [`build_request`]. Returned alongside the request so callers pass it
+/// directly to [`crate::client::extract_response`] — no separate import needed.
 const CALL_ID: &str = "r1";
 
-// Each request contains exactly one method call, identified by CALL_ID.
-// extract_response() relies on this. Do not add multi-call batching here
-// without updating extract_response() to accept a call-id parameter.
-fn build_request(method_name: &str, args: serde_json::Value) -> crate::jmap::JmapRequest {
-    crate::jmap::JmapRequest {
+/// Build a single-method JMAP request.
+///
+/// Returns `(call_id, request)`. Pass `call_id` to
+/// `crate::client::extract_response` so the pairing is explicit and
+/// compiler-visible rather than via a shared constant.
+fn build_request(method_name: &str, args: serde_json::Value) -> (&'static str, crate::jmap::JmapRequest) {
+    let req = crate::jmap::JmapRequest {
         using: chat_using().to_vec(),
         method_calls: vec![(method_name.to_string(), args, CALL_ID.to_string())],
-    }
+    };
+    (CALL_ID, req)
 }
 
 fn chat_using() -> &'static [String] {

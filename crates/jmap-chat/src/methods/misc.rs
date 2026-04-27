@@ -1,4 +1,4 @@
-use super::{GetResponse, SetResponse, CALL_ID};
+use super::{GetResponse, SetResponse};
 
 impl crate::client::JmapChatClient {
     /// Fetch ReadPosition objects by IDs (JMAP Chat §5 ReadPosition/get).
@@ -15,9 +15,9 @@ impl crate::client::JmapChatClient {
             "accountId": account_id,
             "ids": ids,
         });
-        let req = super::build_request("ReadPosition/get", args);
+        let (call_id, req) = super::build_request("ReadPosition/get", args);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, CALL_ID)
+        crate::client::extract_response(resp, call_id)
     }
 
     /// Update the read position for a Chat (JMAP Chat §5 ReadPosition/set).
@@ -41,9 +41,9 @@ impl crate::client::JmapChatClient {
                 read_position_id: { "lastReadMessageId": last_read_message_id }
             },
         });
-        let req = super::build_request("ReadPosition/set", args);
+        let (call_id, req) = super::build_request("ReadPosition/set", args);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, CALL_ID)
+        crate::client::extract_response(resp, call_id)
     }
 
     /// Fetch the singleton PresenceStatus record (JMAP Chat §5 PresenceStatus/get).
@@ -59,8 +59,8 @@ impl crate::client::JmapChatClient {
             "accountId": account_id,
             "ids": serde_json::Value::Null,
         });
-        let req = super::build_request("PresenceStatus/get", args);
+        let (call_id, req) = super::build_request("PresenceStatus/get", args);
         let resp = self.call(api_url, &req).await?;
-        crate::client::extract_response(resp, CALL_ID)
+        crate::client::extract_response(resp, call_id)
     }
 }
