@@ -3159,6 +3159,55 @@ async fn message_query_rejects_empty_thread_root_id() {
     );
 }
 
+/// Oracle: chat_create Group must reject member_ids containing an empty string.
+#[tokio::test]
+async fn chat_create_group_rejects_empty_member_id() {
+    let client = JmapChatClient::new(
+        jmap_chat::DefaultTransport,
+        jmap_chat::NoneAuth,
+        "http://127.0.0.1:1",
+    )
+    .expect("client construction must succeed");
+    let err = client
+        .with_session(&test_session("http://127.0.0.1:1/api"))
+        .chat_create(&ChatCreateInput::Group {
+            client_id: None,
+            name: "Test Group",
+            member_ids: &["valid-id", ""],
+            description: None,
+            avatar_blob_id: None,
+            message_expiry_seconds: None,
+        })
+        .await
+        .expect_err("empty member_ids element must be rejected");
+    assert!(
+        matches!(&err, ClientError::InvalidArgument(msg) if msg.contains("member_ids")),
+        "expected InvalidArgument mentioning 'member_ids', got {err:?}"
+    );
+}
+
+/// Oracle: chat_update must reject pinned_message_ids containing an empty string.
+#[tokio::test]
+async fn chat_update_rejects_empty_pinned_message_id() {
+    let client = JmapChatClient::new(
+        jmap_chat::DefaultTransport,
+        jmap_chat::NoneAuth,
+        "http://127.0.0.1:1",
+    )
+    .expect("client construction must succeed");
+    let mut patch = ChatPatch::default();
+    patch.pinned_message_ids = Some(&["msg-valid", ""]);
+    let err = client
+        .with_session(&test_session("http://127.0.0.1:1/api"))
+        .chat_update("chat-1", &patch)
+        .await
+        .expect_err("empty pinned_message_ids element must be rejected");
+    assert!(
+        matches!(&err, ClientError::InvalidArgument(msg) if msg.contains("pinned_message_ids")),
+        "expected InvalidArgument mentioning 'pinned_message_ids', got {err:?}"
+    );
+}
+
 /// Oracle: space_invite_create must reject default_channel_id=Some("") with InvalidArgument.
 #[tokio::test]
 async fn space_invite_create_rejects_empty_default_channel_id() {
