@@ -186,6 +186,19 @@ pub struct TypingResponse {
 ///
 /// Without `skip_serializing_if`, `Patch::Keep` serializes as `null`, which is
 /// indistinguishable from `Patch::Clear` on the wire and will clear the field.
+///
+/// # Required field attribute
+///
+/// Every struct field of type `Patch<T>` **MUST** carry
+/// `#[serde(skip_serializing_if = "Patch::is_keep")]`. Without it, serializing
+/// a `Patch::Keep` value will return a runtime serde error. There is no
+/// compile-time check for this — test it by serializing a struct where the
+/// field is `Patch::Keep`.
+///
+/// In practice, all structs in this crate build their patch map manually via
+/// [`Patch::map_entry`] rather than deriving `Serialize`, which avoids the
+/// attribute requirement entirely. See the `patch_keep_via_map_entry` test for
+/// the canonical pattern.
 #[derive(Debug, Default, Clone, PartialEq)]
 pub enum Patch<T> {
     #[default]
@@ -922,7 +935,8 @@ impl SessionClient<'_> {
         let api_url = self.session.api_url.as_str();
         let account_id = self.session.chat_account_id().ok_or_else(|| {
             crate::error::ClientError::InvalidSession(
-                "no primary account for urn:ietf:params:jmap:chat in Session.primaryAccounts",
+                "no primary account for urn:ietf:params:jmap:chat in Session.primaryAccounts"
+                    .into(),
             )
         })?;
         Ok((api_url, account_id))
@@ -994,5 +1008,54 @@ pub(super) fn resolve_client_id(id: Option<&str>) -> std::borrow::Cow<'_, str> {
     match id {
         Some(s) => std::borrow::Cow::Borrowed(s),
         None => std::borrow::Cow::Owned(ulid::Ulid::new().to_string()),
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Oracle: `Patch::Keep` via `map_entry()` returns `None` (key omitted from patch).
+    /// This is the canonical pattern used by all patch methods in this crate.
+    /// The expected value `None` is derived directly from the spec: a field not
+    /// present in the patch leaves the server value unchanged (RFC 8620 §5.3).
+    #[test]
+    fn patch_keep_via_map_entry() {
+        let p: Patch<String> = Patch::Keep;
+        let result = p.map_entry().expect("map_entry must not fail for Keep");
+        assert!(
+            result.is_none(),
+            "Patch::Keep must produce None from map_entry (key omitted from patch)"
+        );
+    }
+
+    /// Oracle: `Patch::Set(v)` via `map_entry()` returns `Some(json_value)`.
+    /// Expected JSON is derived from the literal value "hello", not from the code.
+    #[test]
+    fn patch_set_via_map_entry() {
+        let p = Patch::Set("hello".to_string());
+        let result = p.map_entry().expect("map_entry must not fail for Set");
+        assert_eq!(
+            result,
+            Some(serde_json::Value::String("hello".to_string())),
+            "Patch::Set must produce Some(json_value) from map_entry"
+        );
+    }
+
+    /// Oracle: `Patch::Clear` via `map_entry()` returns `Some(Value::Null)`.
+    /// Clearing a nullable field sends explicit JSON null (RFC 8620 §5.3).
+    #[test]
+    fn patch_clear_via_map_entry() {
+        let p: Patch<String> = Patch::Clear;
+        let result = p.map_entry().expect("map_entry must not fail for Clear");
+        assert_eq!(
+            result,
+            Some(serde_json::Value::Null),
+            "Patch::Clear must produce Some(null) from map_entry"
+        );
     }
 }

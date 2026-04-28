@@ -38,8 +38,9 @@ impl JmapChatClient {
     /// (Bearer token, Basic credentials, or none). The two are independent so
     /// any transport can be paired with any credential scheme — for example,
     /// `CustomCaTransport` with `BearerAuth`. `base_url` must be the server
-    /// origin without a trailing slash or path component, e.g.
-    /// `"https://100.64.1.1:8008"`.
+    /// origin (scheme, host, optional port) with no path, query, or fragment
+    /// — e.g. `"https://100.64.1.1:8008"`. Trailing slashes are normalized
+    /// away by the URL parser and are therefore accepted.
     pub fn new(
         transport: impl TransportConfig,
         auth: impl AuthProvider + 'static,
@@ -124,9 +125,9 @@ impl JmapChatClient {
             .await
             .map_err(|e| ClientError::Parse(e.to_string()))?;
 
-        let require_non_empty = |field: &str, name: &'static str| -> Result<(), ClientError> {
+        let require_non_empty = |field: &str, name: &str| -> Result<(), ClientError> {
             if field.is_empty() {
-                Err(ClientError::InvalidSession(name))
+                Err(ClientError::InvalidSession(name.into()))
             } else {
                 Ok(())
             }
@@ -178,16 +179,15 @@ impl JmapChatClient {
     /// Use this method when a single request contains invocations whose
     /// responses have **heterogeneous shapes** — for example, a `Chat/get` and
     /// a `Message/query` in the same request.  Because each invocation returns a
-    /// different schema there is no single concrete type `T` that can be passed
-    /// to [`call`](JmapChatClient::call) followed by
-    /// [`extract_response`](crate::client::extract_response).  Instead, this
-    /// method returns raw `serde_json::Value` per call id so the caller can
-    /// deserialize each entry into its own type independently.
+    /// different schema there is no single concrete type `T` that can be used
+    /// with [`call`](JmapChatClient::call).  Instead, this method returns raw
+    /// `serde_json::Value` per call id so the caller can deserialize each entry
+    /// into its own type independently.
     ///
-    /// Prefer [`call`](JmapChatClient::call) +
-    /// [`extract_response`](crate::client::extract_response) for single-method
-    /// requests or homogeneous batches where every invocation shares the same
-    /// response type.
+    /// For single-method requests, prefer [`call`](JmapChatClient::call) directly.
+    ///
+    /// Keys in the returned map are the **call IDs** (the third element of each
+    /// `[method, args, callId]` invocation tuple), not the method names.
     ///
     /// JMAP `"error"` responses are included in the map with their original
     /// args; callers must check the `"type"` field if they need to distinguish
