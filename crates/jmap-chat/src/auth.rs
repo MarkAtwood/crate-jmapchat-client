@@ -6,42 +6,91 @@ use reqwest::header::{HeaderName, HeaderValue, AUTHORIZATION};
 
 use crate::error::ClientError;
 
-/// Abstracts HTTP client construction and per-request authentication header injection.
-///
-/// Implementors control both how the underlying [`reqwest::Client`] is built (e.g. custom
-/// trust roots, client certificates) and what `Authorization` header (if any) is attached
-/// to each request.
-pub trait AuthProvider: Send + Sync {
-    /// Build the [`reqwest::Client`] for this auth configuration.
-    fn build_client(&self) -> Result<reqwest::Client, ClientError>;
+// ---------------------------------------------------------------------------
+// TransportConfig — HTTP client construction (TLS, timeouts, trust roots)
+// ---------------------------------------------------------------------------
 
-    /// Return an optional `(header-name, header-value)` pair to attach to every request.
-    ///
-    /// Implementations **must not** log the returned value; it may contain credentials.
-    fn auth_header(&self) -> Option<(HeaderName, HeaderValue)>;
+/// Controls how the underlying [`reqwest::Client`] is constructed.
+///
+/// Implementations configure TLS trust roots, client certificates, and
+/// connect timeouts. This is separate from credential injection
+/// (see [`AuthProvider`]) so transports and credentials compose freely.
+pub trait TransportConfig: Send + Sync {
+    /// Build the [`reqwest::Client`] for this transport configuration.
+    fn build_client(&self) -> Result<reqwest::Client, ClientError>;
+}
+
+/// Standard reqwest client with a 10-second connect timeout; no custom TLS.
+///
+/// Use for servers with publicly-trusted certificates. Pair with any
+/// [`AuthProvider`] for credential injection.
+#[derive(Debug)]
+pub struct DefaultTransport;
+
+impl TransportConfig for DefaultTransport {
+    fn build_client(&self) -> Result<reqwest::Client, ClientError> {
+        default_reqwest_client()
+    }
+}
+
+/// Custom CA trust root (DER-encoded). No `Authorization` header is injected.
+///
+/// Use when the server presents a certificate signed by a private CA.
+/// Pair with any [`AuthProvider`] for credential injection — including
+/// [`BearerAuth`] or [`BasicAuth`] if the server also requires credentials.
+#[derive(Debug)]
+pub struct CustomCaTransport {
+    der_cert: Vec<u8>,
+}
+
+impl CustomCaTransport {
+    /// Construct a `CustomCaTransport` from a DER-encoded CA certificate.
+    pub fn new(der_cert: Vec<u8>) -> Self {
+        Self { der_cert }
+    }
+}
+
+impl TransportConfig for CustomCaTransport {
+    fn build_client(&self) -> Result<reqwest::Client, ClientError> {
+        let cert = reqwest::Certificate::from_der(&self.der_cert)?;
+        let client = reqwest::ClientBuilder::new()
+            .connect_timeout(std::time::Duration::from_secs(10))
+            .add_root_certificate(cert)
+            .build()?;
+        Ok(client)
+    }
 }
 
 // ---------------------------------------------------------------------------
-// NoneAuth
+// AuthProvider — per-request credential injection (Authorization header)
 // ---------------------------------------------------------------------------
 
-/// No authentication: default [`reqwest::Client`], no `Authorization` header.
+/// Injects per-request authentication credentials.
+///
+/// Separate from transport configuration ([`TransportConfig`]) so any
+/// credential scheme can be paired with any transport.
+///
+/// Implementations **must not** log the return value of [`auth_header`];
+/// it contains credentials.
+///
+/// [`auth_header`]: AuthProvider::auth_header
+pub trait AuthProvider: Send + Sync {
+    /// Return an optional `(header-name, header-value)` pair to attach to
+    /// every request.
+    ///
+    /// Returns `None` when no `Authorization` header is required.
+    fn auth_header(&self) -> Option<(HeaderName, HeaderValue)>;
+}
+
+/// No authentication: no `Authorization` header.
 #[derive(Debug)]
 pub struct NoneAuth;
 
 impl AuthProvider for NoneAuth {
-    fn build_client(&self) -> Result<reqwest::Client, ClientError> {
-        default_reqwest_client()
-    }
-
     fn auth_header(&self) -> Option<(HeaderName, HeaderValue)> {
         None
     }
 }
-
-// ---------------------------------------------------------------------------
-// BearerAuth
-// ---------------------------------------------------------------------------
 
 /// Bearer-token authentication (`Authorization: Bearer <token>`).
 pub struct BearerAuth {
@@ -52,8 +101,6 @@ pub struct BearerAuth {
 
 impl BearerAuth {
     /// Construct a `BearerAuth` from a Bearer token string.
-    ///
-    /// Validation happens here so that `auth_header` can never fail silently.
     ///
     /// # Errors
     ///
@@ -80,18 +127,10 @@ impl std::fmt::Debug for BearerAuth {
 }
 
 impl AuthProvider for BearerAuth {
-    fn build_client(&self) -> Result<reqwest::Client, ClientError> {
-        default_reqwest_client()
-    }
-
     fn auth_header(&self) -> Option<(HeaderName, HeaderValue)> {
         Some((AUTHORIZATION, self.header_value.clone()))
     }
 }
-
-// ---------------------------------------------------------------------------
-// BasicAuth
-// ---------------------------------------------------------------------------
 
 /// HTTP Basic authentication (`Authorization: Basic <base64(username:password)>`).
 ///
@@ -132,46 +171,8 @@ impl std::fmt::Debug for BasicAuth {
 }
 
 impl AuthProvider for BasicAuth {
-    fn build_client(&self) -> Result<reqwest::Client, ClientError> {
-        default_reqwest_client()
-    }
-
     fn auth_header(&self) -> Option<(HeaderName, HeaderValue)> {
         Some((AUTHORIZATION, self.header_value.clone()))
-    }
-}
-
-// ---------------------------------------------------------------------------
-// CustomCaAuth
-// ---------------------------------------------------------------------------
-
-/// Custom CA trust root (DER-encoded). No `Authorization` header is injected.
-///
-/// Used when the server presents a certificate signed by a private CA (e.g. kith).
-#[derive(Debug)]
-pub struct CustomCaAuth {
-    der_cert: Vec<u8>,
-}
-
-impl CustomCaAuth {
-    /// Construct a `CustomCaAuth` from a DER-encoded CA certificate.
-    pub fn new(der_cert: Vec<u8>) -> Self {
-        Self { der_cert }
-    }
-}
-
-impl AuthProvider for CustomCaAuth {
-    fn build_client(&self) -> Result<reqwest::Client, ClientError> {
-        let cert = reqwest::Certificate::from_der(&self.der_cert)?;
-        let client = reqwest::ClientBuilder::new()
-            .connect_timeout(std::time::Duration::from_secs(10))
-            .add_root_certificate(cert)
-            .build()?;
-        Ok(client)
-    }
-
-    fn auth_header(&self) -> Option<(HeaderName, HeaderValue)> {
-        None
     }
 }
 
@@ -180,10 +181,6 @@ impl AuthProvider for CustomCaAuth {
 // ---------------------------------------------------------------------------
 
 /// Build a standard reqwest client with a 10-second connect timeout.
-///
-/// Used by NoneAuth, BearerAuth, and BasicAuth whose HTTP transport
-/// requirements are identical. CustomCaAuth has its own body because it
-/// must install a custom trust root.
 fn default_reqwest_client() -> Result<reqwest::Client, ClientError> {
     reqwest::ClientBuilder::new()
         .connect_timeout(std::time::Duration::from_secs(10))
@@ -192,26 +189,17 @@ fn default_reqwest_client() -> Result<reqwest::Client, ClientError> {
 }
 
 // ---------------------------------------------------------------------------
-// Blanket impl for Box<dyn AuthProvider>
+// Blanket impl for Box<dyn TransportConfig>
 // ---------------------------------------------------------------------------
 //
-// Allows `Box<dyn AuthProvider>` to satisfy `impl AuthProvider + 'static`, so
-// factory functions (e.g. `config::Config::auth_provider`) can return a boxed
+// Allows `Box<dyn TransportConfig>` to satisfy `impl TransportConfig`, so
+// factory functions (e.g. `config::Config::transport`) can return a boxed
 // trait object and pass it directly to `JmapChatClient::new`.
 //
-// Maintenance cost: every method added to `AuthProvider` must be mirrored here;
-// currently mirrors: build_client, auth_header.
-// The alternative — a concrete wrapper enum — avoids this coupling but requires
-// the enum to live in the same crate as all variants, complicating external
-// AuthProvider implementations. The blanket impl is accepted as the simpler
-// tradeoff for this project's scope.
-impl AuthProvider for Box<dyn AuthProvider> {
+// Maintenance cost: every method added to `TransportConfig` must be mirrored here.
+impl TransportConfig for Box<dyn TransportConfig> {
     fn build_client(&self) -> Result<reqwest::Client, ClientError> {
         (**self).build_client()
-    }
-
-    fn auth_header(&self) -> Option<(HeaderName, HeaderValue)> {
-        (**self).auth_header()
     }
 }
 
@@ -219,17 +207,26 @@ impl AuthProvider for Box<dyn AuthProvider> {
 // Blanket impl for Arc<dyn AuthProvider>
 // ---------------------------------------------------------------------------
 //
-// Mirrors the Box<dyn AuthProvider> blanket impl above. Allows
-// `Arc<dyn AuthProvider>` to satisfy `impl AuthProvider + 'static`, enabling
-// `JmapChatClient` to be `Clone` (Arc is Clone; Box is not).
+// Allows `Arc<dyn AuthProvider>` to satisfy `impl AuthProvider`, enabling
+// `JmapChatClient` to be `Clone` (Arc is Clone).
 //
-// Maintenance cost: every method added to `AuthProvider` must be mirrored here;
-// currently mirrors: build_client, auth_header.
+// Maintenance cost: every method added to `AuthProvider` must be mirrored here.
 impl AuthProvider for Arc<dyn AuthProvider> {
-    fn build_client(&self) -> Result<reqwest::Client, ClientError> {
-        (**self).build_client()
+    fn auth_header(&self) -> Option<(HeaderName, HeaderValue)> {
+        (**self).auth_header()
     }
+}
 
+// ---------------------------------------------------------------------------
+// Blanket impl for Box<dyn AuthProvider>
+// ---------------------------------------------------------------------------
+//
+// Allows `Box<dyn AuthProvider>` to satisfy `impl AuthProvider + 'static`,
+// so factory functions (e.g. `config::Config::auth`) can return a boxed
+// trait object and pass it directly to `JmapChatClient::new`.
+//
+// Maintenance cost: every method added to `AuthProvider` must be mirrored here.
+impl AuthProvider for Box<dyn AuthProvider> {
     fn auth_header(&self) -> Option<(HeaderName, HeaderValue)> {
         (**self).auth_header()
     }
@@ -310,11 +307,13 @@ mod tests {
         assert_eq!(value.to_str().unwrap(), "Basic YWxpY2U6czNjcjN0");
     }
 
-    /// Oracle: CustomCaAuth injects no auth header — no server identity is involved.
+    /// Oracle: CustomCaTransport injects no auth header — it is a transport only.
     #[test]
-    fn custom_ca_auth_no_header() {
-        let auth = CustomCaAuth::new(vec![]);
-        assert!(auth.auth_header().is_none());
+    fn custom_ca_transport_no_build_with_empty_cert() {
+        // Empty DER bytes will fail Certificate::from_der; this test confirms
+        // CustomCaTransport is constructible and that auth is separate.
+        let transport = CustomCaTransport::new(vec![]);
+        assert!(transport.build_client().is_err(), "empty DER must fail");
     }
 
     /// Oracle: BearerAuth constructor rejects an empty token string.
@@ -351,11 +350,11 @@ mod tests {
         }
     }
 
-    /// Oracle: NoneAuth uses the default reqwest::Client which always builds successfully.
+    /// Oracle: DefaultTransport uses the default reqwest::Client which always builds successfully.
     #[tokio::test]
-    async fn none_auth_builds_client() {
-        NoneAuth
+    async fn default_transport_builds_client() {
+        DefaultTransport
             .build_client()
-            .expect("NoneAuth::build_client must succeed");
+            .expect("DefaultTransport::build_client must succeed");
     }
 }

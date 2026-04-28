@@ -21,9 +21,7 @@ fn parse_bearer_only() {
         bearer_token: Some("tok123".into()),
         ..base_config()
     };
-    let provider = cfg
-        .auth_provider()
-        .expect("bearer-only config must produce Ok");
+    let provider = cfg.auth().expect("bearer-only config must produce Ok");
     let header = provider.auth_header();
     assert!(
         header.is_some(),
@@ -46,9 +44,7 @@ fn parse_basic_only() {
         basic_pass: Some("secret".into()),
         ..base_config()
     };
-    let provider = cfg
-        .auth_provider()
-        .expect("basic-only config must produce Ok");
+    let provider = cfg.auth().expect("basic-only config must produce Ok");
     let header = provider.auth_header();
     assert!(
         header.is_some(),
@@ -66,7 +62,7 @@ fn parse_basic_only() {
 #[test]
 fn parse_no_auth() {
     let cfg = base_config();
-    let provider = cfg.auth_provider().expect("no-auth config must produce Ok");
+    let provider = cfg.auth().expect("no-auth config must produce Ok");
     assert!(
         provider.auth_header().is_none(),
         "NoneAuth must return no Authorization header"
@@ -82,7 +78,7 @@ fn parse_conflicting_auth() {
         basic_pass: Some("secret".into()),
         ..base_config()
     };
-    let result = cfg.auth_provider();
+    let result = cfg.auth();
     match result {
         Err(ClientError::InvalidArgument(msg)) => {
             assert!(
@@ -103,7 +99,7 @@ fn parse_missing_basic_pass() {
         basic_pass: None,
         ..base_config()
     };
-    let result = cfg.auth_provider();
+    let result = cfg.auth();
     match result {
         Err(ClientError::InvalidArgument(msg)) => {
             assert!(
@@ -124,7 +120,7 @@ fn parse_missing_basic_user() {
         basic_pass: Some("secret".into()),
         ..base_config()
     };
-    let result = cfg.auth_provider();
+    let result = cfg.auth();
     match result {
         Err(ClientError::InvalidArgument(_)) => {}
         Ok(_) => panic!("missing basic_user must be rejected"),

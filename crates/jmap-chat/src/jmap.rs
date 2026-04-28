@@ -16,12 +16,6 @@ macro_rules! impl_string_newtype {
                 &self.0
             }
         }
-        impl std::ops::Deref for $t {
-            type Target = str;
-            fn deref(&self) -> &str {
-                &self.0
-            }
-        }
         impl PartialEq<str> for $t {
             fn eq(&self, other: &str) -> bool {
                 self.0 == other
@@ -83,9 +77,9 @@ impl Id {
     /// **Only use for server-assigned identifiers and test fixtures.**
     /// Do not pass user-controlled input — call [`Id::new`] instead.
     /// Panics in debug builds if `s` is empty.
-    pub fn from_trusted(s: impl Into<String>) -> Self {
+    pub fn from_raw(s: impl Into<String>) -> Self {
         let s = s.into();
-        debug_assert!(!s.is_empty(), "from_trusted called with empty string");
+        debug_assert!(!s.is_empty(), "from_raw called with empty string");
         Self(s)
     }
 
@@ -133,9 +127,9 @@ impl UTCDate {
     /// **Only use for server-assigned identifiers and test fixtures.**
     /// Do not pass user-controlled input — call [`UTCDate::new`] instead.
     /// Panics in debug builds if `s` is empty.
-    pub fn from_trusted(s: impl Into<String>) -> Self {
+    pub fn from_raw(s: impl Into<String>) -> Self {
         let s = s.into();
-        debug_assert!(!s.is_empty(), "from_trusted called with empty string");
+        debug_assert!(!s.is_empty(), "from_raw called with empty string");
         Self(s)
     }
 
@@ -267,7 +261,10 @@ impl JmapRequestBuilder {
     /// Add one method call to the request.
     ///
     /// `call_id` must be unique within this request; callers use it to match
-    /// responses via [`JmapChatClient::call_batch`](crate::client::JmapChatClient::call_batch).
+    /// responses via [`extract_response`](crate::client::extract_response) (single-method
+    /// or homogeneous batches) or
+    /// [`JmapChatClient::call_batch`](crate::client::JmapChatClient::call_batch)
+    /// (heterogeneous batches).
     pub fn add_call(
         mut self,
         method: impl Into<String>,
@@ -898,7 +895,7 @@ mod tests {
     #[test]
     fn utc_date_parse_valid() {
         // Oracle: RFC 3339 string "2024-01-02T12:00:00Z" → year=2024, month=1, day=2
-        let d = UTCDate::from_trusted("2024-01-02T12:00:00Z");
+        let d = UTCDate::from_raw("2024-01-02T12:00:00Z");
         let dt = d.parse().expect("valid RFC 3339 must parse");
         use chrono::Datelike;
         assert_eq!(dt.year(), 2024);
@@ -908,7 +905,7 @@ mod tests {
 
     #[test]
     fn utc_date_parse_invalid() {
-        let d = UTCDate::from_trusted("not-a-date");
+        let d = UTCDate::from_raw("not-a-date");
         assert!(d.parse().is_err());
     }
 

@@ -439,7 +439,7 @@ pub async fn run(
                     Some(AppCommand::SendMessage { chat_id, body }) => {
                         let client_id = ulid::Ulid::new().to_string();
                         let sent_at =
-                            jmap_chat::UTCDate::from_trusted(now_rfc3339());
+                            jmap_chat::UTCDate::from_raw(now_rfc3339());
                         match client
                             .with_session(&session)
                             .message_create(

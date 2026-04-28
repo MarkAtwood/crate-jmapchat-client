@@ -39,8 +39,12 @@ async fn upload_blob_happy_path() {
         .mount(&server)
         .await;
 
-    let client = JmapChatClient::new(jmap_chat::NoneAuth, &server.uri())
-        .expect("client construction must not fail");
+    let client = JmapChatClient::new(
+        jmap_chat::DefaultTransport,
+        jmap_chat::NoneAuth,
+        &server.uri(),
+    )
+    .expect("client construction must not fail");
     let upload_template = format!("{}/upload/{{accountId}}/", server.uri());
 
     let resp: BlobUploadResponse = client
@@ -76,8 +80,12 @@ async fn upload_blob_sha256_mismatch() {
         .mount(&server)
         .await;
 
-    let client = JmapChatClient::new(jmap_chat::NoneAuth, &server.uri())
-        .expect("client construction must not fail");
+    let client = JmapChatClient::new(
+        jmap_chat::DefaultTransport,
+        jmap_chat::NoneAuth,
+        &server.uri(),
+    )
+    .expect("client construction must not fail");
     let upload_template = format!("{}/upload/{{accountId}}/", server.uri());
 
     let err = client
@@ -114,8 +122,12 @@ async fn upload_blob_no_sha256_skips_check() {
         .mount(&server)
         .await;
 
-    let client = JmapChatClient::new(jmap_chat::NoneAuth, &server.uri())
-        .expect("client construction must not fail");
+    let client = JmapChatClient::new(
+        jmap_chat::DefaultTransport,
+        jmap_chat::NoneAuth,
+        &server.uri(),
+    )
+    .expect("client construction must not fail");
     let upload_template = format!("{}/upload/{{accountId}}/", server.uri());
 
     let resp = client
@@ -143,8 +155,12 @@ async fn download_blob_happy_path() {
         .mount(&server)
         .await;
 
-    let client = JmapChatClient::new(jmap_chat::NoneAuth, &server.uri())
-        .expect("client construction must not fail");
+    let client = JmapChatClient::new(
+        jmap_chat::DefaultTransport,
+        jmap_chat::NoneAuth,
+        &server.uri(),
+    )
+    .expect("client construction must not fail");
     let dl_template = format!(
         "{}/download/{{accountId}}/{{blobId}}/{{name}}",
         server.uri()
@@ -181,8 +197,12 @@ async fn download_blob_sha256_mismatch() {
         .mount(&server)
         .await;
 
-    let client = JmapChatClient::new(jmap_chat::NoneAuth, &server.uri())
-        .expect("client construction must not fail");
+    let client = JmapChatClient::new(
+        jmap_chat::DefaultTransport,
+        jmap_chat::NoneAuth,
+        &server.uri(),
+    )
+    .expect("client construction must not fail");
     let dl_template = format!(
         "{}/download/{{accountId}}/{{blobId}}/{{name}}",
         server.uri()
@@ -224,8 +244,12 @@ async fn download_blob_no_sha256_skips_check() {
         .mount(&server)
         .await;
 
-    let client = JmapChatClient::new(jmap_chat::NoneAuth, &server.uri())
-        .expect("client construction must not fail");
+    let client = JmapChatClient::new(
+        jmap_chat::DefaultTransport,
+        jmap_chat::NoneAuth,
+        &server.uri(),
+    )
+    .expect("client construction must not fail");
     let dl_template = format!(
         "{}/download/{{accountId}}/{{blobId}}/{{name}}",
         server.uri()
@@ -255,8 +279,12 @@ async fn download_blob_with_type_substitution() {
         .mount(&server)
         .await;
 
-    let client = JmapChatClient::new(jmap_chat::NoneAuth, &server.uri())
-        .expect("client construction must not fail");
+    let client = JmapChatClient::new(
+        jmap_chat::DefaultTransport,
+        jmap_chat::NoneAuth,
+        &server.uri(),
+    )
+    .expect("client construction must not fail");
     // RFC 8620 §6.2 recommends placing {type} in the query section to avoid
     // path-segment slash encoding issues; here we use a path-free template to
     // test that {type} with a '/' is percent-encoded correctly.
@@ -315,8 +343,12 @@ async fn blob_convert_returns_typed_response() {
         .mount(&server)
         .await;
 
-    let client = JmapChatClient::new(jmap_chat::NoneAuth, &server.uri())
-        .expect("client construction must succeed");
+    let client = JmapChatClient::new(
+        jmap_chat::DefaultTransport,
+        jmap_chat::NoneAuth,
+        &server.uri(),
+    )
+    .expect("client construction must succeed");
     // Build a minimal session with blob2 capability via serde to handle all fields.
     let api_url = format!("{}/api", server.uri());
     let session: jmap_chat::Session = serde_json::from_value(serde_json::json!({

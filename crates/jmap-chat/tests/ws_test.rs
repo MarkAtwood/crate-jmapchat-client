@@ -11,7 +11,7 @@
 // and RFC 8887. None of these payloads are produced by the code under test.
 
 use futures::{SinkExt as _, StreamExt as _};
-use jmap_chat::{ChatStreamEnable, JmapChatClient, NoneAuth, WsFrame};
+use jmap_chat::{ChatStreamEnable, DefaultTransport, JmapChatClient, NoneAuth, WsFrame};
 use tokio::net::TcpListener;
 use tokio_tungstenite::{accept_async, tungstenite::Message};
 
@@ -69,7 +69,7 @@ async fn connect_and_clean_close() {
     })
     .await;
 
-    let client = JmapChatClient::new(NoneAuth, &format!("http://127.0.0.1"))
+    let client = JmapChatClient::new(DefaultTransport, NoneAuth, &format!("http://127.0.0.1"))
         .expect("client construction must not fail");
 
     let mut session = client
@@ -103,7 +103,7 @@ async fn receives_state_change_frame() {
     })
     .await;
 
-    let client = JmapChatClient::new(NoneAuth, "http://127.0.0.1")
+    let client = JmapChatClient::new(DefaultTransport, NoneAuth, "http://127.0.0.1")
         .expect("client construction must not fail");
     let mut session = client.connect_ws(&url).await.expect("connect_ws");
 
@@ -138,7 +138,7 @@ async fn receives_chat_typing_event() {
     })
     .await;
 
-    let client = JmapChatClient::new(NoneAuth, "http://127.0.0.1").unwrap();
+    let client = JmapChatClient::new(DefaultTransport, NoneAuth, "http://127.0.0.1").unwrap();
     let mut session = client.connect_ws(&url).await.expect("connect_ws");
 
     let frame = session
@@ -175,7 +175,7 @@ async fn receives_chat_presence_event() {
     })
     .await;
 
-    let client = JmapChatClient::new(NoneAuth, "http://127.0.0.1").unwrap();
+    let client = JmapChatClient::new(DefaultTransport, NoneAuth, "http://127.0.0.1").unwrap();
     let mut session = client.connect_ws(&url).await.expect("connect_ws");
 
     let frame = session
@@ -215,7 +215,7 @@ async fn receives_unknown_frame_type() {
     })
     .await;
 
-    let client = JmapChatClient::new(NoneAuth, "http://127.0.0.1").unwrap();
+    let client = JmapChatClient::new(DefaultTransport, NoneAuth, "http://127.0.0.1").unwrap();
     let mut session = client.connect_ws(&url).await.expect("connect_ws");
 
     let frame = session
@@ -251,7 +251,7 @@ async fn receives_multiple_frames_in_order() {
     })
     .await;
 
-    let client = JmapChatClient::new(NoneAuth, "http://127.0.0.1").unwrap();
+    let client = JmapChatClient::new(DefaultTransport, NoneAuth, "http://127.0.0.1").unwrap();
     let mut session = client.connect_ws(&url).await.expect("connect_ws");
 
     let frame1 = session.next_frame().await.unwrap().unwrap();
@@ -273,10 +273,10 @@ async fn receives_multiple_frames_in_order() {
 async fn send_stream_enable_correct_json_shape() {
     let (url, rx) = spawn_capture_server().await;
 
-    let client = JmapChatClient::new(NoneAuth, "http://127.0.0.1").unwrap();
+    let client = JmapChatClient::new(DefaultTransport, NoneAuth, "http://127.0.0.1").unwrap();
     let mut session = client.connect_ws(&url).await.expect("connect_ws");
 
-    let chat_id = jmap_chat::Id::from_trusted("chat-1");
+    let chat_id = jmap_chat::Id::from_raw("chat-1");
     let enable = ChatStreamEnable::new(
         &[
             jmap_chat::ChatStreamDataType::Typing,
@@ -315,7 +315,7 @@ async fn send_stream_enable_correct_json_shape() {
 async fn send_stream_disable_correct_json_shape() {
     let (url, rx) = spawn_capture_server().await;
 
-    let client = JmapChatClient::new(NoneAuth, "http://127.0.0.1").unwrap();
+    let client = JmapChatClient::new(DefaultTransport, NoneAuth, "http://127.0.0.1").unwrap();
     let mut session = client.connect_ws(&url).await.expect("connect_ws");
 
     session

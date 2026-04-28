@@ -1751,7 +1751,10 @@ mod tests {
         assert!(chat.description.is_none());
         assert!(chat.last_message_at.is_some());
         // contactId is required for direct chats
-        assert_eq!(chat.contact_id.as_deref(), Some("user:carol@example.com"));
+        assert_eq!(
+            chat.contact_id.as_ref().map(|id| id.as_str()),
+            Some("user:carol@example.com")
+        );
     }
 
     /// Oracle: spec §4.10 — DeliveryState serializes to the correct lowercase string.
@@ -1910,7 +1913,7 @@ mod tests {
         assert_eq!(rb.spans[5].lang.as_deref(), Some("rust"));
         assert_eq!(rb.spans[6].span_type, SpanType::Mention);
         assert_eq!(
-            rb.spans[6].user_id.as_deref(),
+            rb.spans[6].user_id.as_ref().map(|id| id.as_str()),
             Some("user:alice@example.com")
         );
     }
@@ -1994,7 +1997,7 @@ mod tests {
         );
         assert!(msg.contact_ids.is_none());
         // Test constructor
-        let chat_id = Id::from_trusted("01HV5Z6QKWJ7N3P8R2X4YTMD3G");
+        let chat_id = Id::from_raw("01HV5Z6QKWJ7N3P8R2X4YTMD3G");
         let constructed = ChatStreamEnable::new(
             &[ChatStreamDataType::Typing, ChatStreamDataType::Presence],
             Some(&[chat_id]),
@@ -2231,7 +2234,7 @@ mod tests {
         let v: SenderIdOrSelf = serde_json::from_str("\"contact-abc123\"").unwrap();
         assert_eq!(
             v,
-            SenderIdOrSelf::Contact(crate::jmap::Id::from_trusted("contact-abc123"))
+            SenderIdOrSelf::Contact(crate::jmap::Id::from_raw("contact-abc123"))
         );
     }
 
@@ -2265,7 +2268,10 @@ mod tests {
         assert_eq!(entry.chat_id, "01J3XKZQN4MWVT8PPBEHTJ3HX");
         assert_eq!(entry.chat_kind, ChatKind::Channel);
         assert_eq!(entry.chat_name.as_deref(), Some("general"));
-        assert_eq!(entry.space_id.as_deref(), Some("01J2WKZQM3LVST7OOBDHSI2GW"));
+        assert_eq!(
+            entry.space_id.as_ref().map(|id| id.as_str()),
+            Some("01J2WKZQM3LVST7OOBDHSI2GW")
+        );
         assert_eq!(entry.space_name.as_deref(), Some("ACME Corp"));
         assert_eq!(entry.sender_id, "user:alice@example.com");
         assert_eq!(entry.sender_display_name.as_deref(), Some("Alice"));

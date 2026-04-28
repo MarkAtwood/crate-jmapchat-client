@@ -170,8 +170,9 @@ pub struct TypingResponse {
 /// - `Set(v)`: the field is included with value `v`.
 /// - `Clear`: the field is included as JSON `null` (clears the server-side value).
 ///
-/// Use `Patch::from(v)` or `.into()` to construct `Set(v)`. Use `Default::default()`
-/// or `Patch::Keep` to leave the field unchanged.
+/// Use `Patch::from(v)` to construct `Set(v)`. Use `Default::default()`
+/// or `Patch::Keep` to leave the field unchanged. Use `Patch::Clear` to set a
+/// nullable field to null explicitly.
 ///
 /// # Serde usage
 ///
@@ -206,15 +207,6 @@ impl<T> From<T> for Patch<T> {
     }
 }
 
-impl<T> From<Option<T>> for Patch<T> {
-    fn from(opt: Option<T>) -> Self {
-        match opt {
-            Some(v) => Patch::Set(v),
-            None => Patch::Keep,
-        }
-    }
-}
-
 impl<T: serde::Serialize> Patch<T> {
     /// Returns `None` when `Keep` (omit key from patch),
     /// `Some(Value::Null)` when `Clear`, or `Some(serialized_value)` when `Set`.
@@ -230,15 +222,10 @@ impl<T: serde::Serialize> Patch<T> {
 impl<T: serde::Serialize> serde::Serialize for Patch<T> {
     fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
         match self {
-            Patch::Keep => {
-                // Keep must never reach the serializer — see doc-level serde usage note.
-                debug_assert!(
-                    false,
-                    "Patch::Keep must not be serialized directly; \
-                     add #[serde(skip_serializing_if = \"Patch::is_keep\")] to the field"
-                );
-                s.serialize_none()
-            }
+            Patch::Keep => Err(serde::ser::Error::custom(
+                "Patch::Keep cannot be serialized; add \
+                 #[serde(skip_serializing_if = \"Patch::is_keep\")] to the field",
+            )),
             Patch::Clear => s.serialize_none(),
             Patch::Set(v) => v.serialize(s),
         }
@@ -899,9 +886,9 @@ impl<'a> PushSubscriptionCreateInput<'a> {
 /// every call.
 ///
 /// ```rust,no_run
-/// # use jmap_chat::{JmapChatClient, NoneAuth};
+/// # use jmap_chat::{DefaultTransport, JmapChatClient, NoneAuth};
 /// # async fn example() -> Result<(), jmap_chat::ClientError> {
-/// # let client = JmapChatClient::new(NoneAuth, "http://localhost").unwrap();
+/// # let client = JmapChatClient::new(DefaultTransport, NoneAuth, "http://localhost").unwrap();
 /// # let session: jmap_chat::Session = todo!();
 /// let sc = client.with_session(&session);
 /// let chats = sc.chat_get(None, None).await?;

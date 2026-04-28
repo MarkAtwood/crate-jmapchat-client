@@ -51,8 +51,8 @@ async fn fetch_session_returns_parsed_session() {
         .mount(&server)
         .await;
 
-    let client =
-        JmapChatClient::new(NoneAuth, &server.uri()).expect("NoneAuth::build_client must succeed");
+    let client = JmapChatClient::new(jmap_chat::DefaultTransport, NoneAuth, &server.uri())
+        .expect("client construction must succeed");
 
     let session = client
         .fetch_session()
@@ -101,8 +101,8 @@ async fn fetch_session_401_returns_auth_failed() {
         .mount(&server)
         .await;
 
-    let client =
-        JmapChatClient::new(NoneAuth, &server.uri()).expect("NoneAuth::build_client must succeed");
+    let client = JmapChatClient::new(jmap_chat::DefaultTransport, NoneAuth, &server.uri())
+        .expect("client construction must succeed");
 
     let result = client.fetch_session().await;
 
@@ -127,8 +127,8 @@ async fn fetch_session_403_returns_auth_failed() {
         .mount(&server)
         .await;
 
-    let client =
-        JmapChatClient::new(NoneAuth, &server.uri()).expect("NoneAuth::build_client must succeed");
+    let client = JmapChatClient::new(jmap_chat::DefaultTransport, NoneAuth, &server.uri())
+        .expect("client construction must succeed");
 
     let result = client.fetch_session().await;
 
@@ -153,8 +153,8 @@ async fn fetch_session_500_returns_http_error() {
         .mount(&server)
         .await;
 
-    let client =
-        JmapChatClient::new(NoneAuth, &server.uri()).expect("NoneAuth::build_client must succeed");
+    let client = JmapChatClient::new(jmap_chat::DefaultTransport, NoneAuth, &server.uri())
+        .expect("client construction must succeed");
 
     let result = client.fetch_session().await;
 
@@ -187,8 +187,8 @@ async fn fetch_session_empty_api_url_returns_invalid_session() {
         .mount(&server)
         .await;
 
-    let client =
-        JmapChatClient::new(NoneAuth, &server.uri()).expect("NoneAuth::build_client must succeed");
+    let client = JmapChatClient::new(jmap_chat::DefaultTransport, NoneAuth, &server.uri())
+        .expect("client construction must succeed");
 
     let result = client.fetch_session().await;
 
@@ -213,8 +213,8 @@ async fn fetch_session_invalid_json_returns_parse_error() {
         .mount(&server)
         .await;
 
-    let client =
-        JmapChatClient::new(NoneAuth, &server.uri()).expect("NoneAuth::build_client must succeed");
+    let client = JmapChatClient::new(jmap_chat::DefaultTransport, NoneAuth, &server.uri())
+        .expect("client construction must succeed");
 
     let result = client.fetch_session().await;
 
