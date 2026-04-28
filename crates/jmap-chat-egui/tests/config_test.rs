@@ -28,10 +28,9 @@ fn parse_bearer_only() {
         "BearerAuth must return an Authorization header"
     );
     let (_, value) = header.unwrap();
-    let value_str = value.to_str().expect("header value must be valid ASCII");
     assert!(
-        value_str.starts_with("Bearer "),
-        "header value must start with 'Bearer ', got: {value_str}"
+        value.starts_with("Bearer "),
+        "header value must start with 'Bearer ', got: {value}"
     );
 }
 
@@ -51,10 +50,9 @@ fn parse_basic_only() {
         "BasicAuth must return an Authorization header"
     );
     let (_, value) = header.unwrap();
-    let value_str = value.to_str().expect("header value must be valid ASCII");
     assert!(
-        value_str.starts_with("Basic "),
-        "header value must start with 'Basic ', got: {value_str}"
+        value.starts_with("Basic "),
+        "header value must start with 'Basic ', got: {value}"
     );
 }
 

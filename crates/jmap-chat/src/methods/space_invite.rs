@@ -1,6 +1,6 @@
 use super::{ChangesResponse, GetResponse, SetResponse, SpaceInviteCreateInput};
 
-impl super::SessionClient<'_> {
+impl super::SessionClient {
     /// Fetch SpaceInvite objects by IDs (JMAP Chat §4.17 SpaceInvite/get).
     ///
     /// If `ids` is `None`, returns all SpaceInvite objects for the account.

@@ -42,7 +42,7 @@ pub struct Quota {
     pub description: Option<String>,
 }
 
-impl super::SessionClient<'_> {
+impl super::SessionClient {
     /// Fetch all Quota objects for the account (RFC 8621 §2.1 Quota/get).
     ///
     /// Returns all quota records for the primary JMAP Chat account.  Each

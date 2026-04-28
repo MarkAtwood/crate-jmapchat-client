@@ -4,7 +4,7 @@ use super::{
     SpacePatch, SpaceQueryInput, SpaceUpdateMemberInput,
 };
 
-impl super::SessionClient<'_> {
+impl super::SessionClient {
     /// Fetch Space objects by IDs (RFC 8620 §5.1 / JMAP Chat §Space/get).
     ///
     /// If `ids` is `None`, the server returns all Spaces for the account.

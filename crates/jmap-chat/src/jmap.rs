@@ -16,6 +16,11 @@ macro_rules! impl_string_newtype {
                 &self.0
             }
         }
+        impl std::borrow::Borrow<str> for $t {
+            fn borrow(&self) -> &str {
+                &self.0
+            }
+        }
         impl PartialEq<str> for $t {
             fn eq(&self, other: &str) -> bool {
                 self.0 == other
@@ -44,6 +49,11 @@ macro_rules! impl_string_newtype {
     };
 }
 
+/// Returned by [`Id::new`] and [`UTCDate::new`] when the input string is empty.
+#[derive(Debug, thiserror::Error)]
+#[error("{0} may not be empty")]
+pub struct EmptyError(pub &'static str);
+
 /// An opaque server-assigned identifier string (RFC 8620 §1.2).
 /// Guaranteed non-empty. Serializes/deserializes transparently as a JSON string.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Serialize)]
@@ -62,12 +72,10 @@ impl<'de> serde::Deserialize<'de> for Id {
 
 impl Id {
     /// Create an Id from a string, returning Err if the string is empty.
-    pub fn new(s: impl Into<String>) -> Result<Self, crate::error::ClientError> {
+    pub fn new(s: impl Into<String>) -> Result<Self, EmptyError> {
         let s = s.into();
         if s.is_empty() {
-            return Err(crate::error::ClientError::InvalidArgument(
-                "Id may not be empty".into(),
-            ));
+            return Err(EmptyError("Id"));
         }
         Ok(Self(s))
     }
@@ -116,12 +124,10 @@ impl<'de> serde::Deserialize<'de> for UTCDate {
 
 impl UTCDate {
     /// Create a UTCDate from a string, returning Err if the string is empty.
-    pub fn new(s: impl Into<String>) -> Result<Self, crate::error::ClientError> {
+    pub fn new(s: impl Into<String>) -> Result<Self, EmptyError> {
         let s = s.into();
         if s.is_empty() {
-            return Err(crate::error::ClientError::InvalidArgument(
-                "UTCDate may not be empty".into(),
-            ));
+            return Err(EmptyError("UTCDate"));
         }
         Ok(Self(s))
     }
@@ -249,6 +255,7 @@ pub struct JmapResponse {
 pub struct JmapRequestBuilder {
     using: Vec<String>,
     method_calls: Vec<Invocation>,
+    call_ids: std::collections::HashSet<String>,
 }
 
 impl JmapRequestBuilder {
@@ -263,6 +270,7 @@ impl JmapRequestBuilder {
         Self {
             using: using.iter().map(|s| s.to_string()).collect(),
             method_calls: Vec::new(),
+            call_ids: std::collections::HashSet::new(),
         }
     }
 
@@ -279,8 +287,13 @@ impl JmapRequestBuilder {
         args: serde_json::Value,
         call_id: impl Into<String>,
     ) -> Self {
-        self.method_calls
-            .push(Invocation::new(method, args, call_id));
+        let call_id = call_id.into();
+        assert!(
+            self.call_ids.insert(call_id.clone()),
+            "JmapRequestBuilder: duplicate call_id {:?}",
+            call_id
+        );
+        self.method_calls.push(Invocation::new(method, args, call_id));
         self
     }
 
