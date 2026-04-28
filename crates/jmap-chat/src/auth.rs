@@ -196,6 +196,12 @@ fn default_reqwest_client() -> Result<reqwest::Client, ClientError> {
 // factory functions (e.g. `config::Config::transport`) can return a boxed
 // trait object and pass it directly to `JmapChatClient::new`.
 //
+// There is intentionally NO `Arc<dyn TransportConfig>` blanket here.
+// TransportConfig is consumed once at `JmapChatClient::new` to build the
+// reqwest::Client. The resulting Client is stored; the TransportConfig itself
+// is not kept. Arc would imply shared ownership of something that is not
+// shared after construction.
+//
 // Maintenance cost: every method added to `TransportConfig` must be mirrored here.
 impl TransportConfig for Box<dyn TransportConfig> {
     fn build_client(&self) -> Result<reqwest::Client, ClientError> {

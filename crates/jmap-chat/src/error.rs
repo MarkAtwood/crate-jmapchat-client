@@ -38,7 +38,7 @@ pub enum ClientError {
     /// The JMAP Session object from the server was missing a required field.
     /// Indicates a server-side bug or incompatible server. Not retriable.
     #[error("invalid session: {0}")]
-    InvalidSession(&'static str),
+    InvalidSession(String),
 
     /// The JMAP API response did not contain the expected method call ID.
     /// Indicates a server-side bug or unexpected response shape.
