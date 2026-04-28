@@ -80,6 +80,18 @@ impl JmapChatClient {
         })
     }
 
+    /// Convenience constructor for servers with publicly-trusted TLS.
+    ///
+    /// Equivalent to `JmapChatClient::new(DefaultTransport, auth, base_url)`.
+    /// Use [`JmapChatClient::new`] when you need a custom transport (e.g.
+    /// [`CustomCaTransport`] for a private-CA server).
+    pub fn new_plain(
+        auth: impl AuthProvider + 'static,
+        base_url: &str,
+    ) -> Result<Self, ClientError> {
+        Self::new(crate::auth::DefaultTransport, auth, base_url)
+    }
+
     /// Returns `Err(ClientError::AuthFailed)` when the HTTP status indicates an
     /// authentication or authorization failure.
     ///
@@ -104,6 +116,9 @@ impl JmapChatClient {
     /// distinguish auth failures (which will not resolve on retry) from
     /// transient errors.
     pub async fn fetch_session(&self) -> Result<Session, ClientError> {
+        // url::Url::Display for an origin URL always ends with a trailing slash
+        // (e.g. "https://host/"), so the format string has no explicit separator
+        // and produces the correct path.  Do not add a slash here.
         let url = format!("{}.well-known/jmap", self.base_url);
 
         let mut req = self
@@ -125,17 +140,18 @@ impl JmapChatClient {
             .await
             .map_err(|e| ClientError::Parse(e.to_string()))?;
 
-        let require_non_empty = |field: &str, name: &str| -> Result<(), ClientError> {
-            if field.is_empty() {
-                Err(ClientError::InvalidSession(name.into()))
-            } else {
-                Ok(())
-            }
-        };
-        require_non_empty(&session.api_url, "apiUrl is empty")?;
-        require_non_empty(&session.event_source_url, "eventSourceUrl is empty")?;
-        require_non_empty(&session.upload_url, "uploadUrl is empty")?;
-        require_non_empty(&session.download_url, "downloadUrl is empty")?;
+        if session.api_url.is_empty() {
+            return Err(ClientError::InvalidSession("apiUrl is empty".into()));
+        }
+        if session.event_source_url.is_empty() {
+            return Err(ClientError::InvalidSession("eventSourceUrl is empty".into()));
+        }
+        if session.upload_url.is_empty() {
+            return Err(ClientError::InvalidSession("uploadUrl is empty".into()));
+        }
+        if session.download_url.is_empty() {
+            return Err(ClientError::InvalidSession("downloadUrl is empty".into()));
+        }
 
         Ok(session)
     }
