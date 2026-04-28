@@ -192,6 +192,117 @@ fn apply_presence_update_stores_presence() {
     );
 }
 
+// ---------------------------------------------------------------------------
+// EphemeralUnavailable tests
+// ---------------------------------------------------------------------------
+
+/// Oracle: EphemeralUnavailable must set supports_ephemeral to false, clearing
+/// any previous true value set by SessionReady.
+#[test]
+fn apply_ephemeral_unavailable_clears_supports_ephemeral() {
+    let mut state = AppState::default();
+    // Simulate SessionReady that granted ephemeral support.
+    state.apply_event(AppEvent::SessionReady {
+        api_url: "https://example.com/api".to_string(),
+        account_id: "account1".to_string(),
+        supports_ephemeral: true,
+    });
+    assert!(
+        state.supports_ephemeral,
+        "supports_ephemeral must be true after SessionReady"
+    );
+
+    state.apply_event(AppEvent::EphemeralUnavailable);
+
+    assert!(
+        !state.supports_ephemeral,
+        "EphemeralUnavailable must clear supports_ephemeral"
+    );
+}
+
+// ---------------------------------------------------------------------------
+// ChatsDelta tests
+// ---------------------------------------------------------------------------
+
+/// Oracle: ChatsDelta with new chats must add them to the list.
+#[test]
+fn apply_chats_delta_adds_new_chat() {
+    let json = minimal_chat_json("chat-002");
+    let chat: jmap_chat::Chat = serde_json::from_str(&json).expect("oracle JSON must parse");
+
+    let mut state = AppState::default();
+    state.apply_event(AppEvent::ChatsDelta {
+        created_or_updated: vec![chat.clone()],
+        destroyed: vec![],
+    });
+
+    assert_eq!(state.chats().len(), 1);
+    assert_eq!(state.chats()[0], chat);
+    assert_eq!(state.chat_display.len(), 1);
+}
+
+/// Oracle: ChatsDelta with an existing chat ID must replace the existing entry.
+#[test]
+fn apply_chats_delta_updates_existing_chat() {
+    let json1 = minimal_chat_json("chat-003");
+    let chat1: jmap_chat::Chat = serde_json::from_str(&json1).expect("oracle JSON must parse");
+
+    let mut state = AppState::default();
+    state.apply_event(AppEvent::ChatsLoaded(vec![chat1]));
+    assert_eq!(state.chats().len(), 1);
+
+    // Updated chat has a different unreadCount to verify replacement.
+    let json2 = format!(
+        r#"{{
+            "id": "chat-003",
+            "kind": "direct",
+            "contactId": "user:bob@example.com",
+            "createdAt": "2024-01-01T00:00:00Z",
+            "unreadCount": 5,
+            "pinnedMessageIds": [],
+            "muted": false
+        }}"#
+    );
+    let chat2: jmap_chat::Chat = serde_json::from_str(&json2).expect("oracle JSON must parse");
+
+    state.apply_event(AppEvent::ChatsDelta {
+        created_or_updated: vec![chat2],
+        destroyed: vec![],
+    });
+
+    assert_eq!(state.chats().len(), 1, "update must not duplicate the chat");
+    assert_eq!(
+        state.chats()[0].unread_count,
+        5,
+        "chat must be replaced with updated unreadCount"
+    );
+}
+
+/// Oracle: ChatsDelta with a destroyed ID must remove the chat from the list.
+#[test]
+fn apply_chats_delta_destroys_chat() {
+    let json = minimal_chat_json("chat-004");
+    let chat: jmap_chat::Chat = serde_json::from_str(&json).expect("oracle JSON must parse");
+
+    let mut state = AppState::default();
+    state.apply_event(AppEvent::ChatsLoaded(vec![chat]));
+    assert_eq!(state.chats().len(), 1);
+
+    state.apply_event(AppEvent::ChatsDelta {
+        created_or_updated: vec![],
+        destroyed: vec!["chat-004".to_string()],
+    });
+
+    assert!(
+        state.chats().is_empty(),
+        "destroyed chat must be removed from the list"
+    );
+    assert!(
+        state.chat_display.is_empty(),
+        "chat_display must also be empty"
+    );
+}
+
 /// Oracle: subsequent PresenceUpdate replaces the previous value.
 #[test]
 fn apply_presence_update_replaces_previous() {

@@ -324,6 +324,13 @@ impl super::SessionClient {
         }
         if let Some(rm) = patch.remove_members {
             if !rm.is_empty() {
+                for id in rm.iter() {
+                    if id.is_empty() {
+                        return Err(crate::error::ClientError::InvalidArgument(
+                            "chat_update: remove_members id may not be empty".into(),
+                        ));
+                    }
+                }
                 patch_map.insert(
                     "removeMembers".into(),
                     serde_json::Value::Array(
