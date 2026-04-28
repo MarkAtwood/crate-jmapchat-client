@@ -717,7 +717,7 @@ async fn load_messages_for_chat(
     // undefined. Sort ascending by parsed UTC instant so messages display
     // chronologically regardless of RFC 3339 offset format in sent_at.
     // messages.last() is then the most recent (required for auto-mark-read).
-    // None (parse failure) sorts before Some, placing unparseable entries first.
+    // None (parse failure) sorts before Some, placing unparsable entries first.
     messages.sort_by_cached_key(|m| m.sent_at.parse().ok());
 
     // Capture the last message ID before moving `messages` into the event.

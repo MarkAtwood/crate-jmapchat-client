@@ -106,6 +106,11 @@ impl super::SessionClient {
         since_state: &str,
         max_changes: Option<u64>,
     ) -> Result<ChangesResponse, crate::error::ClientError> {
+        if since_state.is_empty() {
+            return Err(crate::error::ClientError::InvalidArgument(
+                "message_changes: since_state may not be empty".into(),
+            ));
+        }
         let (api_url, account_id) = self.session_parts()?;
         let mut args = serde_json::json!({
             "accountId": account_id,
@@ -212,12 +217,22 @@ impl super::SessionClient {
                     emoji,
                     sent_at,
                 } => {
+                    if sender_reaction_id.is_empty() {
+                        return Err(crate::error::ClientError::InvalidArgument(
+                            "message_update: sender_reaction_id may not be empty".into(),
+                        ));
+                    }
                     patch_map.insert(
                         format!("reactions/{sender_reaction_id}"),
                         serde_json::json!({"emoji": emoji, "sentAt": sent_at.as_str()}),
                     );
                 }
                 ReactionChange::Remove { sender_reaction_id } => {
+                    if sender_reaction_id.is_empty() {
+                        return Err(crate::error::ClientError::InvalidArgument(
+                            "message_update: sender_reaction_id may not be empty".into(),
+                        ));
+                    }
                     patch_map.insert(
                         format!("reactions/{sender_reaction_id}"),
                         serde_json::Value::Null,
@@ -267,6 +282,11 @@ impl super::SessionClient {
         since_query_state: &str,
         max_changes: Option<u64>,
     ) -> Result<QueryChangesResponse, crate::error::ClientError> {
+        if since_query_state.is_empty() {
+            return Err(crate::error::ClientError::InvalidArgument(
+                "message_query_changes: since_query_state may not be empty".into(),
+            ));
+        }
         let (api_url, account_id) = self.session_parts()?;
         let mut args = serde_json::json!({
             "accountId": account_id,

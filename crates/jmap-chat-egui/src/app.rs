@@ -295,10 +295,7 @@ mod tests {
     /// Oracle: non-ASCII Unicode (emoji, accented letters) passes through unchanged.
     #[test]
     fn strip_control_chars_passes_unicode() {
-        assert_eq!(
-            strip_control_chars("caf\u{00e9} \u{1f600}"),
-            "caf\u{00e9} \u{1f600}"
-        );
+        assert_eq!(strip_control_chars("café 😀"), "café 😀");
     }
 
     /// Oracle: a string containing only non-whitelisted control characters becomes empty.

@@ -14,7 +14,7 @@ use wiremock::{
 };
 
 /// SHA-256 of the 3-byte ASCII message "abc".
-/// Oracle: `echo -n "abc" | openssl dgst -sha256` → ba7816bf...15ad
+/// Oracle: `echo -n "abc" | openssl dgst -sha256` (NIST FIPS 180-4 test vector)
 const SHA256_ABC: &str = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad";
 
 // ---------------------------------------------------------------------------

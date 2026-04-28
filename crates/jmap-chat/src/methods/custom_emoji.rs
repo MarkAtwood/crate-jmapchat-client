@@ -29,6 +29,11 @@ impl super::SessionClient {
         since_state: &str,
         max_changes: Option<u64>,
     ) -> Result<ChangesResponse, crate::error::ClientError> {
+        if since_state.is_empty() {
+            return Err(crate::error::ClientError::InvalidArgument(
+                "custom_emoji_changes: since_state may not be empty".into(),
+            ));
+        }
         let (api_url, account_id) = self.session_parts()?;
         let mut args = serde_json::json!({
             "accountId": account_id,
@@ -129,6 +134,11 @@ impl super::SessionClient {
         since_query_state: &str,
         max_changes: Option<u64>,
     ) -> Result<QueryChangesResponse, crate::error::ClientError> {
+        if since_query_state.is_empty() {
+            return Err(crate::error::ClientError::InvalidArgument(
+                "custom_emoji_query_changes: since_query_state may not be empty".into(),
+            ));
+        }
         let (api_url, account_id) = self.session_parts()?;
         let mut args = serde_json::json!({
             "accountId": account_id,
