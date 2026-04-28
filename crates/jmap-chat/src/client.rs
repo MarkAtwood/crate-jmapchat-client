@@ -126,7 +126,7 @@ impl JmapChatClient {
             .get(&url)
             .timeout(std::time::Duration::from_secs(30));
         if let Some((name, value)) = self.auth.auth_header() {
-            req = req.header(name, value);
+            req = req.header(name.as_str(), value.as_str());
         }
 
         let resp = {
@@ -171,7 +171,7 @@ impl JmapChatClient {
         let mut builder = self.http.post(api_url).json(req);
 
         if let Some((name, value)) = self.auth.auth_header() {
-            builder = builder.header(name, value);
+            builder = builder.header(name.as_str(), value.as_str());
         }
 
         builder = builder.timeout(std::time::Duration::from_secs(30));
@@ -256,7 +256,7 @@ impl JmapChatClient {
         &self,
         event_source_url: &str,
         last_event_id: Option<&str>,
-    ) -> Result<impl futures::Stream<Item = Result<SseFrame, ClientError>> + Send, ClientError>
+    ) -> Result<futures::stream::BoxStream<'static, Result<SseFrame, ClientError>>, ClientError>
     {
         let mut req = self
             .http
@@ -267,7 +267,7 @@ impl JmapChatClient {
             req = req.header("Last-Event-ID", id);
         }
         if let Some((name, value)) = self.auth.auth_header() {
-            req = req.header(name, value);
+            req = req.header(name.as_str(), value.as_str());
         }
 
         let resp = req.send().await.map_err(ClientError::Http)?;
@@ -381,7 +381,7 @@ impl JmapChatClient {
                     }
                 }
             },
-        ))
+        ).boxed())
     }
 }
 

@@ -183,7 +183,13 @@ impl crate::client::JmapChatClient {
             .map_err(crate::error::ClientError::WebSocket)?;
 
         if let Some((name, value)) = self.auth.auth_header() {
-            request.headers_mut().insert(name, value);
+            let hdr_name: reqwest::header::HeaderName = name
+                .parse()
+                .expect("pre-computed auth header name is always valid");
+            let hdr_value: reqwest::header::HeaderValue = value
+                .parse()
+                .expect("pre-computed auth header value is always valid");
+            request.headers_mut().insert(hdr_name, hdr_value);
         }
 
         // WebSocketConfig is #[non_exhaustive] in tungstenite; use Default + field assignment.

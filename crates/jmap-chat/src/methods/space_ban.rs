@@ -1,6 +1,6 @@
 use super::{ChangesResponse, GetResponse, SetResponse, SpaceBanCreateInput};
 
-impl super::SessionClient<'_> {
+impl super::SessionClient {
     /// Fetch SpaceBan objects by IDs (JMAP Chat §4.18 SpaceBan/get).
     ///
     /// If `ids` is `None`, returns all SpaceBan objects for the account.

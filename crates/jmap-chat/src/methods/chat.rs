@@ -3,7 +3,7 @@ use super::{
     QueryChangesResponse, QueryResponse, SetResponse, TypingResponse, UpdateMemberRoleInput,
 };
 
-impl super::SessionClient<'_> {
+impl super::SessionClient {
     /// Fetch Chat objects by IDs (RFC 8620 §5.1 / JMAP Chat §5 Chat/get).
     ///
     /// If `ids` is `None`, the server returns all Chats for the account.

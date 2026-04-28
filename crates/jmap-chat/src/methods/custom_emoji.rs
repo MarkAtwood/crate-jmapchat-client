@@ -3,7 +3,7 @@ use super::{
     QueryChangesResponse, QueryResponse, SetResponse,
 };
 
-impl super::SessionClient<'_> {
+impl super::SessionClient {
     /// Fetch CustomEmoji objects by IDs (JMAP Chat §4.16 CustomEmoji/get).
     ///
     /// If `ids` is `None`, returns all CustomEmoji objects for the account.

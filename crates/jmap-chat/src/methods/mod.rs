@@ -309,6 +309,14 @@ pub struct MessageQueryInput<'a> {
     pub sort_ascending: bool,
 }
 
+impl<'a> MessageQueryInput<'a> {
+    /// Set ascending sort order (oldest first).
+    pub fn with_sort_ascending(mut self, v: bool) -> Self {
+        self.sort_ascending = v;
+        self
+    }
+}
+
 /// Input parameters for [`JmapChatClient::message_create`].
 #[non_exhaustive]
 #[derive(Debug)]
@@ -926,23 +934,23 @@ impl<'a> PushSubscriptionCreateInput<'a> {
 /// # Ok(())
 /// # }
 /// ```
-pub struct SessionClient<'s> {
-    client: &'s crate::client::JmapChatClient,
-    session: &'s crate::jmap::Session,
+pub struct SessionClient {
+    client: crate::client::JmapChatClient,
+    session: crate::jmap::Session,
 }
 
 impl crate::client::JmapChatClient {
     /// Bind this client to a JMAP session, returning a [`SessionClient`] that
     /// exposes all JMAP Chat methods without a `&Session` parameter on each call.
-    pub fn with_session<'s>(&'s self, session: &'s crate::jmap::Session) -> SessionClient<'s> {
+    pub fn with_session(&self, session: &crate::jmap::Session) -> SessionClient {
         SessionClient {
-            client: self,
-            session,
+            client: self.clone(),
+            session: session.clone(),
         }
     }
 }
 
-impl SessionClient<'_> {
+impl SessionClient {
     /// Extract `(api_url, chat_account_id)` from the bound session.
     ///
     /// Returns `Err(InvalidSession)` if there is no primary account for

@@ -26,8 +26,8 @@ pub use error::ClientError;
 
 // --- jmap core types ---
 pub use jmap::{
-    AccountInfo, ChatCapability, ChatPushCapability, ChatWebSocketCapability, Id, Invocation,
-    JmapRequest, JmapRequestBuilder, JmapResponse, ResultReference, Session, UTCDate,
+    AccountInfo, ChatCapability, ChatPushCapability, ChatWebSocketCapability, EmptyError, Id,
+    Invocation, JmapRequest, JmapRequestBuilder, JmapResponse, ResultReference, Session, UTCDate,
     WebSocketCapability,
 };
 

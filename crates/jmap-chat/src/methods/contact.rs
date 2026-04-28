@@ -3,7 +3,7 @@ use super::{
     QueryResponse, SetResponse,
 };
 
-impl super::SessionClient<'_> {
+impl super::SessionClient {
     /// Fetch ChatContact objects by IDs (JMAP Chat §5 ChatContact/get).
     ///
     /// If `ids` is `None`, returns all ChatContacts for the account.

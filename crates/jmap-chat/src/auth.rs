@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use base64::engine::general_purpose::STANDARD as BASE64_STANDARD;
 use base64::Engine as _;
-use reqwest::header::{HeaderName, HeaderValue, AUTHORIZATION};
+use reqwest::header::{HeaderValue, AUTHORIZATION};
 
 use crate::error::ClientError;
 
@@ -89,7 +89,7 @@ pub trait AuthProvider: Send + Sync {
     /// every request.
     ///
     /// Returns `None` when no `Authorization` header is required.
-    fn auth_header(&self) -> Option<(HeaderName, HeaderValue)>;
+    fn auth_header(&self) -> Option<(String, String)>;
 }
 
 /// No authentication: no `Authorization` header.
@@ -97,12 +97,13 @@ pub trait AuthProvider: Send + Sync {
 pub struct NoneAuth;
 
 impl AuthProvider for NoneAuth {
-    fn auth_header(&self) -> Option<(HeaderName, HeaderValue)> {
+    fn auth_header(&self) -> Option<(String, String)> {
         None
     }
 }
 
 /// Bearer-token authentication (`Authorization: Bearer <token>`).
+#[derive(Clone)]
 pub struct BearerAuth {
     // Pre-computed at construction: avoids per-request allocation and ensures
     // that invalid credentials fail at construction, not at the first request.
@@ -137,14 +138,21 @@ impl std::fmt::Debug for BearerAuth {
 }
 
 impl AuthProvider for BearerAuth {
-    fn auth_header(&self) -> Option<(HeaderName, HeaderValue)> {
-        Some((AUTHORIZATION, self.header_value.clone()))
+    fn auth_header(&self) -> Option<(String, String)> {
+        Some((
+            AUTHORIZATION.as_str().to_string(),
+            self.header_value
+                .to_str()
+                .expect("pre-computed auth header is always valid ASCII")
+                .to_string(),
+        ))
     }
 }
 
 /// HTTP Basic authentication (`Authorization: Basic <base64(username:password)>`).
 ///
 /// Credentials are encoded per RFC 7617: `base64(username ":" password)`.
+#[derive(Clone)]
 pub struct BasicAuth {
     // Pre-computed at construction: avoids per-request allocation and ensures
     // that invalid credentials fail at construction, not at the first request.
@@ -181,8 +189,14 @@ impl std::fmt::Debug for BasicAuth {
 }
 
 impl AuthProvider for BasicAuth {
-    fn auth_header(&self) -> Option<(HeaderName, HeaderValue)> {
-        Some((AUTHORIZATION, self.header_value.clone()))
+    fn auth_header(&self) -> Option<(String, String)> {
+        Some((
+            AUTHORIZATION.as_str().to_string(),
+            self.header_value
+                .to_str()
+                .expect("pre-computed auth header is always valid ASCII")
+                .to_string(),
+        ))
     }
 }
 
@@ -228,7 +242,7 @@ impl TransportConfig for Box<dyn TransportConfig> {
 //
 // Maintenance cost: every method added to `AuthProvider` must be mirrored here.
 impl AuthProvider for Arc<dyn AuthProvider> {
-    fn auth_header(&self) -> Option<(HeaderName, HeaderValue)> {
+    fn auth_header(&self) -> Option<(String, String)> {
         (**self).auth_header()
     }
 }
@@ -243,7 +257,7 @@ impl AuthProvider for Arc<dyn AuthProvider> {
 //
 // Maintenance cost: every method added to `AuthProvider` must be mirrored here.
 impl AuthProvider for Box<dyn AuthProvider> {
-    fn auth_header(&self) -> Option<(HeaderName, HeaderValue)> {
+    fn auth_header(&self) -> Option<(String, String)> {
         (**self).auth_header()
     }
 }
@@ -274,8 +288,8 @@ mod tests {
     fn bearer_auth_header() {
         let auth = BearerAuth::new("tok123").expect("valid ASCII token must construct");
         let (name, value) = auth.auth_header().expect("BearerAuth must return a header");
-        assert_eq!(name, AUTHORIZATION);
-        assert_eq!(value.to_str().unwrap(), "Bearer tok123");
+        assert_eq!(name, "authorization");
+        assert_eq!(value, "Bearer tok123");
     }
 
     /// Oracle: BearerAuth constructor rejects tokens containing C0 control characters.
@@ -319,8 +333,8 @@ mod tests {
     fn basic_auth_header() {
         let auth = BasicAuth::new("alice", "s3cr3t").expect("valid credentials must construct");
         let (name, value) = auth.auth_header().expect("BasicAuth must return a header");
-        assert_eq!(name, AUTHORIZATION);
-        assert_eq!(value.to_str().unwrap(), "Basic YWxpY2U6czNjcjN0");
+        assert_eq!(name, "authorization");
+        assert_eq!(value, "Basic YWxpY2U6czNjcjN0");
     }
 
     /// Oracle: CustomCaTransport injects no auth header — it is a transport only.

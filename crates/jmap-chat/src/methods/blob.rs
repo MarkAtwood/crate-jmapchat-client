@@ -34,7 +34,7 @@ pub struct BlobLookupResponse {
     pub not_found: Vec<String>,
 }
 
-impl super::SessionClient<'_> {
+impl super::SessionClient {
     /// Reverse-lookup blobs: given a list of blob IDs and data type names,
     /// returns which objects of those types reference each blob.
     ///
@@ -89,7 +89,7 @@ pub struct BlobConvertResponse {
     pub content_type: String,
 }
 
-impl super::SessionClient<'_> {
+impl super::SessionClient {
     /// Convert a blob to a different MIME type (JMAP-BLOBEXT §7 / blob2 capability).
     ///
     /// Typical use: request a thumbnail (`image/webp`) from an image blob without

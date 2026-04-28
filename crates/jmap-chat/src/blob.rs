@@ -97,7 +97,7 @@ impl crate::client::JmapChatClient {
             .header(CONTENT_TYPE, ct_hv)
             .body(data.to_vec());
         if let Some((name, value)) = self.auth.auth_header() {
-            req = req.header(name, value);
+            req = req.header(name.as_str(), value.as_str());
         }
 
         let resp = req.send().await.map_err(crate::error::ClientError::Http)?;
@@ -155,7 +155,7 @@ impl crate::client::JmapChatClient {
 
         let mut req = self.http.get(&url);
         if let Some((hdr_name, hdr_value)) = self.auth.auth_header() {
-            req = req.header(hdr_name, hdr_value);
+            req = req.header(hdr_name.as_str(), hdr_value.as_str());
         }
 
         let resp = req.send().await.map_err(crate::error::ClientError::Http)?;

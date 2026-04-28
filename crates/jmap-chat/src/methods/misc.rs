@@ -3,7 +3,7 @@ use super::{
     SetResponse,
 };
 
-impl super::SessionClient<'_> {
+impl super::SessionClient {
     /// Fetch ReadPosition objects by IDs (JMAP Chat §5 ReadPosition/get).
     ///
     /// If `ids` is `None`, returns all ReadPosition records for the account.
