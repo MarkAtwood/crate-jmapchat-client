@@ -2939,3 +2939,130 @@ fn patch_set_serializes_as_inner_value() {
         .expect("Patch::Set must serialize");
     assert_eq!(v, serde_json::json!("hello"));
 }
+
+// ---------------------------------------------------------------------------
+// Input guard rejection tests — no network call needed; guards fire before I/O.
+// ---------------------------------------------------------------------------
+
+/// Oracle: message_create must reject reply_to=Some("") with InvalidArgument
+/// before any network I/O — an empty message ID is semantically invalid.
+#[tokio::test]
+async fn message_create_rejects_empty_reply_to() {
+    let client = JmapChatClient::new(
+        jmap_chat::DefaultTransport,
+        jmap_chat::NoneAuth,
+        "http://127.0.0.1:1",
+    )
+    .expect("client construction must succeed");
+    let sent_at = jmap_chat::UTCDate::from_raw("2024-01-01T00:00:00Z");
+    let err = client
+        .with_session(&test_session("http://127.0.0.1:1/api"))
+        .message_create(
+            &MessageCreateInput::new("chat-1", "hello", jmap_chat::BodyType::Plain, &sent_at)
+                .with_reply_to(""),
+        )
+        .await
+        .expect_err("empty reply_to must be rejected");
+    assert!(
+        matches!(&err, ClientError::InvalidArgument(msg) if msg.contains("reply_to")),
+        "expected InvalidArgument mentioning 'reply_to', got {err:?}"
+    );
+}
+
+/// Oracle: custom_emoji_query must reject filter_space_id=Some("") with
+/// InvalidArgument — an empty space ID is semantically invalid.
+#[tokio::test]
+async fn custom_emoji_query_rejects_empty_filter_space_id() {
+    use jmap_chat::CustomEmojiQueryInput;
+    let client = JmapChatClient::new(
+        jmap_chat::DefaultTransport,
+        jmap_chat::NoneAuth,
+        "http://127.0.0.1:1",
+    )
+    .expect("client construction must succeed");
+    let mut input = CustomEmojiQueryInput::default();
+    input.filter_space_id = Some("");
+    let err = client
+        .with_session(&test_session("http://127.0.0.1:1/api"))
+        .custom_emoji_query(&input)
+        .await
+        .expect_err("empty filter_space_id must be rejected");
+    assert!(
+        matches!(&err, ClientError::InvalidArgument(msg) if msg.contains("filter_space_id")),
+        "expected InvalidArgument mentioning 'filter_space_id', got {err:?}"
+    );
+}
+
+/// Oracle: space_update must reject add_channels with an empty name before
+/// any network I/O — an empty channel name is semantically invalid.
+#[tokio::test]
+async fn space_update_rejects_empty_add_channel_name() {
+    use jmap_chat::SpaceAddChannelInput;
+    let client = JmapChatClient::new(
+        jmap_chat::DefaultTransport,
+        jmap_chat::NoneAuth,
+        "http://127.0.0.1:1",
+    )
+    .expect("client construction must succeed");
+    let channels = [SpaceAddChannelInput::new("")];
+    let mut patch = SpacePatch::default();
+    patch.add_channels = Some(&channels);
+    let err = client
+        .with_session(&test_session("http://127.0.0.1:1/api"))
+        .space_update("space-1", &patch)
+        .await
+        .expect_err("empty channel name must be rejected");
+    assert!(
+        matches!(&err, ClientError::InvalidArgument(msg) if msg.contains("channel name")),
+        "expected InvalidArgument mentioning 'channel name', got {err:?}"
+    );
+}
+
+/// Oracle: chat_update must reject add_members with an empty member ID before
+/// any network I/O.
+#[tokio::test]
+async fn chat_update_rejects_empty_add_member_id() {
+    let client = JmapChatClient::new(
+        jmap_chat::DefaultTransport,
+        jmap_chat::NoneAuth,
+        "http://127.0.0.1:1",
+    )
+    .expect("client construction must succeed");
+    let members = [AddMemberInput::new("")];
+    let mut patch = ChatPatch::default();
+    patch.add_members = Some(&members);
+    let err = client
+        .with_session(&test_session("http://127.0.0.1:1/api"))
+        .chat_update("chat-1", &patch)
+        .await
+        .expect_err("empty member id must be rejected");
+    assert!(
+        matches!(&err, ClientError::InvalidArgument(msg) if msg.contains("member id")),
+        "expected InvalidArgument mentioning 'member id', got {err:?}"
+    );
+}
+
+/// Oracle: chat_update must reject update_member_roles with an empty ID before
+/// any network I/O.
+#[tokio::test]
+async fn chat_update_rejects_empty_update_member_role_id() {
+    use jmap_chat::{ChatMemberRole, UpdateMemberRoleInput};
+    let client = JmapChatClient::new(
+        jmap_chat::DefaultTransport,
+        jmap_chat::NoneAuth,
+        "http://127.0.0.1:1",
+    )
+    .expect("client construction must succeed");
+    let roles = [UpdateMemberRoleInput::new("", ChatMemberRole::Member)];
+    let mut patch = ChatPatch::default();
+    patch.update_member_roles = Some(&roles);
+    let err = client
+        .with_session(&test_session("http://127.0.0.1:1/api"))
+        .chat_update("chat-1", &patch)
+        .await
+        .expect_err("empty update_member_roles id must be rejected");
+    assert!(
+        matches!(&err, ClientError::InvalidArgument(msg) if msg.contains("update_member_roles id")),
+        "expected InvalidArgument mentioning 'update_member_roles id', got {err:?}"
+    );
+}
