@@ -114,6 +114,11 @@ impl super::SessionClient {
             "accountId": account_id,
         });
         if let Some(sid) = input.filter_space_id {
+            if sid.is_empty() {
+                return Err(crate::error::ClientError::InvalidArgument(
+                    "custom_emoji_query: filter_space_id may not be empty".into(),
+                ));
+            }
             args["filter"] = serde_json::json!({"spaceId": sid});
         }
         if let Some(p) = input.position {

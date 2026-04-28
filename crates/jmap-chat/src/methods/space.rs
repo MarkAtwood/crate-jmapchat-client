@@ -310,9 +310,14 @@ impl super::SessionClient {
         }
         if let Some(ac) = patch.add_channels {
             if !ac.is_empty() {
-                let arr: Vec<serde_json::Value> = ac
+                let arr = ac
                     .iter()
                     .map(|c: &SpaceAddChannelInput<'_>| {
+                        if c.name.is_empty() {
+                            return Err(crate::error::ClientError::InvalidArgument(
+                                "space_update: channel name may not be empty".into(),
+                            ));
+                        }
                         let mut obj = serde_json::json!({ "name": c.name });
                         if let Some(cat) = c.category_id {
                             obj["categoryId"] = cat.into();
@@ -323,9 +328,9 @@ impl super::SessionClient {
                         if let Some(t) = c.topic {
                             obj["topic"] = t.into();
                         }
-                        obj
+                        Ok(obj)
                     })
-                    .collect();
+                    .collect::<Result<Vec<serde_json::Value>, _>>()?;
                 patch_map.insert("addChannels".into(), serde_json::Value::Array(arr));
             }
         }
