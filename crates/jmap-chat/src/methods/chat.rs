@@ -190,6 +190,13 @@ impl super::SessionClient {
                         "chat_create: name may not be empty".into(),
                     ));
                 }
+                for id in member_ids.iter() {
+                    if id.is_empty() {
+                        return Err(crate::error::ClientError::InvalidArgument(
+                            "chat_create: member_ids element may not be empty".into(),
+                        ));
+                    }
+                }
                 let mut obj = serde_json::json!({
                     "kind": "group",
                     "name": name,
@@ -278,6 +285,13 @@ impl super::SessionClient {
             patch_map.insert("receiveTypingIndicators".into(), rti.into());
         }
         if let Some(ids) = patch.pinned_message_ids {
+            for id in ids.iter() {
+                if id.is_empty() {
+                    return Err(crate::error::ClientError::InvalidArgument(
+                        "chat_update: pinned_message_ids element may not be empty".into(),
+                    ));
+                }
+            }
             patch_map.insert(
                 "pinnedMessageIds".into(),
                 serde_json::Value::Array(
