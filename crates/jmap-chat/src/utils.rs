@@ -96,14 +96,14 @@ mod tests {
     /// Oracle: same-day UTCDate (with seconds precision) formats as "Today".
     #[test]
     fn test_same_day_returns_today() {
-        let dt = UTCDate::from_trusted("2024-03-20T14:32:07Z");
+        let dt = UTCDate::from_raw("2024-03-20T14:32:07Z");
         assert_eq!(format_receipt_timestamp_at(&dt, now()), "Today");
     }
 
     /// Oracle: yesterday's UTCDate formats as "Yesterday" (no sub-minute detail).
     #[test]
     fn test_yesterday_returns_yesterday() {
-        let dt = UTCDate::from_trusted("2024-03-19T09:15:45Z");
+        let dt = UTCDate::from_raw("2024-03-19T09:15:45Z");
         assert_eq!(format_receipt_timestamp_at(&dt, now()), "Yesterday");
     }
 
@@ -111,7 +111,7 @@ mod tests {
     /// Note: no seconds in output.
     #[test]
     fn test_within_week_returns_weekday_and_time() {
-        let dt = UTCDate::from_trusted("2024-03-17T08:03:59Z");
+        let dt = UTCDate::from_raw("2024-03-17T08:03:59Z");
         let result = format_receipt_timestamp_at(&dt, now());
         assert_eq!(result, "Sun 08:03");
         assert!(
@@ -123,7 +123,7 @@ mod tests {
     /// Oracle: 2024-01-15 is more than 7 days before 2024-03-20 — formats as "Jan 15".
     #[test]
     fn test_old_date_returns_month_and_day() {
-        let dt = UTCDate::from_trusted("2024-01-15T09:00:00Z");
+        let dt = UTCDate::from_raw("2024-01-15T09:00:00Z");
         let result = format_receipt_timestamp_at(&dt, now());
         assert_eq!(result, "Jan 15");
     }
@@ -133,7 +133,7 @@ mod tests {
     #[test]
     fn test_future_timestamp_formats_as_today() {
         // 2024-03-21: one calendar day after now (2024-03-20) — days_diff = -1
-        let dt = UTCDate::from_trusted("2024-03-21T10:00:00Z");
+        let dt = UTCDate::from_raw("2024-03-21T10:00:00Z");
         assert_eq!(
             format_receipt_timestamp_at(&dt, now()),
             "Today",
@@ -144,7 +144,7 @@ mod tests {
     /// Oracle: date from a prior year includes the year (2023-01-15 vs now 2024-03-20).
     #[test]
     fn test_prior_year_date_includes_year() {
-        let dt = UTCDate::from_trusted("2023-01-15T09:00:00Z");
+        let dt = UTCDate::from_raw("2023-01-15T09:00:00Z");
         let result = format_receipt_timestamp_at(&dt, now());
         assert_eq!(result, "Jan 15 2023");
     }
@@ -159,7 +159,7 @@ mod tests {
             "2024-01-15T09:00:30Z", // old
         ];
         for case in cases {
-            let dt = UTCDate::from_trusted(case);
+            let dt = UTCDate::from_raw(case);
             let result = format_receipt_timestamp_at(&dt, now());
             // No seconds component — the format never contains "HH:MM:SS"
             assert!(

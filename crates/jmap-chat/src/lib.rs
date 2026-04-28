@@ -10,7 +10,10 @@ pub(crate) mod utils;
 pub(crate) mod ws;
 
 // --- auth ---
-pub use auth::{AuthProvider, BasicAuth, BearerAuth, CustomCaAuth, NoneAuth};
+pub use auth::{
+    AuthProvider, BasicAuth, BearerAuth, CustomCaTransport, DefaultTransport, NoneAuth,
+    TransportConfig,
+};
 
 // --- blob ---
 pub use blob::BlobUploadResponse;

@@ -215,7 +215,12 @@ impl AppState {
             .iter()
             .map(|chat| {
                 let display_name = match chat.kind {
-                    ChatKind::Direct => chat.contact_id.as_deref().unwrap_or("Direct").to_string(),
+                    ChatKind::Direct => chat
+                        .contact_id
+                        .as_ref()
+                        .map(|id| id.as_str())
+                        .unwrap_or("Direct")
+                        .to_string(),
                     _ => chat.name.as_deref().unwrap_or("(unnamed)").to_string(),
                 };
                 let label = if chat.unread_count > 0 {

@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use crate::auth::AuthProvider;
+use crate::auth::{AuthProvider, TransportConfig};
 use crate::error::ClientError;
 use crate::jmap::{JmapRequest, JmapResponse, Session};
 use crate::sse::{parse_sse_block, SseFrame};
@@ -25,7 +25,7 @@ struct SseStreamState<S> {
 /// [`fetch_session`]: JmapChatClient::fetch_session
 #[derive(Clone)]
 pub struct JmapChatClient {
-    pub(crate) base_url: String,
+    pub(crate) base_url: url::Url,
     pub(crate) auth: Arc<dyn AuthProvider>,
     pub(crate) http: reqwest::Client,
 }
@@ -33,11 +33,18 @@ pub struct JmapChatClient {
 impl JmapChatClient {
     /// Create a new client.
     ///
-    /// `auth` provides both the HTTP client configuration (trust roots, client
-    /// certificates) and per-request header injection. `base_url` must be the
-    /// server origin without a trailing slash or path component, e.g.
+    /// `transport` configures the underlying HTTP client (TLS trust roots,
+    /// client certificates, timeouts). `auth` injects per-request credentials
+    /// (Bearer token, Basic credentials, or none). The two are independent so
+    /// any transport can be paired with any credential scheme — for example,
+    /// `CustomCaTransport` with `BearerAuth`. `base_url` must be the server
+    /// origin without a trailing slash or path component, e.g.
     /// `"https://100.64.1.1:8008"`.
-    pub fn new(auth: impl AuthProvider + 'static, base_url: &str) -> Result<Self, ClientError> {
+    pub fn new(
+        transport: impl TransportConfig,
+        auth: impl AuthProvider + 'static,
+        base_url: &str,
+    ) -> Result<Self, ClientError> {
         if base_url.is_empty() {
             return Err(ClientError::InvalidArgument(
                 "base_url may not be empty".into(),
@@ -64,14 +71,9 @@ impl JmapChatClient {
                 "base_url must not have a fragment".into(),
             ));
         }
-        // Strip trailing slash here so self.base_url is always slash-free.
-        // fetch_session also trims defensively because the JMAP session document
-        // may contain URL fields that already include a trailing slash, and
-        // RFC 6570 URI templates require a clean base to expand correctly.
-        let base_url = base_url.trim_end_matches('/').to_string();
-        let http = auth.build_client()?;
+        let http = transport.build_client()?;
         Ok(Self {
-            base_url,
+            base_url: parsed,
             auth: Arc::new(auth),
             http,
         })
@@ -101,7 +103,7 @@ impl JmapChatClient {
     /// distinguish auth failures (which will not resolve on retry) from
     /// transient errors.
     pub async fn fetch_session(&self) -> Result<Session, ClientError> {
-        let url = format!("{}/.well-known/jmap", self.base_url.trim_end_matches('/'));
+        let url = format!("{}.well-known/jmap", self.base_url);
 
         let mut req = self
             .http
@@ -173,9 +175,19 @@ impl JmapChatClient {
 
     /// POST a multi-method [`JmapRequest`] and return all responses indexed by call id.
     ///
-    /// Thin wrapper over [`call`](JmapChatClient::call) for batch requests
-    /// built with [`JmapRequestBuilder`](crate::jmap::JmapRequestBuilder).
-    /// Returns a `HashMap` from call id to the raw JSON args of each response.
+    /// Use this method when a single request contains invocations whose
+    /// responses have **heterogeneous shapes** — for example, a `Chat/get` and
+    /// a `Message/query` in the same request.  Because each invocation returns a
+    /// different schema there is no single concrete type `T` that can be passed
+    /// to [`call`](JmapChatClient::call) followed by
+    /// [`extract_response`](crate::client::extract_response).  Instead, this
+    /// method returns raw `serde_json::Value` per call id so the caller can
+    /// deserialize each entry into its own type independently.
+    ///
+    /// Prefer [`call`](JmapChatClient::call) +
+    /// [`extract_response`](crate::client::extract_response) for single-method
+    /// requests or homogeneous batches where every invocation shares the same
+    /// response type.
     ///
     /// JMAP `"error"` responses are included in the map with their original
     /// args; callers must check the `"type"` field if they need to distinguish
@@ -432,8 +444,12 @@ mod tests {
             .mount(&server)
             .await;
 
-        let client = JmapChatClient::new(crate::auth::NoneAuth, &server.uri())
-            .expect("client construction must succeed");
+        let client = JmapChatClient::new(
+            crate::auth::DefaultTransport,
+            crate::auth::NoneAuth,
+            &server.uri(),
+        )
+        .expect("client construction must succeed");
 
         let session = client
             .fetch_session()
@@ -462,8 +478,12 @@ mod tests {
             .mount(&server)
             .await;
 
-        let client = JmapChatClient::new(crate::auth::NoneAuth, &server.uri())
-            .expect("client construction must succeed");
+        let client = JmapChatClient::new(
+            crate::auth::DefaultTransport,
+            crate::auth::NoneAuth,
+            &server.uri(),
+        )
+        .expect("client construction must succeed");
 
         let session = client
             .fetch_session()
@@ -484,8 +504,12 @@ mod tests {
             .mount(&server)
             .await;
 
-        let client = JmapChatClient::new(crate::auth::NoneAuth, &server.uri())
-            .expect("client construction must succeed");
+        let client = JmapChatClient::new(
+            crate::auth::DefaultTransport,
+            crate::auth::NoneAuth,
+            &server.uri(),
+        )
+        .expect("client construction must succeed");
 
         let err = client.fetch_session().await.expect_err("401 must fail");
         assert!(
@@ -505,8 +529,12 @@ mod tests {
             .mount(&server)
             .await;
 
-        let client = JmapChatClient::new(crate::auth::NoneAuth, &server.uri())
-            .expect("client construction must succeed");
+        let client = JmapChatClient::new(
+            crate::auth::DefaultTransport,
+            crate::auth::NoneAuth,
+            &server.uri(),
+        )
+        .expect("client construction must succeed");
 
         let err = client.fetch_session().await.expect_err("403 must fail");
         assert!(
@@ -526,8 +554,12 @@ mod tests {
             .mount(&server)
             .await;
 
-        let client = JmapChatClient::new(crate::auth::NoneAuth, &server.uri())
-            .expect("client construction must succeed");
+        let client = JmapChatClient::new(
+            crate::auth::DefaultTransport,
+            crate::auth::NoneAuth,
+            &server.uri(),
+        )
+        .expect("client construction must succeed");
 
         let err = client.fetch_session().await.expect_err("500 must fail");
         assert!(
@@ -548,8 +580,12 @@ mod tests {
             .mount(&server)
             .await;
 
-        let client = JmapChatClient::new(crate::auth::NoneAuth, &server.uri())
-            .expect("client construction must succeed");
+        let client = JmapChatClient::new(
+            crate::auth::DefaultTransport,
+            crate::auth::NoneAuth,
+            &server.uri(),
+        )
+        .expect("client construction must succeed");
 
         let err = client
             .fetch_session()
@@ -576,8 +612,12 @@ mod tests {
             .mount(&server)
             .await;
 
-        let client = JmapChatClient::new(crate::auth::NoneAuth, &server.uri())
-            .expect("client construction must succeed");
+        let client = JmapChatClient::new(
+            crate::auth::DefaultTransport,
+            crate::auth::NoneAuth,
+            &server.uri(),
+        )
+        .expect("client construction must succeed");
 
         let err = client
             .fetch_session()
@@ -604,8 +644,12 @@ mod tests {
             .mount(&server)
             .await;
 
-        let client = JmapChatClient::new(crate::auth::NoneAuth, &server.uri())
-            .expect("client construction must succeed");
+        let client = JmapChatClient::new(
+            crate::auth::DefaultTransport,
+            crate::auth::NoneAuth,
+            &server.uri(),
+        )
+        .expect("client construction must succeed");
 
         let err = client
             .fetch_session()
@@ -652,8 +696,12 @@ mod tests {
             .mount(&server)
             .await;
 
-        let client = JmapChatClient::new(crate::auth::NoneAuth, &server.uri())
-            .expect("client construction must succeed");
+        let client = JmapChatClient::new(
+            crate::auth::DefaultTransport,
+            crate::auth::NoneAuth,
+            &server.uri(),
+        )
+        .expect("client construction must succeed");
 
         let api_url = format!("{}/api", server.uri());
         let resp = client
@@ -677,8 +725,12 @@ mod tests {
             .mount(&server)
             .await;
 
-        let client = JmapChatClient::new(crate::auth::NoneAuth, &server.uri())
-            .expect("client construction must succeed");
+        let client = JmapChatClient::new(
+            crate::auth::DefaultTransport,
+            crate::auth::NoneAuth,
+            &server.uri(),
+        )
+        .expect("client construction must succeed");
 
         let api_url = format!("{}/api", server.uri());
         let err = client
@@ -703,8 +755,12 @@ mod tests {
             .mount(&server)
             .await;
 
-        let client = JmapChatClient::new(crate::auth::NoneAuth, &server.uri())
-            .expect("client construction must succeed");
+        let client = JmapChatClient::new(
+            crate::auth::DefaultTransport,
+            crate::auth::NoneAuth,
+            &server.uri(),
+        )
+        .expect("client construction must succeed");
 
         let api_url = format!("{}/api", server.uri());
         let err = client
@@ -729,8 +785,12 @@ mod tests {
             .mount(&server)
             .await;
 
-        let client = JmapChatClient::new(crate::auth::NoneAuth, &server.uri())
-            .expect("client construction must succeed");
+        let client = JmapChatClient::new(
+            crate::auth::DefaultTransport,
+            crate::auth::NoneAuth,
+            &server.uri(),
+        )
+        .expect("client construction must succeed");
 
         let api_url = format!("{}/api", server.uri());
         let err = client
@@ -755,8 +815,12 @@ mod tests {
             .mount(&server)
             .await;
 
-        let client = JmapChatClient::new(crate::auth::NoneAuth, &server.uri())
-            .expect("client construction must succeed");
+        let client = JmapChatClient::new(
+            crate::auth::DefaultTransport,
+            crate::auth::NoneAuth,
+            &server.uri(),
+        )
+        .expect("client construction must succeed");
 
         let api_url = format!("{}/api", server.uri());
         let err = client
@@ -846,7 +910,12 @@ mod tests {
     /// Oracle: base_url validation — a URL with a path component must be rejected.
     #[test]
     fn new_rejects_base_url_with_path() {
-        let result = JmapChatClient::new(crate::auth::NoneAuth, "https://host/path").map(|_| ());
+        let result = JmapChatClient::new(
+            crate::auth::DefaultTransport,
+            crate::auth::NoneAuth,
+            "https://host/path",
+        )
+        .map(|_| ());
         match result {
             Err(ClientError::InvalidArgument(_)) => {}
             other => panic!("expected InvalidArgument, got {other:?}"),
@@ -856,7 +925,12 @@ mod tests {
     /// Oracle: base_url validation — an invalid URL string must be rejected.
     #[test]
     fn new_rejects_invalid_url() {
-        let result = JmapChatClient::new(crate::auth::NoneAuth, "not a url").map(|_| ());
+        let result = JmapChatClient::new(
+            crate::auth::DefaultTransport,
+            crate::auth::NoneAuth,
+            "not a url",
+        )
+        .map(|_| ());
         match result {
             Err(ClientError::InvalidArgument(_)) => {}
             other => panic!("expected InvalidArgument, got {other:?}"),
@@ -866,15 +940,23 @@ mod tests {
     /// Oracle: base_url validation — a valid origin URL must be accepted.
     #[test]
     fn new_accepts_valid_base_url() {
-        let result = JmapChatClient::new(crate::auth::NoneAuth, "https://example.com");
+        let result = JmapChatClient::new(
+            crate::auth::DefaultTransport,
+            crate::auth::NoneAuth,
+            "https://example.com",
+        );
         assert!(result.is_ok(), "valid base_url must be accepted");
     }
 
     /// Oracle: base_url validation — an IP:port URL (as documented in the constructor) must be accepted.
     #[test]
     fn new_accepts_ip_port_base_url() {
-        let result =
-            JmapChatClient::new(crate::auth::NoneAuth, "https://100.64.1.1:8008").map(|_| ());
+        let result = JmapChatClient::new(
+            crate::auth::DefaultTransport,
+            crate::auth::NoneAuth,
+            "https://100.64.1.1:8008",
+        )
+        .map(|_| ());
         assert!(
             result.is_ok(),
             "IP:port base_url must be accepted: {result:?}"
@@ -884,16 +966,25 @@ mod tests {
     /// Oracle: base_url validation — an IPv6 literal URL must be accepted.
     #[test]
     fn new_accepts_ipv6_base_url() {
-        let result = JmapChatClient::new(crate::auth::NoneAuth, "https://[::1]:8008").map(|_| ());
+        let result = JmapChatClient::new(
+            crate::auth::DefaultTransport,
+            crate::auth::NoneAuth,
+            "https://[::1]:8008",
+        )
+        .map(|_| ());
         assert!(result.is_ok(), "IPv6 base_url must be accepted: {result:?}");
     }
 
     /// Oracle: base_url validation — a URL with a query string must be rejected.
     #[test]
     fn new_rejects_base_url_with_query() {
-        let err = JmapChatClient::new(crate::auth::NoneAuth, "https://host?foo=1")
-            .map(|_| ())
-            .expect_err("base_url with query must be rejected");
+        let err = JmapChatClient::new(
+            crate::auth::DefaultTransport,
+            crate::auth::NoneAuth,
+            "https://host?foo=1",
+        )
+        .map(|_| ())
+        .expect_err("base_url with query must be rejected");
         assert!(
             matches!(err, ClientError::InvalidArgument(_)),
             "expected InvalidArgument, got {err:?}"
@@ -903,9 +994,13 @@ mod tests {
     /// Oracle: base_url validation — a URL with a fragment must be rejected.
     #[test]
     fn new_rejects_base_url_with_fragment() {
-        let err = JmapChatClient::new(crate::auth::NoneAuth, "https://host#anchor")
-            .map(|_| ())
-            .expect_err("base_url with fragment must be rejected");
+        let err = JmapChatClient::new(
+            crate::auth::DefaultTransport,
+            crate::auth::NoneAuth,
+            "https://host#anchor",
+        )
+        .map(|_| ())
+        .expect_err("base_url with fragment must be rejected");
         assert!(
             matches!(err, ClientError::InvalidArgument(_)),
             "expected InvalidArgument, got {err:?}"

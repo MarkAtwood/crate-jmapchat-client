@@ -49,7 +49,12 @@ async fn call_batch_returns_all_responses() {
         .mount(&server)
         .await;
 
-    let client = JmapChatClient::new(jmap_chat::NoneAuth, &server.uri()).unwrap();
+    let client = JmapChatClient::new(
+        jmap_chat::DefaultTransport,
+        jmap_chat::NoneAuth,
+        &server.uri(),
+    )
+    .unwrap();
     let session = test_session(&server.uri());
 
     let req = JmapRequestBuilder::new(&["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:chat"])
@@ -95,7 +100,12 @@ async fn quota_get_returns_quota_list() {
         .mount(&server)
         .await;
 
-    let client = JmapChatClient::new(jmap_chat::NoneAuth, &server.uri()).unwrap();
+    let client = JmapChatClient::new(
+        jmap_chat::DefaultTransport,
+        jmap_chat::NoneAuth,
+        &server.uri(),
+    )
+    .unwrap();
     let session = test_session(&server.uri());
 
     let quotas = client
@@ -156,7 +166,12 @@ async fn quota_get_uses_quotas_capability_not_chat() {
         .mount(&server)
         .await;
 
-    let client = JmapChatClient::new(jmap_chat::NoneAuth, &server.uri()).unwrap();
+    let client = JmapChatClient::new(
+        jmap_chat::DefaultTransport,
+        jmap_chat::NoneAuth,
+        &server.uri(),
+    )
+    .unwrap();
     let session = test_session(&server.uri());
 
     client
@@ -190,7 +205,12 @@ async fn push_subscription_create_without_chat_push_uses_core_only() {
         .mount(&server)
         .await;
 
-    let client = JmapChatClient::new(jmap_chat::NoneAuth, &server.uri()).unwrap();
+    let client = JmapChatClient::new(
+        jmap_chat::DefaultTransport,
+        jmap_chat::NoneAuth,
+        &server.uri(),
+    )
+    .unwrap();
     let api_url = format!("{}/api", server.uri());
     let session = test_session(&api_url);
 

@@ -8,15 +8,21 @@ use jmap_chat_egui::{
 fn main() -> eframe::Result<()> {
     let config = <jmap_chat_egui::config::Config as clap::Parser>::parse();
 
-    let auth = config.auth_provider().unwrap_or_else(|e| {
+    let transport = config.transport().unwrap_or_else(|e| {
         eprintln!("error: {e}");
         std::process::exit(1);
     });
 
-    let client = jmap_chat::JmapChatClient::new(auth, &config.server_url).unwrap_or_else(|e| {
+    let auth = config.auth().unwrap_or_else(|e| {
         eprintln!("error: {e}");
         std::process::exit(1);
     });
+
+    let client = jmap_chat::JmapChatClient::new(transport, auth, &config.server_url)
+        .unwrap_or_else(|e| {
+            eprintln!("error: {e}");
+            std::process::exit(1);
+        });
 
     // Unbounded channel from background task to UI: events are never dropped
     // due to backpressure (no channel-full condition; receiver is always draining).
