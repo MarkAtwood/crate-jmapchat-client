@@ -133,7 +133,7 @@ pub struct Span {
 /// Per spec (IMPROVEMENTS.md §13), `Message.body` for rich messages is a JSON-encoded *string*
 /// (not an embedded object). Parse with:
 /// ```rust,no_run
-/// # use jmap_chat::RichBody;
+/// # use jmapchat_client::RichBody;
 /// # let message_body = String::new();
 /// let rich: RichBody = serde_json::from_str(&message_body).unwrap();
 /// ```

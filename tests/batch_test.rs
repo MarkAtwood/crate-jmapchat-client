@@ -4,13 +4,13 @@
 // asserts key fields of the response.  Fixtures are in tests/fixtures/methods/
 // (response shapes) and tests/fixtures/jmap/ (request shapes).
 
-use jmap_chat::{
+use jmapchat_client::{
     ChatPushConfig, ClientError, JmapChatClient, JmapRequestBuilder, PushSubscriptionCreateInput,
 };
 use wiremock::matchers::{body_json, method};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
-fn test_session(api_url: &str) -> jmap_chat::Session {
+fn test_session(api_url: &str) -> jmapchat_client::Session {
     serde_json::from_value(serde_json::json!({
         "capabilities": {},
         "accounts": {},
@@ -52,8 +52,8 @@ async fn call_batch_returns_all_responses() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .unwrap();
@@ -103,8 +103,8 @@ async fn quota_get_returns_quota_list() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .unwrap();
@@ -125,7 +125,7 @@ async fn quota_get_returns_quota_list() {
         .find(|q| q.id == "quota-msg-1")
         .expect("quota-msg-1 must be present");
     assert_eq!(msg_quota.name, "Message Storage");
-    assert_eq!(msg_quota.scope, jmap_chat::QuotaScope::Account);
+    assert_eq!(msg_quota.scope, jmapchat_client::QuotaScope::Account);
     assert_eq!(msg_quota.data_types, vec!["Message"]);
     assert_eq!(msg_quota.used, 52428800);
     assert_eq!(msg_quota.hard_limit, 1073741824);
@@ -169,8 +169,8 @@ async fn quota_get_uses_quotas_capability_not_chat() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .unwrap();
@@ -208,8 +208,8 @@ async fn push_subscription_create_without_chat_push_uses_core_only() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .unwrap();
@@ -254,8 +254,8 @@ async fn call_batch_duplicate_call_id_returns_parse_error() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .unwrap();
@@ -291,8 +291,8 @@ async fn call_batch_duplicate_call_id_returns_parse_error() {
 #[tokio::test]
 async fn push_subscription_create_duplicate_account_id_returns_invalid_argument() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "https://example.invalid",
     )
     .unwrap();

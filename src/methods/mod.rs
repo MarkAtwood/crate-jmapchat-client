@@ -925,10 +925,10 @@ impl<'a> PushSubscriptionCreateInput<'a> {
 /// every call.
 ///
 /// ```rust,no_run
-/// # use jmap_chat::{DefaultTransport, JmapChatClient, NoneAuth};
-/// # async fn example() -> Result<(), jmap_chat::ClientError> {
+/// # use jmapchat_client::{DefaultTransport, JmapChatClient, NoneAuth};
+/// # async fn example() -> Result<(), jmapchat_client::ClientError> {
 /// # let client = JmapChatClient::new(DefaultTransport, NoneAuth, "http://localhost").unwrap();
-/// # let session: jmap_chat::Session = todo!();
+/// # let session: jmapchat_client::Session = todo!();
 /// let sc = client.with_session(&session);
 /// let chats = sc.chat_get(None, None).await?;
 /// # Ok(())

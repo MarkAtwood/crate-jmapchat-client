@@ -6,7 +6,7 @@
 // Fixtures live in tests/fixtures/methods/ and are hand-written from the
 // RFC 8620 §5 response shapes — they are NOT derived from the code under test.
 
-use jmap_chat::{
+use jmapchat_client::{
     AddMemberInput, ChatContactPatch, ChatContactQueryInput, ChatCreateInput, ChatPatch,
     ChatQueryInput, ClientError, ContactSortProperty, GetResponse, JmapChatClient,
     MessageCreateInput, MessagePatch, MessageQueryInput, OwnerPresence, PresenceStatusPatch,
@@ -16,7 +16,7 @@ use jmap_chat::{
 use wiremock::matchers::{body_json, method};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
-fn test_session(api_url: &str) -> jmap_chat::Session {
+fn test_session(api_url: &str) -> jmapchat_client::Session {
     // "account1" is the chat primary account id used across all test fixtures.
     // accounts map is intentionally empty — tests only need chat_account_id(),
     // not the full AccountInfo. chat_capability() returns Ok(None) on this session.
@@ -61,8 +61,8 @@ async fn chat_get_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -103,21 +103,21 @@ async fn message_create_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
 
     let api_url = format!("{}/api", server.uri());
-    let sent_at = jmap_chat::UTCDate::from_raw("2024-01-02T12:00:00Z");
+    let sent_at = jmapchat_client::UTCDate::from_raw("2024-01-02T12:00:00Z");
     let result = client
         .with_session(&test_session(&api_url))
         .message_create(
             &MessageCreateInput::new(
                 "01HV5Z6QKWJ7N3P8R2X4YTMD3G",
                 "Hello, world!",
-                jmap_chat::BodyType::Plain,
+                jmapchat_client::BodyType::Plain,
                 &sent_at,
             )
             .with_client_id("client-ulid-001"),
@@ -160,8 +160,8 @@ async fn read_position_update_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -206,8 +206,8 @@ async fn chat_get_method_error_returns_client_error() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -245,8 +245,8 @@ async fn chat_get_method_error_returns_client_error() {
 #[tokio::test]
 async fn message_query_rejects_invalid_filter() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -290,8 +290,8 @@ async fn message_query_rejects_invalid_filter() {
 #[tokio::test]
 async fn message_get_rejects_empty_ids() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -386,8 +386,8 @@ async fn chat_query_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -432,8 +432,8 @@ async fn chat_changes_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -468,8 +468,8 @@ async fn message_get_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -515,8 +515,8 @@ async fn message_query_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -558,8 +558,8 @@ async fn message_changes_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -604,8 +604,8 @@ async fn chat_contact_get_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -652,8 +652,8 @@ async fn read_position_get_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -691,8 +691,8 @@ async fn presence_status_get_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -737,8 +737,8 @@ async fn read_position_changes_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -773,8 +773,8 @@ async fn presence_status_update_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -813,8 +813,8 @@ async fn presence_status_changes_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -849,8 +849,8 @@ async fn custom_emoji_get_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -885,8 +885,8 @@ async fn custom_emoji_changes_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -912,7 +912,7 @@ async fn custom_emoji_changes_returns_typed_response() {
 /// Fixture hand-written from §5.3 /set response definition.
 #[tokio::test]
 async fn custom_emoji_create_returns_typed_response() {
-    use jmap_chat::CustomEmojiCreateInput;
+    use jmapchat_client::CustomEmojiCreateInput;
 
     let server = MockServer::start().await;
 
@@ -924,8 +924,8 @@ async fn custom_emoji_create_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -955,7 +955,7 @@ async fn custom_emoji_create_returns_typed_response() {
 /// null filter and some servers may reject unknown null fields.
 #[tokio::test]
 async fn custom_emoji_query_returns_typed_response() {
-    use jmap_chat::CustomEmojiQueryInput;
+    use jmapchat_client::CustomEmojiQueryInput;
 
     let server = MockServer::start().await;
 
@@ -973,8 +973,8 @@ async fn custom_emoji_query_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -1016,8 +1016,8 @@ async fn custom_emoji_query_changes_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -1053,8 +1053,8 @@ async fn space_ban_get_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -1092,8 +1092,8 @@ async fn space_ban_create_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -1131,8 +1131,8 @@ async fn space_ban_changes_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -1168,8 +1168,8 @@ async fn space_invite_get_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -1204,8 +1204,8 @@ async fn space_invite_changes_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -1240,8 +1240,8 @@ async fn space_invite_create_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -1292,8 +1292,8 @@ async fn message_update_body_edit_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -1330,7 +1330,7 @@ async fn message_update_body_edit_returns_typed_response() {
 #[tokio::test]
 async fn message_update_add_reaction_sends_correct_patch() {
     let server = MockServer::start().await;
-    let sent_at = jmap_chat::UTCDate::from_raw("2024-01-02T12:00:00Z");
+    let sent_at = jmapchat_client::UTCDate::from_raw("2024-01-02T12:00:00Z");
 
     Mock::given(method("POST"))
         .and(body_json(serde_json::json!({
@@ -1354,8 +1354,8 @@ async fn message_update_add_reaction_sends_correct_patch() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -1406,8 +1406,8 @@ async fn message_destroy_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -1434,8 +1434,8 @@ async fn message_destroy_returns_typed_response() {
 #[tokio::test]
 async fn message_destroy_rejects_empty_ids() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -1471,8 +1471,8 @@ async fn message_query_changes_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -1525,8 +1525,8 @@ async fn message_query_with_text_filter_sends_correct_body() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -1584,8 +1584,8 @@ async fn chat_create_direct_variant_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -1648,8 +1648,8 @@ async fn chat_create_group_variant_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -1712,8 +1712,8 @@ async fn chat_update_muted_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -1761,8 +1761,8 @@ async fn chat_typing_sends_correct_args() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -1787,8 +1787,8 @@ async fn chat_typing_sends_correct_args() {
 #[tokio::test]
 async fn chat_typing_rejects_empty_chat_id() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -1832,8 +1832,8 @@ async fn chat_query_changes_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -1884,15 +1884,15 @@ async fn chat_update_with_add_members_role_serializes_correctly() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
 
     let api_url = format!("{}/api", server.uri());
     let members =
-        [AddMemberInput::new("contact-id-003").with_role(jmap_chat::ChatMemberRole::Admin)];
+        [AddMemberInput::new("contact-id-003").with_role(jmapchat_client::ChatMemberRole::Admin)];
     let result = client
         .with_session(&test_session(&api_url))
         .chat_update("01HV5Z6QKWJ7N3P8R2X4YTMDAA", &{
@@ -1935,8 +1935,8 @@ async fn chat_contact_changes_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -1986,8 +1986,8 @@ async fn chat_contact_update_blocked_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -2044,8 +2044,8 @@ async fn chat_contact_query_filters_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -2098,8 +2098,8 @@ async fn chat_contact_query_changes_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -2135,8 +2135,8 @@ async fn space_get_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -2185,8 +2185,8 @@ async fn space_changes_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -2238,8 +2238,8 @@ async fn space_create_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -2286,8 +2286,8 @@ async fn space_update_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -2334,8 +2334,8 @@ async fn space_destroy_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -2381,8 +2381,8 @@ async fn space_query_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -2433,8 +2433,8 @@ async fn space_query_changes_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -2478,8 +2478,8 @@ async fn space_join_by_invite_code() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -2521,8 +2521,8 @@ async fn space_join_by_space_id() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -2579,19 +2579,19 @@ async fn push_subscription_create_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
 
     let api_url = format!("{}/api", server.uri());
-    let push_config = jmap_chat::ChatPushConfig {
+    let push_config = jmapchat_client::ChatPushConfig {
         kinds: None,
         chat_ids: None,
         properties: None,
-        urgency: Some(jmap_chat::PushUrgency::Normal),
-        mention_urgency: Some(jmap_chat::PushUrgency::High),
+        urgency: Some(jmapchat_client::PushUrgency::Normal),
+        mention_urgency: Some(jmapchat_client::PushUrgency::High),
     };
     let result = client
         .with_session(&test_session(&api_url))
@@ -2631,8 +2631,8 @@ async fn blob_lookup_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must not fail");
@@ -2668,7 +2668,7 @@ async fn blob_lookup_returns_typed_response() {
 #[tokio::test]
 async fn message_update_read_at_sends_correct_patch() {
     let server = MockServer::start().await;
-    let read_at = jmap_chat::UTCDate::from_raw("2024-01-01T10:05:00Z");
+    let read_at = jmapchat_client::UTCDate::from_raw("2024-01-01T10:05:00Z");
 
     Mock::given(method("POST"))
         .and(body_json(serde_json::json!({
@@ -2689,8 +2689,8 @@ async fn message_update_read_at_sends_correct_patch() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -2736,8 +2736,8 @@ async fn message_query_with_thread_root_id_sends_correct_filter() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -2773,18 +2773,18 @@ async fn message_create_rate_limited_returns_error() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
 
     let api_url = format!("{}/api", server.uri());
-    let sent_at = jmap_chat::UTCDate::from_raw("2024-01-01T10:00:30Z");
+    let sent_at = jmapchat_client::UTCDate::from_raw("2024-01-01T10:00:30Z");
     let err = client
         .with_session(&test_session(&api_url))
         .message_create(
-            &MessageCreateInput::new("chat-001", "Hello", jmap_chat::BodyType::Plain, &sent_at)
+            &MessageCreateInput::new("chat-001", "Hello", jmapchat_client::BodyType::Plain, &sent_at)
                 .with_client_id("client-id-001"),
         )
         .await
@@ -2823,8 +2823,8 @@ async fn chat_destroy_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -2874,8 +2874,8 @@ async fn chat_create_channel_variant_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
@@ -2915,7 +2915,7 @@ async fn chat_create_channel_variant_returns_typed_response() {
 /// intended to modify.
 #[test]
 fn patch_keep_serialization_fails() {
-    let result = serde_json::to_value(&jmap_chat::Patch::<String>::Keep);
+    let result = serde_json::to_value(&jmapchat_client::Patch::<String>::Keep);
     assert!(
         result.is_err(),
         "Patch::Keep must not serialize to any JSON value; got: {:?}",
@@ -2927,7 +2927,7 @@ fn patch_keep_serialization_fails() {
 /// this is the wire value that tells the server to clear a nullable field).
 #[test]
 fn patch_clear_serializes_as_null() {
-    let v = serde_json::to_value(&jmap_chat::Patch::<String>::Clear)
+    let v = serde_json::to_value(&jmapchat_client::Patch::<String>::Clear)
         .expect("Patch::Clear must serialize");
     assert_eq!(v, serde_json::Value::Null);
 }
@@ -2935,7 +2935,7 @@ fn patch_clear_serializes_as_null() {
 /// Regression guard: `Patch::Set(v)` serializes as the inner value.
 #[test]
 fn patch_set_serializes_as_inner_value() {
-    let v = serde_json::to_value(&jmap_chat::Patch::Set("hello".to_string()))
+    let v = serde_json::to_value(&jmapchat_client::Patch::Set("hello".to_string()))
         .expect("Patch::Set must serialize");
     assert_eq!(v, serde_json::json!("hello"));
 }
@@ -2949,16 +2949,16 @@ fn patch_set_serializes_as_inner_value() {
 #[tokio::test]
 async fn message_create_rejects_empty_reply_to() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
-    let sent_at = jmap_chat::UTCDate::from_raw("2024-01-01T00:00:00Z");
+    let sent_at = jmapchat_client::UTCDate::from_raw("2024-01-01T00:00:00Z");
     let err = client
         .with_session(&test_session("http://127.0.0.1:1/api"))
         .message_create(
-            &MessageCreateInput::new("chat-1", "hello", jmap_chat::BodyType::Plain, &sent_at)
+            &MessageCreateInput::new("chat-1", "hello", jmapchat_client::BodyType::Plain, &sent_at)
                 .with_reply_to(""),
         )
         .await
@@ -2973,10 +2973,10 @@ async fn message_create_rejects_empty_reply_to() {
 /// InvalidArgument — an empty space ID is semantically invalid.
 #[tokio::test]
 async fn custom_emoji_query_rejects_empty_filter_space_id() {
-    use jmap_chat::CustomEmojiQueryInput;
+    use jmapchat_client::CustomEmojiQueryInput;
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -2997,10 +2997,10 @@ async fn custom_emoji_query_rejects_empty_filter_space_id() {
 /// any network I/O — an empty channel name is semantically invalid.
 #[tokio::test]
 async fn space_update_rejects_empty_add_channel_name() {
-    use jmap_chat::SpaceAddChannelInput;
+    use jmapchat_client::SpaceAddChannelInput;
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3023,8 +3023,8 @@ async fn space_update_rejects_empty_add_channel_name() {
 #[tokio::test]
 async fn chat_update_rejects_empty_add_member_id() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3046,10 +3046,10 @@ async fn chat_update_rejects_empty_add_member_id() {
 /// any network I/O.
 #[tokio::test]
 async fn chat_update_rejects_empty_update_member_role_id() {
-    use jmap_chat::{ChatMemberRole, UpdateMemberRoleInput};
+    use jmapchat_client::{ChatMemberRole, UpdateMemberRoleInput};
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3071,8 +3071,8 @@ async fn chat_update_rejects_empty_update_member_role_id() {
 #[tokio::test]
 async fn space_update_rejects_empty_remove_member_id() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3094,8 +3094,8 @@ async fn space_update_rejects_empty_remove_member_id() {
 #[tokio::test]
 async fn space_update_rejects_empty_remove_channel_id() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3117,8 +3117,8 @@ async fn space_update_rejects_empty_remove_channel_id() {
 #[tokio::test]
 async fn chat_update_rejects_empty_remove_member_id() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3140,8 +3140,8 @@ async fn chat_update_rejects_empty_remove_member_id() {
 #[tokio::test]
 async fn message_query_rejects_empty_thread_root_id() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3163,8 +3163,8 @@ async fn message_query_rejects_empty_thread_root_id() {
 #[tokio::test]
 async fn chat_create_group_rejects_empty_member_id() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3190,8 +3190,8 @@ async fn chat_create_group_rejects_empty_member_id() {
 #[tokio::test]
 async fn chat_update_rejects_empty_pinned_message_id() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3212,8 +3212,8 @@ async fn chat_update_rejects_empty_pinned_message_id() {
 #[tokio::test]
 async fn space_invite_create_rejects_empty_default_channel_id() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3234,8 +3234,8 @@ async fn space_invite_create_rejects_empty_default_channel_id() {
 #[tokio::test]
 async fn space_destroy_rejects_empty_id_element() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3254,8 +3254,8 @@ async fn space_destroy_rejects_empty_id_element() {
 #[tokio::test]
 async fn chat_destroy_rejects_empty_id_element() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3274,8 +3274,8 @@ async fn chat_destroy_rejects_empty_id_element() {
 #[tokio::test]
 async fn message_destroy_rejects_empty_id_element() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3294,8 +3294,8 @@ async fn message_destroy_rejects_empty_id_element() {
 #[tokio::test]
 async fn custom_emoji_destroy_rejects_empty_id_element() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3314,8 +3314,8 @@ async fn custom_emoji_destroy_rejects_empty_id_element() {
 #[tokio::test]
 async fn space_ban_destroy_rejects_empty_id_element() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3334,8 +3334,8 @@ async fn space_ban_destroy_rejects_empty_id_element() {
 #[tokio::test]
 async fn space_invite_destroy_rejects_empty_id_element() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3353,10 +3353,10 @@ async fn space_invite_destroy_rejects_empty_id_element() {
 /// Oracle: space_update addMembers must reject role_ids containing an empty string.
 #[tokio::test]
 async fn space_update_rejects_empty_add_member_role_id() {
-    use jmap_chat::SpaceAddMemberInput;
+    use jmapchat_client::SpaceAddMemberInput;
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3380,10 +3380,10 @@ async fn space_update_rejects_empty_add_member_role_id() {
 /// Oracle: space_update updateMembers must reject role_ids containing an empty string.
 #[tokio::test]
 async fn space_update_rejects_empty_update_member_role_id() {
-    use jmap_chat::SpaceUpdateMemberInput;
+    use jmapchat_client::SpaceUpdateMemberInput;
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3407,10 +3407,10 @@ async fn space_update_rejects_empty_update_member_role_id() {
 /// Oracle: space_update addChannels must reject category_id="" with InvalidArgument.
 #[tokio::test]
 async fn space_update_rejects_empty_add_channel_category_id() {
-    use jmap_chat::SpaceAddChannelInput;
+    use jmapchat_client::SpaceAddChannelInput;
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3433,10 +3433,10 @@ async fn space_update_rejects_empty_add_channel_category_id() {
 /// Oracle: custom_emoji_create must reject space_id=Some("") with InvalidArgument.
 #[tokio::test]
 async fn custom_emoji_create_rejects_empty_space_id() {
-    use jmap_chat::CustomEmojiCreateInput;
+    use jmapchat_client::CustomEmojiCreateInput;
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3457,8 +3457,8 @@ async fn custom_emoji_create_rejects_empty_space_id() {
 #[tokio::test]
 async fn space_create_rejects_empty_icon_blob_id() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3479,8 +3479,8 @@ async fn space_create_rejects_empty_icon_blob_id() {
 #[tokio::test]
 async fn chat_create_group_rejects_empty_avatar_blob_id() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3506,8 +3506,8 @@ async fn chat_create_group_rejects_empty_avatar_blob_id() {
 #[tokio::test]
 async fn chat_get_rejects_empty_id_element() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3526,8 +3526,8 @@ async fn chat_get_rejects_empty_id_element() {
 #[tokio::test]
 async fn message_get_rejects_empty_id_element() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3546,8 +3546,8 @@ async fn message_get_rejects_empty_id_element() {
 #[tokio::test]
 async fn space_get_rejects_empty_id_element() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3566,8 +3566,8 @@ async fn space_get_rejects_empty_id_element() {
 #[tokio::test]
 async fn custom_emoji_get_rejects_empty_id_element() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3586,8 +3586,8 @@ async fn custom_emoji_get_rejects_empty_id_element() {
 #[tokio::test]
 async fn space_ban_get_rejects_empty_id_element() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3606,8 +3606,8 @@ async fn space_ban_get_rejects_empty_id_element() {
 #[tokio::test]
 async fn space_invite_get_rejects_empty_id_element() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3626,8 +3626,8 @@ async fn space_invite_get_rejects_empty_id_element() {
 #[tokio::test]
 async fn read_position_get_rejects_empty_id_element() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3646,8 +3646,8 @@ async fn read_position_get_rejects_empty_id_element() {
 #[tokio::test]
 async fn chat_contact_get_rejects_empty_id_element() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
@@ -3666,8 +3666,8 @@ async fn chat_contact_get_rejects_empty_id_element() {
 #[tokio::test]
 async fn blob_lookup_rejects_empty_id_element() {
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         "http://127.0.0.1:1",
     )
     .expect("client construction must succeed");
