@@ -183,12 +183,16 @@ impl crate::client::JmapChatClient {
             .map_err(crate::error::ClientError::WebSocket)?;
 
         if let Some((name, value)) = self.auth.auth_header() {
-            let hdr_name: reqwest::header::HeaderName = name
-                .parse()
-                .expect("pre-computed auth header name is always valid");
-            let hdr_value: reqwest::header::HeaderValue = value
-                .parse()
-                .expect("pre-computed auth header value is always valid");
+            let hdr_name: reqwest::header::HeaderName = name.parse().map_err(|e| {
+                crate::error::ClientError::InvalidArgument(format!(
+                    "auth header name is invalid: {e}"
+                ))
+            })?;
+            let hdr_value: reqwest::header::HeaderValue = value.parse().map_err(|e| {
+                crate::error::ClientError::InvalidArgument(format!(
+                    "auth header value is invalid: {e}"
+                ))
+            })?;
             request.headers_mut().insert(hdr_name, hdr_value);
         }
 

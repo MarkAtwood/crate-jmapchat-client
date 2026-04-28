@@ -944,6 +944,16 @@ mod tests {
     // JmapRequestBuilder tests
     // ---------------------------------------------------------------------------
 
+    /// Oracle: RFC 8620 §3.3 — duplicate call_id is a programmer error; the
+    /// builder panics immediately rather than producing an ambiguous request.
+    #[test]
+    #[should_panic(expected = "duplicate call_id")]
+    fn request_builder_panics_on_duplicate_call_id() {
+        JmapRequestBuilder::new(&["urn:ietf:params:jmap:core"])
+            .add_call("Chat/get", json!({}), "r1")
+            .add_call("Message/get", json!({}), "r1"); // duplicate "r1" must panic
+    }
+
     /// Oracle: RFC 8620 §3.3 — builder produces JmapRequest with correct using
     /// and method_calls arrays, derived from spec structure.
     #[test]
