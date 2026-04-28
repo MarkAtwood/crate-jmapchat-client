@@ -206,6 +206,17 @@ pub struct TypingResponse {
 ///   attribute `#[serde(skip_serializing_if = "Patch::is_keep")]` **must** be
 ///   present on every `Patch<T>` field, or serializing a `Keep` variant will
 ///   produce a runtime error.
+///
+/// # Deserialization
+///
+/// `Patch::Keep` is **not reachable from JSON deserialization**.  The custom
+/// `Deserialize` impl maps JSON `null` → `Clear` and a JSON value → `Set(v)`.
+/// An absent key (via `#[serde(default)]`) produces `Keep` via `Default`, but
+/// that path is triggered by serde's field-absence logic, not by deserializing
+/// a JSON token.  In practice this means: any `Patch<T>` value obtained by
+/// deserializing a JSON object will always be `Clear` or `Set` — never `Keep`.
+/// Code that round-trips patch structs through serde must not assume `Keep` can
+/// appear in inbound data.
 #[derive(Debug, Default, Clone, PartialEq)]
 pub enum Patch<T> {
     #[default]

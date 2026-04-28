@@ -15,6 +15,11 @@ use crate::error::ClientError;
 /// Implementations configure TLS trust roots, client certificates, and
 /// connect timeouts. This is separate from credential injection
 /// (see [`AuthProvider`]) so transports and credentials compose freely.
+///
+/// **Implement this trait** when you need custom TLS logic (e.g. a private CA
+/// or a client certificate).  For custom per-request credentials only,
+/// implement [`AuthProvider`] instead.  [`DefaultTransport`] covers the common
+/// case of publicly-trusted TLS with no custom certificates.
 pub trait TransportConfig: Send + Sync {
     /// Build the [`reqwest::Client`] for this transport configuration.
     fn build_client(&self) -> Result<reqwest::Client, ClientError>;
@@ -69,6 +74,11 @@ impl TransportConfig for CustomCaTransport {
 ///
 /// Separate from transport configuration ([`TransportConfig`]) so any
 /// credential scheme can be paired with any transport.
+///
+/// **Implement this trait** when you need a custom `Authorization` header or
+/// other per-request credential scheme.  For custom TLS/trust-root logic
+/// implement [`TransportConfig`] instead.  [`NoneAuth`], [`BearerAuth`], and
+/// [`BasicAuth`] cover the common cases.
 ///
 /// Implementations **must not** log the return value of [`auth_header`];
 /// it contains credentials.

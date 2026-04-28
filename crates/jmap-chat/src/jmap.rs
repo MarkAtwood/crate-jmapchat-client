@@ -74,8 +74,12 @@ impl Id {
 
     /// Create an `Id` from a string, bypassing the non-empty validation.
     ///
-    /// **Only use for server-assigned identifiers and test fixtures.**
-    /// Do not pass user-controlled input — call [`Id::new`] instead.
+    /// # Caller invariant
+    ///
+    /// The caller asserts that `s` is non-empty because it came from a trusted
+    /// source: a server JSON response or a hardcoded test vector.  Do not pass
+    /// user-controlled or runtime-computed strings — call [`Id::new`] instead,
+    /// which validates and returns an error on empty input.
     /// Panics in debug builds if `s` is empty.
     pub fn from_raw(s: impl Into<String>) -> Self {
         let s = s.into();
@@ -124,8 +128,12 @@ impl UTCDate {
 
     /// Create a `UTCDate` from a string, bypassing the non-empty validation.
     ///
-    /// **Only use for server-assigned identifiers and test fixtures.**
-    /// Do not pass user-controlled input — call [`UTCDate::new`] instead.
+    /// # Caller invariant
+    ///
+    /// The caller asserts that `s` is non-empty because it came from a trusted
+    /// source: a server JSON response or a hardcoded test vector.  Do not pass
+    /// user-controlled or runtime-computed strings — call [`UTCDate::new`] instead,
+    /// which validates and returns an error on empty input.
     /// Panics in debug builds if `s` is empty.
     pub fn from_raw(s: impl Into<String>) -> Self {
         let s = s.into();
