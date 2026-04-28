@@ -53,6 +53,11 @@ impl super::SessionClient {
         blob_ids: &[&str],
         type_names: Option<&[&str]>,
     ) -> Result<BlobLookupResponse, crate::error::ClientError> {
+        if blob_ids.is_empty() {
+            return Err(crate::error::ClientError::InvalidArgument(
+                "blob_lookup: blob_ids may not be empty".into(),
+            ));
+        }
         let (api_url, account_id) = self.session_parts()?;
         let args = serde_json::json!({
             "accountId": account_id,
@@ -105,6 +110,16 @@ impl super::SessionClient {
         width: Option<u32>,
         height: Option<u32>,
     ) -> Result<BlobConvertResponse, crate::error::ClientError> {
+        if from_blob_id.is_empty() {
+            return Err(crate::error::ClientError::InvalidArgument(
+                "blob_convert: from_blob_id may not be empty".into(),
+            ));
+        }
+        if content_type.is_empty() {
+            return Err(crate::error::ClientError::InvalidArgument(
+                "blob_convert: content_type may not be empty".into(),
+            ));
+        }
         let (api_url, account_id) = self.session_parts()?;
         let mut args = serde_json::json!({
             "accountId": account_id,
