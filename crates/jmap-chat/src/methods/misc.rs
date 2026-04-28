@@ -82,6 +82,11 @@ impl super::SessionClient {
         since_state: &str,
         max_changes: Option<u64>,
     ) -> Result<super::ChangesResponse, crate::error::ClientError> {
+        if since_state.is_empty() {
+            return Err(crate::error::ClientError::InvalidArgument(
+                "read_position_changes: since_state may not be empty".into(),
+            ));
+        }
         let (api_url, account_id) = self.session_parts()?;
         let mut args = serde_json::json!({
             "accountId": account_id,
@@ -144,6 +149,11 @@ impl super::SessionClient {
         since_state: &str,
         max_changes: Option<u64>,
     ) -> Result<super::ChangesResponse, crate::error::ClientError> {
+        if since_state.is_empty() {
+            return Err(crate::error::ClientError::InvalidArgument(
+                "presence_status_changes: since_state may not be empty".into(),
+            ));
+        }
         let (api_url, account_id) = self.session_parts()?;
         let mut args = serde_json::json!({
             "accountId": account_id,

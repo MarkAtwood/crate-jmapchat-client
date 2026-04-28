@@ -34,6 +34,11 @@ impl super::SessionClient {
         since_state: &str,
         max_changes: Option<u64>,
     ) -> Result<ChangesResponse, crate::error::ClientError> {
+        if since_state.is_empty() {
+            return Err(crate::error::ClientError::InvalidArgument(
+                "space_changes: since_state may not be empty".into(),
+            ));
+        }
         let (api_url, account_id) = self.session_parts()?;
         let mut args = serde_json::json!({
             "accountId": account_id,
@@ -116,6 +121,11 @@ impl super::SessionClient {
         since_query_state: &str,
         max_changes: Option<u64>,
     ) -> Result<QueryChangesResponse, crate::error::ClientError> {
+        if since_query_state.is_empty() {
+            return Err(crate::error::ClientError::InvalidArgument(
+                "space_query_changes: since_query_state may not be empty".into(),
+            ));
+        }
         let (api_url, account_id) = self.session_parts()?;
         let mut args = serde_json::json!({
             "accountId": account_id,
@@ -173,9 +183,19 @@ impl super::SessionClient {
         let mut args = serde_json::json!({ "accountId": account_id });
         match input {
             SpaceJoinInput::InviteCode(ic) => {
+                if ic.is_empty() {
+                    return Err(crate::error::ClientError::InvalidArgument(
+                        "space_join: invite_code may not be empty".into(),
+                    ));
+                }
                 args["inviteCode"] = (*ic).into();
             }
             SpaceJoinInput::SpaceId(sid) => {
+                if sid.is_empty() {
+                    return Err(crate::error::ClientError::InvalidArgument(
+                        "space_join: space_id may not be empty".into(),
+                    ));
+                }
                 args["spaceId"] = (*sid).into();
             }
         }
@@ -227,7 +247,12 @@ impl super::SessionClient {
             if !members.is_empty() {
                 let arr: Vec<serde_json::Value> = members
                     .iter()
-                    .map(|m: &SpaceAddMemberInput<'_>| {
+                    .map(|m: &SpaceAddMemberInput<'_>| -> Result<serde_json::Value, crate::error::ClientError> {
+                        if m.id.is_empty() {
+                            return Err(crate::error::ClientError::InvalidArgument(
+                                "space_update: addMembers member id may not be empty".into(),
+                            ));
+                        }
                         let mut obj = serde_json::json!({ "id": m.id });
                         if let Some(role_ids) = m.role_ids {
                             obj["roleIds"] = serde_json::Value::Array(
@@ -237,9 +262,9 @@ impl super::SessionClient {
                                     .collect(),
                             );
                         }
-                        obj
+                        Ok(obj)
                     })
-                    .collect();
+                    .collect::<Result<Vec<_>, _>>()?;
                 patch_map.insert("addMembers".into(), serde_json::Value::Array(arr));
             }
         }
@@ -260,6 +285,11 @@ impl super::SessionClient {
                 let arr: Vec<serde_json::Value> = um
                     .iter()
                     .map(|u: &SpaceUpdateMemberInput<'_>| -> Result<serde_json::Value, crate::error::ClientError> {
+                        if u.id.is_empty() {
+                            return Err(crate::error::ClientError::InvalidArgument(
+                                "space_update: updateMembers member id may not be empty".into(),
+                            ));
+                        }
                         let mut obj = serde_json::json!({ "id": u.id });
                         if let Some(role_ids) = u.role_ids {
                             obj["roleIds"] = serde_json::Value::Array(

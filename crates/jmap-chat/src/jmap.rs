@@ -299,7 +299,16 @@ impl JmapRequestBuilder {
     }
 
     /// Consume the builder and produce the [`JmapRequest`].
+    ///
+    /// # Panics
+    ///
+    /// Panics if no method calls have been added. An empty `methodCalls` array
+    /// is invalid per RFC 8620 §3.3 and indicates a programmer error.
     pub fn build(self) -> JmapRequest {
+        assert!(
+            !self.method_calls.is_empty(),
+            "JmapRequestBuilder::build: method_calls must not be empty"
+        );
         JmapRequest {
             using: self.using,
             method_calls: self.method_calls,
