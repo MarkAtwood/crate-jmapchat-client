@@ -11,7 +11,7 @@
 // and RFC 8887. None of these payloads are produced by the code under test.
 
 use futures::{SinkExt as _, StreamExt as _};
-use jmap_chat::{ChatStreamEnable, DefaultTransport, JmapChatClient, NoneAuth, WsFrame};
+use jmapchat_client::{ChatStreamEnable, DefaultTransport, JmapChatClient, NoneAuth, WsFrame};
 use tokio::net::TcpListener;
 use tokio_tungstenite::{accept_async, tungstenite::Message};
 
@@ -187,10 +187,10 @@ async fn receives_chat_presence_event() {
     match frame {
         WsFrame::ChatPresence(evt) => {
             assert_eq!(evt.contact_id.as_str(), "user-abc");
-            assert_eq!(evt.presence, jmap_chat::ContactPresence::Online);
+            assert_eq!(evt.presence, jmapchat_client::ContactPresence::Online);
             assert_eq!(
                 evt.status_text,
-                jmap_chat::Patch::Set("Working remotely".to_string())
+                jmapchat_client::Patch::Set("Working remotely".to_string())
             );
         }
         other => panic!("expected ChatPresence, got {other:?}"),
@@ -276,11 +276,11 @@ async fn send_stream_enable_correct_json_shape() {
     let client = JmapChatClient::new(DefaultTransport, NoneAuth, "http://127.0.0.1").unwrap();
     let mut session = client.connect_ws(&url).await.expect("connect_ws");
 
-    let chat_id = jmap_chat::Id::from_raw("chat-1");
+    let chat_id = jmapchat_client::Id::from_raw("chat-1");
     let enable = ChatStreamEnable::new(
         &[
-            jmap_chat::ChatStreamDataType::Typing,
-            jmap_chat::ChatStreamDataType::Presence,
+            jmapchat_client::ChatStreamDataType::Typing,
+            jmapchat_client::ChatStreamDataType::Presence,
         ],
         Some(&[chat_id]),
         None,

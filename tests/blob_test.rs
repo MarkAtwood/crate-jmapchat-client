@@ -7,7 +7,7 @@
 // Fixtures are either inline JSON (upload) or raw bytes (download); none are
 // produced by the code under test.
 
-use jmap_chat::{BlobUploadResponse, ClientError, JmapChatClient};
+use jmapchat_client::{BlobUploadResponse, ClientError, JmapChatClient};
 use wiremock::{
     matchers::{method, path},
     Mock, MockServer, ResponseTemplate,
@@ -40,8 +40,8 @@ async fn upload_blob_happy_path() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must not fail");
@@ -81,8 +81,8 @@ async fn upload_blob_sha256_mismatch() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must not fail");
@@ -123,8 +123,8 @@ async fn upload_blob_no_sha256_skips_check() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must not fail");
@@ -156,8 +156,8 @@ async fn download_blob_happy_path() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must not fail");
@@ -198,8 +198,8 @@ async fn download_blob_sha256_mismatch() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must not fail");
@@ -245,8 +245,8 @@ async fn download_blob_no_sha256_skips_check() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must not fail");
@@ -280,8 +280,8 @@ async fn download_blob_with_type_substitution() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must not fail");
@@ -316,7 +316,7 @@ async fn download_blob_with_type_substitution() {
 /// Fixture hand-written from JMAP blob extension spec §7.
 #[tokio::test]
 async fn blob_convert_returns_typed_response() {
-    use jmap_chat::BlobConvertResponse;
+    use jmapchat_client::BlobConvertResponse;
     use wiremock::matchers::body_json;
 
     let server = MockServer::start().await;
@@ -344,14 +344,14 @@ async fn blob_convert_returns_typed_response() {
         .await;
 
     let client = JmapChatClient::new(
-        jmap_chat::DefaultTransport,
-        jmap_chat::NoneAuth,
+        jmapchat_client::DefaultTransport,
+        jmapchat_client::NoneAuth,
         &server.uri(),
     )
     .expect("client construction must succeed");
     // Build a minimal session with blob2 capability via serde to handle all fields.
     let api_url = format!("{}/api", server.uri());
-    let session: jmap_chat::Session = serde_json::from_value(serde_json::json!({
+    let session: jmapchat_client::Session = serde_json::from_value(serde_json::json!({
         "capabilities": { "urn:ietf:params:jmap:blob2": null },
         "accounts": {
             "account1": {
