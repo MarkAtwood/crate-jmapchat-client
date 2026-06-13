@@ -1,4 +1,26 @@
-# jmapchat-client
+# jmapchat-client — ABANDONED
+
+> **This project is abandoned.** It has been superseded by `jmap-chat-client` in the
+> JMAP monorepo workspace at `~/PROJECT/crate-jmap/`, which shares types with
+> `jmap-chat-types` and `jmap-chat-server` and builds on the shared `jmap-base-client`
+> HTTP/WebSocket/SSE infrastructure.
+>
+> This standalone crate defines all 2,500+ lines of chat domain types locally in
+> `types.rs` — a full parallel copy that would diverge from the monorepo as the spec
+> evolves. The monorepo client uses shared types (single source of truth), shared
+> transport infrastructure, vendor extension round-trip via `extra` fields, and
+> forward-compatible `impl_string_enum!` enums with `Other(String)` fallback.
+>
+> No further development will occur here. Use `crate-jmap/crate-jmap-chat-client`
+> instead.
+
+---
+
+*Original README preserved below for reference.*
+
+---
+
+# jmapchat-client (historical)
 
 An auth-agnostic Rust client library for the [JMAP Chat](https://github.com/MarkAtwood/jmap-chat-spec) protocol.
 
