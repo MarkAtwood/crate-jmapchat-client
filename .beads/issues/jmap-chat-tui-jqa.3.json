@@ -1,0 +1,25 @@
+{
+  "id": "jmap-chat-tui-jqa.3",
+  "title": "Separate required object ID from optional patch fields",
+  "description": "Update input structs mix a required id (the object to update) with optional patch fields. Because id has no default, Default cannot be derived, so callers must write out every field even when patching just one:\n\nChatUpdateInput { id: 'abc', muted: Some(true), mute_until: None, receive_typing_indicators: None, pinned_message_ids: None, ... } // 13 fields\n\nFix: move id to a direct method parameter, rename struct to *Patch, derive Default:\n\nclient.chat_update(\u0026session, 'abc', \u0026ChatPatch { muted: Some(true), ..Default::default() })\n\nAffected update structs (5):\n- ChatUpdateInput -\u003e ChatPatch\n- MessageUpdateInput -\u003e MessagePatch (also: reaction_changes: \u0026[] becomes absent by default)\n- PresenceStatusSetInput -\u003e PresenceStatusPatch\n- ChatContactSetInput -\u003e ChatContactPatch\n- SpaceUpdateInput -\u003e SpacePatch\n\nMethod signatures change: the id parameter moves out of the struct and becomes the second argument after session.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T14:31:02Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T15:10:51Z",
+  "closed_at": "2026-04-27T15:10:51Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-jqa.3",
+      "depends_on_id": "jmap-chat-tui-jqa",
+      "type": "parent-child",
+      "created_at": "2026-04-27T07:31:01Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

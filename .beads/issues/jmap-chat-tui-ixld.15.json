@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-ixld.15",
+  "title": "two-trait split: doc which trait to implement for each use case",
+  "description": "TransportConfig and AuthProvider trait docs explain what each trait does but not which one a contributor should implement in common scenarios. A contributor writing a custom auth scheme must read JmapChatClient::new and both trait definitions before understanding the rule: implement TransportConfig for custom TLS/trust-root logic; implement AuthProvider for custom header injection; implement both only if the same type needs to control both. The trait-level docs should each include a one-sentence decision guide so contributors do not have to read the constructor to figure out the right trait.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T01:04:56Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T01:29:44Z",
+  "closed_at": "2026-04-28T01:29:44Z",
+  "close_reason": "Added decision guide to TransportConfig and AuthProvider trait docs in auth.rs",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-ixld.15",
+      "depends_on_id": "jmap-chat-tui-ixld",
+      "type": "parent-child",
+      "created_at": "2026-04-27T18:04:56Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-yof",
+  "title": "Review round 2: API ergonomics",
+  "notes": "SEC1 verdict: Maintainer risk MEDIUM — 7 issues filed covering: AuthProvider blanket impl mirroring, CALL_ID string coupling, Unknown variant re-serialization, hardcoded pagination limits, SSE error swallowing, String IDs bypassing Id invariant, stale read_positions map.\nConfidence: 25% chance of missed bug. Uncertainty driven by: (1) no test coverage for SSE reconnect flow with Last-Event-ID tracking (issue .5 is unfixable by tests alone without integration test harness); (2) client_task.rs has no unit tests — all behavioral logic (delta sync, read position staleness, backoff) is exercised only by manual testing; (3) the 200-chat and 100-message pagination limits (.10, .9) are silent truncations that only surface at scale; (4) GetResponse/ChangesResponse using String vs Id (.13) means empty-string IDs from a misbehaving server will propagate silently. Would raise confidence if: integration tests against a real or mock JMAP Chat server exercised SSE reconnect with replay, pagination past 200 chats, and multi-chat Message state-change events. The 25% estimate reflects that P0 bugs (.5, .10, .12) are real and confirmed; the remaining uncertainty is whether there are similar correctness gaps in paths not covered by the reviewed code (e.g. SSE auth error handling in subscribe_events, state transitions in chat_delta_sync fallback).\nR3-SEC1: 1 correctness bug found in 2146a05. Filed as jmap-chat-tui-yof.35. Paths reviewed: (1) Last-Event-ID tracking: correct — only updated when non-None, preserved across reconnects. (2) AuthFailed propagation: BUG — spawn_sse_task unconditionally sends StreamEnded after run_sse_stream returns, even when run_sse_stream sent AuthFailed first; StreamEnded triggers reconnect after AuthFailed is handled, creating infinite retry loop. (3) Chat pagination: correct — breaks on fetched\u003cPAGE or position\u003e=total. (4) Message StateChange calls chat_delta_sync: correct — redundant second call when Chat+Message both present is idempotent, not a correctness bug. (5) auth_failed_if helper: correct mechanical refactor. (6) sort_by_cached_key: correct — DateTime\u003cUtc\u003e implements Ord, semantics preserved.\nR3b-SEC0: cd3cb50 AuthFailed fix is correct; all run_sse_stream exit paths covered",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:34:17Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T07:02:30Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

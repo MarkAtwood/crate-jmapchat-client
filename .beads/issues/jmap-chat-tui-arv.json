@@ -1,0 +1,25 @@
+{
+  "id": "jmap-chat-tui-arv",
+  "title": "Epic: WebSocket transport client",
+  "description": "Why: Current client uses SSE only. IMPROVEMENTS.md §1.1 defines a new WebSocket companion spec (draft-atwood-jmap-chat-wss-00) that adds low-latency ephemeral events: ChatTypingEvent, ChatPresenceEvent. WebSocket is lower latency than SSE and required for real-time typing indicators and presence.\\n\\nWhat:\\n- Add tokio-tungstenite dependency\\n- WebSocket connect/reconnect with exponential backoff\\n- Capability detection: if session advertises urn:ietf:params:jmap:chat:websocket, prefer WS over SSE\\n- ChatStreamEnable: send on connect and on chat view change\\n- ChatStreamDisable: send when leaving a chat context\\n- ChatTypingEvent receive → dispatch to AppEvent::TypingIndicator\\n- ChatPresenceEvent receive → dispatch to AppEvent::PresenceUpdate\\n- On reconnect, re-send ChatStreamEnable to restore subscriptions (session-scoped)\\n- Tests using a mock WebSocket server\\n\\nDepends on: types.rs upgrades epic (jmap-chat-tui-1aq), methods refactor epic",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:15:35Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T10:39:57Z",
+  "closed_at": "2026-04-27T10:39:57Z",
+  "close_reason": "Epic complete: WebSocket transport client implemented, reviewed, and all review issues resolved",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-arv",
+      "depends_on_id": "jmap-chat-tui-1aq",
+      "type": "blocks",
+      "created_at": "2026-04-26T21:18:40Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

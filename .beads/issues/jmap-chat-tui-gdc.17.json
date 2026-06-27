@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-gdc.17",
+  "title": "Error banner renders before the selected_chat branch so bootstrap errors are always visible",
+  "description": "In the CentralPanel's update() body, the error banner (if let Some(err) = \u0026self.state.error) is rendered before the if self.state.selected_chat.is_none() branch. This ordering is load-bearing: bootstrap errors — auth failure, no JMAP Chat account in the session — arrive before any chat is selected, so selected_chat is None when they fire. If the banner were inside the else branch (message panel), it would never render during bootstrap failure, leaving the UI silently stuck on 'Select a chat to start messaging' with no indication of what went wrong. The banner must be outside both branches so it renders regardless of selection state. A future contributor might move the banner inside the message scroll area for visual tidiness — that would hide bootstrap errors.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:34:58Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:40:43Z",
+  "closed_at": "2026-04-26T09:40:43Z",
+  "close_reason": "Good decision already implemented in current codebase",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-gdc.17",
+      "depends_on_id": "jmap-chat-tui-gdc",
+      "type": "parent-child",
+      "created_at": "2026-04-26T02:34:57Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

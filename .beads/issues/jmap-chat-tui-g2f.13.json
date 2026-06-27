@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-g2f.13",
+  "title": "send_event blocks tokio executor when UI channel is full",
+  "description": "Trigger: 256 AppEvent messages queued without the egui frame loop draining them (e.g. rapid SSE state changes, slow repaints, or window minimized). Condition: SyncSender::send() on a full sync_channel BLOCKS the calling thread. send_event() is called from within tokio::runtime::Runtime::block_on(), so blocking that thread stalls the entire async runtime — no SSE events are read, no commands are processed, and the UI appears frozen. Bad behavior: application deadlocks until the UI drains the channel, which cannot happen because the egui frame loop only runs when the OS schedules a repaint.",
+  "status": "closed",
+  "priority": 0,
+  "issue_type": "bug",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:41:24Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T08:57:22Z",
+  "closed_at": "2026-04-26T08:57:22Z",
+  "close_reason": "Closed",
+  "labels": [
+    "correctness",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-g2f.13",
+      "depends_on_id": "jmap-chat-tui-g2f",
+      "type": "parent-child",
+      "created_at": "2026-04-26T01:41:24Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

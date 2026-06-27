@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-tbs.9",
+  "title": "Manual JSON construction in push_subscription_set diverges from build_request() pattern",
+  "description": "Every other method in misc.rs uses build_request(method_name, args) which encapsulates the using array and call-id. push_subscription_set hand-builds a JmapRequest directly with a hardcoded using vec and call_id=r1. This makes push_subscription_set look different from its siblings for no reason, and means a future refactor of build_request() will silently miss this method. Suggested rewrite: extend build_request() to accept an optional extra capability URI, or create a build_push_request() variant. The using array construction should not be inline in the method body.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T09:29:10Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T09:34:49Z",
+  "closed_at": "2026-04-27T09:34:49Z",
+  "close_reason": "design decision: PushSubscription/set is account-independent and needs custom using array; build_request pattern does not apply",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-tbs.9",
+      "depends_on_id": "jmap-chat-tui-tbs",
+      "type": "parent-child",
+      "created_at": "2026-04-27T02:29:09Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

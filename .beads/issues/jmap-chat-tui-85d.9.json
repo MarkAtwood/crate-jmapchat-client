@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-85d.9",
+  "title": "space_query: null filter when empty matches RFC 8620 §5.5",
+  "description": "space_query sends filter: null when no filter fields are set, rather than sending an empty object {} or omitting the key. This is the correct RFC 8620 §5.5 behavior: 'filter: null means no filter'. The test (Test 52) uses body_json to verify this and captures both the filter-present and null cases implicitly. A contributor might suggest simplifying by always sending filter: {} — that is wrong (some servers reject empty filter objects as invalid). The null-when-empty pattern should be preserved.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T09:10:17Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T09:14:48Z",
+  "closed_at": "2026-04-27T09:14:48Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-85d.9",
+      "depends_on_id": "jmap-chat-tui-85d",
+      "type": "parent-child",
+      "created_at": "2026-04-27T02:10:17Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

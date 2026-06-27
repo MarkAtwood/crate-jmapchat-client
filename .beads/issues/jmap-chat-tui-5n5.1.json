@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-5n5.1",
+  "title": "Review round 1: methods.rs refactor and fixture tests",
+  "notes": "SEC2: no efficiency issues found\nMaintainer risk: MEDIUM — three structural issues: (1) CALL_ID coupling between build_request and extract_response is invisible to the compiler and will bite on first batch-call attempt; (2) fixture loading pattern is contradicted by the README, splitting contributor practice between compile-time and runtime failure modes; (3) message_query bakes sentAt-descending into the wire call without surfacing it in the public API, making the sort a breaking change target for Phase 4 pagination work.\nConfidence: 85% chance of no missed production bug. Uncertainty driven by: (1) wiremock tests do not verify the outgoing request body — method name, accountId, filter keys, sort fields, and create/update payloads are unchecked at test time; (2) read_position_get fixture uses a lastReadMessageId-absent shape that exercises the Option path but does not verify lastReadAt deserialization; (3) cannot see live server to confirm ChatKind serialization round-trip behavior with real JMAP endpoint. Would raise confidence to 95%+ if: wiremock matchers checked the JSON body of at least one request per method, and the list-length assertions in tests 13/14/15 were tightened to == 1.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:18:39Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T07:39:49Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-5n5.1",
+      "depends_on_id": "jmap-chat-tui-5n5",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:18:40Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

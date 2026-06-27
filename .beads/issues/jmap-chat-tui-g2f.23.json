@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-g2f.23",
+  "title": "now_rfc3339() is undocumented custom calendar math with silent clock failure",
+  "description": "client_task.rs::now_rfc3339() hand-implements Gregorian calendar decomposition (Hinnant algorithm) with no doc comment citing the reference or explaining why a time crate was not used. It silently produces 1970-01-01T00:00:00Z if SystemTime::now() is before UNIX_EPOCH (unwrap_or_default()). A contributor seeing this will either trust it blindly, rewrite it incorrectly, or replace it with a crate without understanding why it was done inline. No test covers it against a known reference timestamp.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:42:07Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T08:57:41Z",
+  "closed_at": "2026-04-26T08:57:41Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-g2f.23",
+      "depends_on_id": "jmap-chat-tui-g2f",
+      "type": "parent-child",
+      "created_at": "2026-04-26T01:42:06Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

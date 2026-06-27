@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-yof.5",
+  "title": "SSE reconnect never sends Last-Event-ID; missed updates silently lost",
+  "description": "Trigger: any SSE disconnect followed by reconnect. run_sse_stream always calls subscribe_events(url, None), never tracking the last SseFrame::id and never passing it as Last-Event-ID on reconnect. Per RFC 8620 §7.3 the server cannot replay missed StateChange events without Last-Event-ID. Bad behavior: all state changes (new messages, chat updates) that occurred during the disconnect window are silently lost — they will never trigger a sync — until the next SSE event happens to arrive after the reconnect.",
+  "status": "closed",
+  "priority": 0,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:37:50Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:54:46Z",
+  "closed_at": "2026-04-27T06:54:46Z",
+  "close_reason": "Closed",
+  "labels": [
+    "correctness",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yof.5",
+      "depends_on_id": "jmap-chat-tui-yof",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:37:50Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

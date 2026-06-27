@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-g2f.11",
+  "title": "Document 100-event-per-frame drain cap in App::update",
+  "description": "main.rs App::update() drains at most 100 events per frame (while count \u003c 100). The section comment labels this as a cap but does not explain: (1) why 100 specifically (frame budget? measured at 60fps?), (2) what happens when more than 100 events are queued — the next repaint will drain the next 100, but does egui schedule an immediate repaint when the channel is non-empty? Without a note, a contributor may raise this as a potential starvation issue without understanding whether it was already considered. Add a comment explaining the cap's purpose and the re-paint guarantee (or lack thereof) that makes it safe.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:41:19Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:22:39Z",
+  "closed_at": "2026-04-26T09:22:39Z",
+  "close_reason": "Already documented in code comments",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-g2f.11",
+      "depends_on_id": "jmap-chat-tui-g2f",
+      "type": "parent-child",
+      "created_at": "2026-04-26T01:41:18Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

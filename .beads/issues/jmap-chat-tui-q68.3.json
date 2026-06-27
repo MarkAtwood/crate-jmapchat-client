@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-q68.3",
+  "title": "SessionClient doc example is rust,ignore — will silently rot",
+  "description": "The doc example in SessionClient uses rust,ignore so it is never compiled. If chat_get signature changes or SessionClient is moved, the example silently becomes wrong. Use rust,no_run instead: that compiles the example without running it, catching type errors and import issues while still not requiring a live server. Change the fenced block from ```rust,ignore to ```rust,no_run and add the necessary use imports.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T15:55:29Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T15:57:45Z",
+  "closed_at": "2026-04-27T15:57:45Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-q68.3",
+      "depends_on_id": "jmap-chat-tui-q68",
+      "type": "parent-child",
+      "created_at": "2026-04-27T08:55:29Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-x2d.1",
+  "title": "Space/join: custom method for redeeming invite codes and joining public Spaces",
+  "description": "Why: Space/join is a distinct custom JMAP method defined in the spec (separate from SpaceInvite/set) for two cases: (1) redeeming a SpaceInvite code to join a Space, and (2) joining a public Space (isPublic: true) without a code. It is not the same as SpaceInvite/set accept action.\\n\\nWhat:\\n- Space/join method: accountId + spaceId + optional inviteCode\\n- Handle success: server adds owner to Space.members, returns updated Space state\\n- Handle errors: inviteExpired, inviteUsed, notPublic, alreadyMember\\n- Fixture tests for join-by-code and join-public paths",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T05:25:55Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T09:03:02Z",
+  "closed_at": "2026-04-27T09:03:02Z",
+  "close_reason": "superseded by x2d.5 (space_create and space_join implemented there)",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-x2d.1",
+      "depends_on_id": "jmap-chat-tui-x2d",
+      "type": "parent-child",
+      "created_at": "2026-04-26T22:25:55Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

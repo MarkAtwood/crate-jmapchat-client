@@ -1,0 +1,34 @@
+{
+  "id": "jmap-chat-tui-4yc.5",
+  "title": "egui App: chat list, message view, compose bar",
+  "description": "Implement the eframe::App trait on the main App struct in main.rs (or a new ui.rs module).\n\nWhat: Full egui rendering pass producing a 3-panel chat interface.\n\nAlgorithm:\n1. App struct holds: app_state: AppState, tx: mpsc::SyncSender\u003cAppCommand\u003e, rx: mpsc::Receiver\u003cAppEvent\u003e, ctx: egui::Context\n2. In update():\n   a. Drain rx with try_recv() in a loop; call app_state.apply_event(ev) for each; call ctx.request_repaint() after any event.\n   b. TopBottomPanel::top('status'): show connection status + username.\n   c. SidePanel::left('chats').default_width(220.0).show():\n      - heading 'Chats'\n      - For each chat in app_state.chats (sorted by last_message_at desc):\n        - Button with chat name/contact + unread badge if unread_count \u003e 0\n        - If clicked: tx.send(AppCommand::SelectChat(chat.id.to_string()))\n        - Highlight selected chat\n   d. TopBottomPanel::bottom('compose').exact_height(60.0).show():\n      - TextEdit::multiline(\u0026mut app_state.compose_text).hint_text('Message...')\n      - If Enter key pressed (and not Shift+Enter) OR Send button clicked:\n        - tx.send(AppCommand::SendMessage { chat_id, body: compose_text.drain(..) })\n   e. CentralPanel::default().show() (must be last):\n      - If no chat selected: label('Select a chat')\n      - Else: ScrollArea::vertical().stick_to_bottom(true).show():\n        - For each message in app_state.messages:\n          - Sender name (bold), timestamp, body text\n          - Show [edited] if edited_at is Some\n          - Show [deleted] if deleted_at is Some\n      - Show error toast if app_state.error is Some.\n\nDefensive rules:\n- Never call unwrap() in update() path.\n- Sanitize chat names: strip ASCII control characters before display.\n- Message body: display as plain text regardless of bodyType (no HTML rendering).\n- try_recv() loop must have iteration cap (max 100 events per frame) to prevent stall.\n\nTests: (ui is hard to test headlessly; test AppState logic via app_state_test.rs instead)\n- update_drains_events: create App with pre-populated rx, call update() once, verify app_state updated\nOracle: AppState field values after update compared to expected values from injected events.",
+  "acceptance_criteria": "cargo check -p jmap-chat-egui exits 0; cargo clippy -p jmap-chat-egui exits 0; app_state tests pass",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:21:55Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-26T08:32:03Z",
+  "close_reason": "egui App with 3-panel UI; cargo check + clippy clean",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4yc.5",
+      "depends_on_id": "jmap-chat-tui-4yc.3",
+      "type": "blocks",
+      "created_at": "2026-04-26T01:22:14Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-4yc.5",
+      "depends_on_id": "jmap-chat-tui-4yc",
+      "type": "parent-child",
+      "created_at": "2026-04-26T01:21:54Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

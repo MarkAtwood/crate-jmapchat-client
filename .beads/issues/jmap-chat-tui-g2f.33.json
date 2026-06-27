@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-g2f.33",
+  "title": "strip_control_chars has no test — silent regression risk",
+  "description": "main.rs::strip_control_chars() filters control characters from message bodies, preserving newlines. It is called in the message render path but has no unit test. A refactor that accidentally changes the newline-preservation behavior (e.g. '\\r\\n' handling, Unicode control chars like U+0085 NEL, or BOM) would not be caught. The function sits in main.rs which is also harder to unit-test than lib code.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:43:01Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T08:58:18Z",
+  "closed_at": "2026-04-26T08:58:18Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-g2f.33",
+      "depends_on_id": "jmap-chat-tui-g2f",
+      "type": "parent-child",
+      "created_at": "2026-04-26T01:43:00Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

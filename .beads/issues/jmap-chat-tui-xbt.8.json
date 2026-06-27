@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-xbt.8",
+  "title": "build_request/extract_response call-id coupling is implicit",
+  "description": "build_request() hardcodes call-id 'r1'. extract_response() is then called with literal 'r1' at every callsite in methods.rs. The comment says not to add multi-call batching without updating extract_response, but the invariant is not enforced by the type system. A contributor adding a new method will copy the pattern and may accidentally pass the wrong call-id string to extract_response — extracting the wrong invocation. If the argument shapes are compatible, no compile error and no test failure unless the test checks the exact field values. Maintenance consequence: silent wrong-invocation bugs in new method wrappers that pass code review because the pattern looks correct.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:35:31Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:41:04Z",
+  "closed_at": "2026-04-26T07:41:04Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-xbt.8",
+      "depends_on_id": "jmap-chat-tui-xbt",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:35:31Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

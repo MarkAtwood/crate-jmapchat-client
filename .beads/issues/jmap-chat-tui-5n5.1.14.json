@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-5n5.1.14",
+  "title": "SetResponse\u003cT=serde_json::Value\u003e default type parameter avoids boilerplate for callers",
+  "description": "SetResponse uses a default type parameter T=serde_json::Value. This lets read_position_set and message_create return SetResponse (unqualified) while still allowing a future caller to use SetResponse\u003cTypedObject\u003e when the created/updated map shape is known. A contributor might remove the default to 'keep generics simple'. That would force every caller to either spell out SetResponse\u003cserde_json::Value\u003e or require an explicit type annotation at call sites, breaking the ergonomics of the common case.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:24:03Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:36:57Z",
+  "closed_at": "2026-04-27T07:36:57Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-5n5.1.14",
+      "depends_on_id": "jmap-chat-tui-5n5.1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:24:02Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

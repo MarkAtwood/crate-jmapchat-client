@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-29i.4",
+  "title": "Response types in methods/mod.rs missing Clone derive",
+  "description": "GetResponse\u003cT\u003e, SetResponse\u003cT\u003e, ChangesResponse, QueryResponse, QueryChangesResponse, TypingResponse, AddedItem, SetError, PushSubscriptionSetResponse all only derive Debug + Deserialize. BlobConvertResponse in blob.rs derives Clone. The inconsistency means callers who receive a response and want to pass it to multiple consumers (store + emit an event, cache in AppState, etc.) must manually destructure instead of cloning. Library response types should derive Clone where possible. Fix: add Clone to the derive list on all of these types. The generic T on GetResponse/SetResponse needs T: Clone to conditionally derive Clone — #[derive(Clone)] handles this automatically via the derived bound.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T16:46:26Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T16:56:04Z",
+  "closed_at": "2026-04-27T16:56:04Z",
+  "close_reason": "Closed",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-29i.4",
+      "depends_on_id": "jmap-chat-tui-29i",
+      "type": "parent-child",
+      "created_at": "2026-04-27T09:46:26Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

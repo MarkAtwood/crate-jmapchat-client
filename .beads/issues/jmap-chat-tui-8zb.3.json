@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-8zb.3",
+  "title": "SEC1: MessageCreateInput.body_type doc omits Rich variant",
+  "description": "methods/mod.rs line 232-233: doc comment says 'Use Plain or Markdown; Unknown(s) passes s as-is' — silently omits BodyType::Rich, which is now a first-class variant. A caller writing a rich-message client reads this doc and does not discover Rich exists. Fix: add Rich to the doc examples alongside Plain and Markdown.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T18:25:34Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T18:27:42Z",
+  "closed_at": "2026-04-27T18:27:42Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-8zb.3",
+      "depends_on_id": "jmap-chat-tui-8zb",
+      "type": "parent-child",
+      "created_at": "2026-04-27T11:25:34Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

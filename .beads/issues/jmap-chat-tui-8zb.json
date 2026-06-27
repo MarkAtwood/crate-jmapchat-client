@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-8zb",
+  "title": "Review round 2: jmap-chat idiomaticity pass",
+  "notes": "Confidence: 8% chance of missed bug. Running out of real complaints: YES. Justification: The codebase is in good shape. The one efficiency item filed (BodyType as_str DRY refactor) has genuine engineering basis — the same 4-arm mapping is written three times where EndpointType already uses the as_uri() pattern — but it is a maintainability concern more than a performance bug. No correctness or security issues found in the recent changes. BodyType::Rich, Display for BodyType, and the body_type field change are all straightforward and correct. The #[doc(inline)] additions in lib.rs are purely cosmetic with no behavioral impact. The filter_presence doc improvements are clear and correct. The 8% residual reflects uncertainty about edge cases in the rich body parsing documentation example (it uses unwrap() in a doc comment which is expected for rustdoc examples) and the non_exhaustive interaction with the Display impl if a new variant is added without updating Display.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T18:23:29Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T18:27:57Z",
+  "close_reason": "Closed"
+}

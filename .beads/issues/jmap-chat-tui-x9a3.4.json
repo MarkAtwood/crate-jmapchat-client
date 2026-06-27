@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-x9a3.4",
+  "title": "SseStreamState named struct: scan_from char-boundary invariant is documented",
+  "description": "The scan_from field carries a non-obvious invariant (must be valid UTF-8 char boundary of buf). It is documented in the field-level doc comment. The char-boundary walk-back code is also present and correct. A contributor removing the walk-back thinking it is unnecessary would break UTF-8 multibyte streams — the comment is the only guard against this.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T22:43:44Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T22:44:17Z",
+  "closed_at": "2026-04-27T22:44:17Z",
+  "close_reason": "Decision record — no code change needed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-x9a3.4",
+      "depends_on_id": "jmap-chat-tui-x9a3",
+      "type": "parent-child",
+      "created_at": "2026-04-27T15:43:43Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

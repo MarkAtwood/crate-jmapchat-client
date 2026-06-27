@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-stl1",
+  "title": "subscribe_events: return BoxStream not impl Stream",
+  "description": "## Why\\n\\nsubscribe_events currently returns impl futures::Stream + Send inside a Result. impl Trait in library return position means callers cannot name or store the type. Every long-lived JMAP client (background tasks, app state structs, reconnection loops) must write Box::pin(stream) manually. That friction belongs in the library, not in every caller.\\n\\n## What needs to be done\\n\\nChange the return type to futures::stream::BoxStream\u003c'static, Result\u003cSseFrame, ClientError\u003e\u003e. Add .boxed() at the end of the stream pipeline inside the function body. Update any tests that rely on the concrete return type.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T01:44:14Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-28T02:15:01Z",
+  "close_reason": "Closed"
+}

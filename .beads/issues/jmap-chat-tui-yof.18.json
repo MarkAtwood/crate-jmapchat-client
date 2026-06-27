@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-yof.18",
+  "title": "Id and UTCDate duplicate identical newtype boilerplate",
+  "description": "jmap.rs: Id and UTCDate are both String newtypes with identical implementations of new(), from_trusted(), as_str(), Display, AsRef\u003cstr\u003e, Deref\u003cTarget=str\u003e, PartialEq\u003cstr\u003e, PartialEq\u003c\u0026str\u003e, and the reverse PartialEq. The ~90 lines of implementation are copy-pasted with only the type name changed. Suggested rewrite: introduce a macro_rules! non_empty_string_newtype!(TypeName) that expands all the boilerplate once, then define Id and UTCDate as single-line invocations of that macro. This keeps the distinct types (no accidental interchangeability) while having one source of truth for the invariant and trait impls.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:38:55Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:50:04Z",
+  "closed_at": "2026-04-27T06:50:04Z",
+  "close_reason": "Opinion: macro dedup for newtype boilerplate is preference, not a correctness or maintenance issue",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "opinion",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yof.18",
+      "depends_on_id": "jmap-chat-tui-yof",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:38:55Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

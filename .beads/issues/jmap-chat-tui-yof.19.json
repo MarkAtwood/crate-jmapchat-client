@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-yof.19",
+  "title": "Error 'Server has no JMAP Chat account' is not actionable",
+  "description": "client_task.rs run: when session.chat_account_id() is None, the user sees: 'Server has no JMAP Chat account — check that the server supports the JMAP Chat extension'. At 2am this tells the user nothing actionable. They do not know whether the problem is a wrong URL, a missing server config flag, a wrong account, or a server version that predates the capability. Fix: name the exact capability URI expected (urn:ietf:params:jmap:chat), and suggest checking the server's /.well-known/jmap response to verify the capability is advertised.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:38:58Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:50:13Z",
+  "closed_at": "2026-04-27T06:50:13Z",
+  "close_reason": "Opinion: error message wording per SEC7",
+  "labels": [
+    "my-oss",
+    "opinion",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yof.19",
+      "depends_on_id": "jmap-chat-tui-yof",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:38:57Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

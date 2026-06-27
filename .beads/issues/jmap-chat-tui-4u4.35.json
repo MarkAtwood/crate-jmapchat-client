@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-4u4.35",
+  "title": "extract_response matches by call_id not method name, per RFC 8620 batch semantics",
+  "description": "extract_response() correlates responses by callId (third tuple element), not by method name. Matching on method name would be wrong for batched requests where the same method appears twice with different call IDs (RFC 8620 §3.2). The spec is explicit that callId is the correlation key.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:08:51Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:27:11Z",
+  "closed_at": "2026-04-26T07:27:11Z",
+  "close_reason": "Decision record — current design is correct, no change needed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4u4.35",
+      "depends_on_id": "jmap-chat-tui-4u4",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:08:51Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

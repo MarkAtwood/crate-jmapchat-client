@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-3ix.1",
+  "title": "ChatCreateInput missing #[non_exhaustive]",
+  "description": "ChatCreateInput mirrors spec-defined chat kinds (direct/group/channel). Without #[non_exhaustive], adding a new kind in a future spec version is a breaking change for any caller that exhaustively matches on it. CLAUDE.md coding rule: use #[non_exhaustive] on enums mirroring spec-defined sets.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T15:18:27Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T15:20:22Z",
+  "closed_at": "2026-04-27T15:20:22Z",
+  "close_reason": "Closed",
+  "labels": [
+    "correctness",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-3ix.1",
+      "depends_on_id": "jmap-chat-tui-3ix",
+      "type": "parent-child",
+      "created_at": "2026-04-27T08:18:26Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

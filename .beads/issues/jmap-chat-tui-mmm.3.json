@@ -1,0 +1,26 @@
+{
+  "id": "jmap-chat-tui-mmm.3",
+  "title": "SenderIdOrSelf enum: type Message.sender_id and Reaction.sender_id",
+  "description": "What: Add SenderIdOrSelf enum with custom serde; migrate Message.sender_id and Reaction.sender_id from String to SenderIdOrSelf.\n\nAlgorithm:\n1. In crates/jmap-chat/src/types.rs, add this enum BEFORE the Message struct:\n   #[non_exhaustive]\n   #[derive(Debug, Clone, PartialEq)]\n   pub enum SenderIdOrSelf {\n       /// Owner-composed. Wire value: literal string \"self\".\n       SelfSender,\n       /// Inbound from a contact. Wire value: the contact's ChatContact.id string.\n       Contact(String),\n   }\n   \n   Implement Serialize manually:\n   impl Serialize for SenderIdOrSelf {\n       fn serialize\u003cS: Serializer\u003e(\u0026self, s: S) -\u003e Result\u003cS::Ok, S::Error\u003e {\n           match self {\n               SenderIdOrSelf::SelfSender =\u003e s.serialize_str(\"self\"),\n               SenderIdOrSelf::Contact(id) =\u003e s.serialize_str(id),\n           }\n       }\n   }\n   \n   Implement Deserialize manually:\n   impl\u003c'de\u003e Deserialize\u003c'de\u003e for SenderIdOrSelf {\n       fn deserialize\u003cD: Deserializer\u003c'de\u003e\u003e(d: D) -\u003e Result\u003cSelf, D::Error\u003e {\n           let s = String::deserialize(d)?;\n           if s == \"self\" {\n               Ok(SenderIdOrSelf::SelfSender)\n           } else if s.is_empty() {\n               Err(serde::de::Error::custom(\"sender_id must not be empty\"))\n           } else {\n               Ok(SenderIdOrSelf::Contact(s))\n           }\n       }\n   }\n\n2. Change Message.sender_id: String → SenderIdOrSelf\n3. Change Reaction.sender_id: String → SenderIdOrSelf\n4. Update the existing inline test in types.rs that asserts msg.sender_id == \"self\":\n   Change to: assert_eq!(msg.sender_id, SenderIdOrSelf::SelfSender)\n5. Verify the message fixture at tests/fixtures/types/message.json still deserializes correctly.\n6. Run: cargo test -p jmap-chat\n\nDefensive rules:\n- Use manual Serialize/Deserialize, not #[serde(untagged)] (untagged does not work cleanly for string sentinels).\n- Reject empty strings in Deserialize.\n- Do not change the wire format (\"self\" stays as-is).\n- #[non_exhaustive] must be present.\n\nTests: \n- Oracle: the string 'self' in the existing message.json fixture.\n- After change, deserialization of {\"senderId\":\"self\"} produces SenderIdOrSelf::SelfSender.\n- Deserialization of {\"senderId\":\"contact-123\"} produces SenderIdOrSelf::Contact(\"contact-123\".into()).\n- Serialization roundtrips correctly.",
+  "acceptance_criteria": "cargo test -p jmap-chat passes. SenderIdOrSelf deserializes 'self' → SelfSender, any other string → Contact(s). Existing message fixture test passes.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T05:43:00Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T05:53:28Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-mmm.3",
+      "depends_on_id": "jmap-chat-tui-mmm",
+      "type": "parent-child",
+      "created_at": "2026-04-26T22:43:00Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

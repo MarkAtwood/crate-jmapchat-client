@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-npl",
+  "title": "ws: add max_message_size cap to connect_async_with_config",
+  "description": "Consistent with SSE 1MiB cap. connect_async uses tungstenite default (64MiB). Use connect_async_with_config with explicit max_message_size.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T10:33:48Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T10:39:51Z",
+  "closed_at": "2026-04-27T10:39:51Z",
+  "close_reason": "Fixed in arv review cycle: P1 issues (connect_async_with_config size cap, URL scheme validation, Response parse error → Unknown) and P2 issues (removed redundant _ws_tx_keepalive, removed unused status_text/status_emoji from PresenceUpdate)"
+}

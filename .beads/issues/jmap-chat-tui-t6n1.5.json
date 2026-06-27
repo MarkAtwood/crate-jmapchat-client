@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-t6n1.5",
+  "title": "EndpointType missing Display impl that BodyType has",
+  "description": "BodyType implements Display (lines 581-585) delegating to as_str(). EndpointType has as_uri() but no Display impl. Any caller formatting an EndpointType in an error message or log line must call .as_uri() explicitly instead of using {} in a format string. The two enums are structurally parallel (same manual serde, same canonical-string method, same use in Endpoint and MessageAction structs), so the missing Display is an oversight. Suggested rewrite: add impl std::fmt::Display for EndpointType delegating to self.as_uri() (or self.as_str() after the rename in the companion issue).",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:06:49Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:21:36Z",
+  "closed_at": "2026-04-27T19:21:36Z",
+  "close_reason": "Valid polish; deferred. Tracked in follow-up bead jmap-chat-tui-yw6v or standalone.",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-t6n1.5",
+      "depends_on_id": "jmap-chat-tui-t6n1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T12:06:49Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

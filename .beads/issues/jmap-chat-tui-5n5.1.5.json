@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-5n5.1.5",
+  "title": "MessageCreateInput.body_type has no documentation of valid values",
+  "description": "MessageCreateInput.body_type (methods/mod.rs) is a \u0026str with no doc comment and no guidance on what values the spec permits. A contributor integrating at 2am will guess a MIME type, pass the wrong value, and receive an opaque server-side rejection with no actionable client-side message. Fix: add a doc comment listing the spec-defined allowed values (e.g. \"text/plain\", \"text/markdown\") and a note that invalid values will produce a server MethodError.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:21:07Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:34:30Z",
+  "closed_at": "2026-04-27T07:34:30Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-5n5.1.5",
+      "depends_on_id": "jmap-chat-tui-5n5.1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:21:06Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

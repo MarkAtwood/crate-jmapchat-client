@@ -1,0 +1,14 @@
+{
+  "id": "jmap-chat-tui-h42o",
+  "title": "ChatMessageEntry and BlobUploadResponse use String for typed ID fields",
+  "description": "ChatMessageEntry has message_id, chat_id, sender_id as plain String fields. BlobUploadResponse has account_id and blob_id as String. All of these are non-empty server-assigned identifiers that should use the Id type. Using String bypasses Id's non-empty invariant (enforced in deserializer and Id::new), making it easy for code to accidentally accept or produce empty strings. SseEvent::Typing.chat_id/sender_id and SseEvent::Presence.contact_id are also String but should be Id. Fix: change String to Id in all four push/SSE/blob types.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "bug",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T21:58:46Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T22:29:01Z",
+  "close_reason": "Closed"
+}

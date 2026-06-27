@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-2x6d",
+  "title": "chat_create Group: validate member_ids elements; chat_update: validate pinned_message_ids elements",
+  "description": "In chat_create Group variant, member_ids \u0026[\u0026str] is inserted into JSON without validating individual elements for empty string. In chat_update, pinned_message_ids array elements are not validated. Both follow the same pattern as the remove_members/remove_channels guards added in round 8. Fix: add for-loop validation before array insertion.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T03:46:12Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T03:48:17Z",
+  "closed_at": "2026-04-28T03:48:17Z",
+  "close_reason": "Closed"
+}

@@ -1,0 +1,31 @@
+{
+  "id": "jmap-chat-tui-ucdp.9",
+  "title": "ws_backoff_idx and ws_consecutive_failures drift by 1 at failure threshold",
+  "description": "client_task.rs: At the 5th consecutive WS failure, ws_consecutive_failures \u003e= WS_MAX_FAILURES is true so ws_needs_restart is left false and reconnect_ws() is NOT called — meaning ws_backoff_idx is NOT incremented for that failure. If retry is ever re-enabled after EphemeralUnavailable (e.g. after session refresh), ws_backoff_idx will be 4 instead of 5, causing one retry with 16s backoff instead of 30s. Latent maintenance trap; harmless in current code.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T02:39:24Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T02:49:19Z",
+  "closed_at": "2026-04-28T02:49:19Z",
+  "close_reason": "Won't fix: drift has zero effect in current code (no path re-enables WS after EphemeralUnavailable). Fixing it would add dead speculative code, violating the no-dead-code rule. Accepted known drift.",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-ucdp.9",
+      "depends_on_id": "jmap-chat-tui-ucdp",
+      "type": "parent-child",
+      "created_at": "2026-04-27T19:39:23Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

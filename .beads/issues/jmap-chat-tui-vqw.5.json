@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-vqw.5",
+  "title": "Auth types (BearerAuth, BasicAuth) have no Debug impl — silent compile error when composed",
+  "description": "BearerAuth and BasicAuth have no Debug impl. Any struct that derives Debug and contains one of these will fail to compile — a maintenance trap for library users. The fix is a manual Debug impl that redacts the credential: impl fmt::Debug for BearerAuth { fn fmt(\u0026self, f: \u0026mut fmt::Formatter) -\u003e fmt::Result { f.debug_struct(\"BearerAuth\").field(\"token\", \u0026\"[REDACTED]\").finish() } }. NoneAuth and CustomCaAuth have no credential to redact and can derive Debug directly.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T17:10:14Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T17:32:10Z",
+  "closed_at": "2026-04-27T17:32:10Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-vqw.5",
+      "depends_on_id": "jmap-chat-tui-vqw",
+      "type": "parent-child",
+      "created_at": "2026-04-27T10:10:14Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-tbs.11",
+  "title": "PushSubscriptionCreateInput doc comment references §3.1 which does not exist in spec",
+  "description": "The doc comment on PushSubscriptionCreateInput references 'draft-atwood-jmap-chat-push-00 §3.1'. The actual spec section numbers are: §3 = PushSubscription Extension (which covers what used to be called §3.1 in draft form). The spec has no §3.1 sub-section heading. The doc on push_subscription_set in misc.rs has the same reference. A contributor looking up §3.1 in the spec will find nothing. Fix: correct to §3 (PushSubscription Extension).",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T09:29:24Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T09:34:22Z",
+  "closed_at": "2026-04-27T09:34:22Z",
+  "close_reason": "fixed in implementation",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-tbs.11",
+      "depends_on_id": "jmap-chat-tui-tbs",
+      "type": "parent-child",
+      "created_at": "2026-04-27T02:29:24Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

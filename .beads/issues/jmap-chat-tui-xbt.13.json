@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-xbt.13",
+  "title": "SSE buf.drain from front is O(remaining) per frame",
+  "description": "client.rs subscribe_events: buf.drain(..pos + delim_len) shifts all remaining bytes in the String left after each frame extraction — O(remaining_bytes) per frame. A VecDeque\u003cu8\u003e with a read-cursor, or tracking a byte offset into the buffer and trimming periodically, would make extraction O(1). Impact is bounded by the 1 MiB cap but still wastes cycles for high-volume SSE streams where many frames are back-to-back in the buffer.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:35:43Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:40:32Z",
+  "closed_at": "2026-04-26T07:40:32Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-xbt.13",
+      "depends_on_id": "jmap-chat-tui-xbt",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:35:43Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

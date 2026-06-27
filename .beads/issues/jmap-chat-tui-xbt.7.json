@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-xbt.7",
+  "title": "message_query: has_mention=Some(false) bypasses guard but sends unsupported filter",
+  "description": "The validation guard (chat_id.is_none() \u0026\u0026 has_mention.is_none()) only blocks the case where both are None. Calling message_query with chat_id=None and has_mention=Some(false) passes the guard and sends {\"hasMention\": false} in the filter. Per spec, servers MUST return unsupportedFilter when neither a chatId nor hasMention:true is present. The guard should additionally check that if chat_id is None then has_mention must be Some(true); passing Some(false) is semantically equivalent to providing no filter anchor. The error message also misleads: 'at least one of chat_id or has_mention must be provided' implies Some(false) is acceptable.",
+  "status": "closed",
+  "priority": 0,
+  "issue_type": "bug",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:35:27Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:41:02Z",
+  "closed_at": "2026-04-26T07:41:02Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-xbt.7",
+      "depends_on_id": "jmap-chat-tui-xbt",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:35:26Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

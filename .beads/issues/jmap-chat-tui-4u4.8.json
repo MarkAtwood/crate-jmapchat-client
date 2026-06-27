@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-4u4.8",
+  "title": "AuthProvider unifies client construction and header injection into one trait",
+  "description": "AuthProvider has two methods: build_client() and auth_header(). A future contributor might split these ('single responsibility'), but they are semantically coupled: the choice of auth mechanism determines both the TLS configuration and the credential injection strategy. CustomCaAuth sets a custom trust root in the client builder but injects no header. BearerAuth uses the default client but injects a token. Splitting the trait would make it impossible to express this correctly without pairing types externally. Keeping them together means one Box\u003cdyn AuthProvider\u003e covers the full auth contract.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:07:41Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:26:34Z",
+  "closed_at": "2026-04-26T07:26:34Z",
+  "close_reason": "Decision record — current design is correct, no change needed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4u4.8",
+      "depends_on_id": "jmap-chat-tui-4u4",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:07:41Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

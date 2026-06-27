@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-scza",
+  "title": "chat_update: validate add_members and update_member_roles IDs for empty string",
+  "description": "In chat.rs chat_update, the add_members and update_member_roles closures use m.id and u.id without validating for empty string. Space.rs has the same operations with empty-string guards (added in round 3). For consistency, chat.rs needs the same guards. Fix: add if m.id.is_empty() / if u.id.is_empty() checks that return ClientError::InvalidArgument.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T03:30:45Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T03:31:33Z",
+  "closed_at": "2026-04-28T03:31:33Z",
+  "close_reason": "Closed"
+}

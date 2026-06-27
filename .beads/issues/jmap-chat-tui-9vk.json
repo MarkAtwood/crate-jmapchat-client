@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-9vk",
+  "title": "Review: jmap-chat-egui round 2 (P0/P1/P2 fixes)",
+  "notes": "Confidence: 35% chance of missed bug. Uncertainty driven by: (1) SSE reconnect fix (abort + channel recreation) has no unit test — it is tested only by code inspection; the race window where an aborted task's StreamEnded arrives before the abort is acknowledged cannot be exercised in tests without a mock SSE server; (2) delta sync (chat_changes integration) has never been run against a real or mock JMAP server; the only test is apply_chats_loaded / apply_messages_for_selected_chat in app_state_test.rs which exercises apply_event not the network path; (3) try_send event dropping has no test that verifies a ChatsLoaded or MessagesLoaded event is not dropped when the channel is near capacity — these are structural events, not transient errors, and silent drop would leave UI state stale; (4) ChatsDelta merge correctness (retain + upsert) has no integration test against a server sequence. Would raise confidence if: (a) a mock JmapChatClient backed by in-memory state drove an end-to-end test of chat_delta_sync applying a created/updated/destroyed triple and verifying final chat list; (b) a test forced the sync_channel to capacity and verified a MessagesLoaded event was NOT dropped (or was replaced by a ChatsLoaded fallback); (c) the SSE reconnect was exercised by injecting a StreamEnded and asserting exactly one reconnect attempt.\nMaintainer risk: MEDIUM — Six real risks found: missing #[non_exhaustive] on pub AppEvent enum, undocumented tab stripping in strip_control_chars, pub cache fields with unenforced invariants, dead Disconnected variant, silent MarkRead failure in fallback branch, and fatal auth errors auto-dismissed after 5s leaving the UI in a zombie Connecting state.\nSEC7 calibration update: After seeing full issue list (19 open children), P0=2 found by other reviewers. Both P0s are confirmed by code inspection: (1) jmap-chat-tui-9vk.10: try_send drops MessagesLoaded/ChatsLoaded — structural events should not use the same non-blocking send path as transient status updates. (2) jmap-chat-tui-9vk.12: empty chat_state causes full-reload loop when account has 0 chats — load_chats skips Chat/get on empty id list so no server state is obtained. Revised confidence: 25% chance of additional missed bug (down from 35%), because the two P0s I flagged as test-coverage gaps were independently confirmed by other agents. Residual uncertainty: SSE reconnect race (no unit test possible without mock server), and whether the JMAP server's cannotCalculateChanges error variant is handled — not seen in the code.\nSEC7: Found additional unfiled bug: cannotCalculateChanges from chat_changes is treated as a generic error (send_event + return None). chat_state is left unchanged, so the next SSE StateChange retries chat_changes with the same baseline, gets cannotCalculateChanges again, and loops indefinitely emitting error toasts with no automatic fallback to full reload. Per RFC 8620 §5.5, cannotCalculateChanges MUST trigger a full resync (equivalent to has_more_changes=true path). This should be filed as a separate P1 bug.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:58:58Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-26T09:24:12Z",
+  "close_reason": "all steps complete",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-j1w7",
+  "title": "AuthProvider::auth_header: decouple from http::HeaderName/HeaderValue",
+  "description": "## Why\n\nAuthProvider::auth_header returns Option\u003c(HeaderName, HeaderValue)\u003e where HeaderName and HeaderValue are from the http crate (re-exported by reqwest). Any third-party implementation of AuthProvider must take on the http crate as a dependency to satisfy the trait signature, defeating the injectable intent. The coupling also makes the trait awkward to mock in tests without reqwest.\n\n## What needs to be done\n\nChange the return type to Option\u003c(String, String)\u003e representing (header-name, header-value). Inside JmapChatClient::call and fetch_session, convert with HeaderName::from_str and HeaderValue::from_str; these can panic/unwrap if the AuthProvider is expected to pre-validate. Update NoneAuth, BearerAuth, BasicAuth impls accordingly. Add a test verifying that a mock AuthProvider returning (String, String) is accepted by the client.\n\nNote: the pre-computation optimization (HeaderValue stored at construction time, not recomputed per-request) still works with this change -- the stored field type changes from HeaderValue to String (or bytes), and the conversion happens once in a wrapper type. Alternatively, keep the internal pre-computation and expose a different public-facing conversion layer.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T01:45:03Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-28T02:15:05Z",
+  "close_reason": "Closed"
+}

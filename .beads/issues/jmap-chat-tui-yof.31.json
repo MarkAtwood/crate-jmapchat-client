@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-yof.31",
+  "title": "SSE scan_from overlap with UTF-8 char-boundary fix is correct and must not be simplified away",
+  "description": "The SSE stream parser maintains scan_from = old_len.saturating_sub(3) so that delimiter searches only re-scan the overlap region between old and new data (catching delimiters that span a chunk boundary). After setting scan_from, the code walks backward to a UTF-8 char boundary so that buf[scan_from..] never panics on a multibyte codepoint. This is correct: (1) the overlap of 3 bytes is the minimum needed to catch all four delimiter patterns (CRLF-CRLF = 4 bytes, LF-LF = 2 bytes, CR-CR = 2 bytes), and scanning from position 0 on every append would be O(total buffer) rather than O(new chunk); (2) the char-boundary walk is required because saturating_sub(3) can land inside a 4-byte UTF-8 character (e.g. an emoji at the chunk boundary). A future contributor might remove the char-boundary walk as 'unnecessary' if they do not realize that scan_from is used as a slice index into a String. The regression test sse_scan_from_char_boundary_fix documents the exact panic scenario using 'a\\u{1F600}' (1+4 bytes) and verifies both the bug trigger and the fix.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:42:10Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:01:35Z",
+  "closed_at": "2026-04-27T07:01:35Z",
+  "close_reason": "Decision record — no action needed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yof.31",
+      "depends_on_id": "jmap-chat-tui-yof",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:42:10Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-7xg.2",
+  "title": "SetResponse.updated/not_updated/not_destroyed lack complementary doc comment",
+  "description": "After adding '/// Keys are caller-supplied creation keys' to created and not_created, the updated/not_updated/not_destroyed fields have no comment. A reader seeing the pattern on created will wonder if updated is also caller-keyed — it is NOT (those keys are server Ids per RFC 8620 §5.3). Add '/// Keys are server-assigned object Ids; see RFC 8620 §5.3.' to updated, not_updated, not_destroyed.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T17:41:28Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T17:46:54Z",
+  "closed_at": "2026-04-27T17:46:54Z",
+  "close_reason": "Fixed: added 'Keys are server-assigned object Ids; see RFC 8620 §5.3.' to updated, not_updated, not_destroyed fields.",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-7xg.2",
+      "depends_on_id": "jmap-chat-tui-7xg",
+      "type": "parent-child",
+      "created_at": "2026-04-27T10:41:28Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

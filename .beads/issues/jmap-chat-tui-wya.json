@@ -1,0 +1,31 @@
+{
+  "id": "jmap-chat-tui-wya",
+  "title": "api: generic SetResponse\u003cT\u003e for typed create/update results",
+  "description": "SetResponse.created and .updated are Option\u003cHashMap\u003cString, serde_json::Value\u003e\u003e. When a UI crate creates a Chat or Message, it receives the created object as an untyped Value and must downcast it manually.\\n\\nDesign:\\n  pub struct SetResponse\u003cT = serde_json::Value\u003e {\\n      pub account_id: String,\\n      pub old_state: Option\u003cString\u003e,\\n      pub new_state: String,\\n      pub created: Option\u003cHashMap\u003cString, T\u003e\u003e,\\n      pub updated: Option\u003cHashMap\u003cString, Option\u003cT\u003e\u003e\u003e,\\n      pub destroyed: Option\u003cVec\u003cString\u003e\u003e,\\n      pub not_created: Option\u003cHashMap\u003cString, SetError\u003e\u003e,\\n      pub not_updated: Option\u003cHashMap\u003cString, SetError\u003e\u003e,\\n      pub not_destroyed: Option\u003cHashMap\u003cString, SetError\u003e\u003e,\\n  }\\n\\nUsage:\\n  message_create(...) -\u003e Result\u003cSetResponse\u003cMessage\u003e\u003e\\n  chat_set(...) -\u003e Result\u003cSetResponse\u003cChat\u003e\u003e\\n  read_position_set(...) -\u003e Result\u003cSetResponse\u003cReadPosition\u003e\u003e\\n\\nDefault type parameter = serde_json::Value for backward compat with untyped callers.\\n\\nMigration: update all existing /set methods to return SetResponse\u003cT\u003e with the correct T. Update all call sites.\\n\\nTests: fixture-based round-trip — SetResponse\u003cMessage\u003e deserializes created Message fields correctly.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:32:09Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T05:45:05Z",
+  "closed_at": "2026-04-27T05:45:05Z",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-wya",
+      "depends_on_id": "jmap-chat-tui-mmm.4",
+      "type": "supersedes",
+      "created_at": "2026-04-26T22:45:04Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-wya",
+      "depends_on_id": "jmap-chat-tui-8cl",
+      "type": "blocks",
+      "created_at": "2026-04-26T21:32:55Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

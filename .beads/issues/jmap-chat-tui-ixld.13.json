@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-ixld.13",
+  "title": "require_non_empty closure in fetch_session adds indirection for two lines",
+  "description": "client.rs lines 127-133: fetch_session defines a local closure require_non_empty to validate four string fields and then calls it four times. The closure is three lines; the four call sites are four more lines; total cost is seven lines. The equivalent macro-free inline form is four consecutive if-blocks of two lines each, totalling eight lines — essentially the same. The closure does not reduce total lines and adds an indirection layer (the field name is passed as a string literal, losing the compiler's ability to name the offending expression directly). The closure also fires ClientError::InvalidSession with a \u0026'static str message only, while the inline form could interpolate the field value. Suggested rewrite: replace the closure and its four calls with four plain if-guards: if session.api_url.is_empty() { return Err(ClientError::InvalidSession(\"apiUrl is empty\")); }. This is longer by one line but removes the indirection and is immediately legible without tracing the closure.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T01:04:30Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T01:29:47Z",
+  "closed_at": "2026-04-28T01:29:47Z",
+  "close_reason": "Replaced require_non_empty closure with four inline if-guards in fetch_session",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-ixld.13",
+      "depends_on_id": "jmap-chat-tui-ixld",
+      "type": "parent-child",
+      "created_at": "2026-04-27T18:04:33Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

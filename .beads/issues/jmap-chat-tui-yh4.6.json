@@ -1,0 +1,50 @@
+{
+  "id": "jmap-chat-tui-yh4.6",
+  "title": "download_blob: implement + test",
+  "description": "Why: Client needs to download blobs per RFC 8620 §6.2 with optional SHA-256 integrity verification.\\n\\nWhat: Implement JmapChatClient::download_blob in src/blob.rs:\\n  pub async fn download_blob(\u0026self, download_url_template: \u0026str, account_id: \u0026str, blob_id: \u0026str, name: \u0026str, expected_sha256: Option\u003c\u0026str\u003e) -\u003e Result\u003cVec\u003cu8\u003e, ClientError\u003e\\n\\nAlgorithm:\\n1. Expand {accountId}, {blobId}, {name} using expand_url_template\\n2. Build GET request with auth header (same pattern as upload_blob)\\n3. Send, auth_failed_if, error_for_status\\n4. Read body: resp.bytes().await -\u003e Bytes, convert to Vec\u003cu8\u003e\\n5. If expected_sha256 is Some(hex): validate 64-char lowercase hex (Parse error if invalid); compute Sha256::digest(\u0026bytes), hex-encode, compare — return BlobIntegrityMismatch if mismatch\\n6. Return bytes\\n\\nTests:\\n- wiremock GET /download/account1/blob123/file.bin returns fixture bytes; assert bytes match\\n- sha256 mismatch returns BlobIntegrityMismatch with correct expected/actual values\\n- expected_sha256=None skips check, returns bytes\\n\\nDefensive rules: no unwrap(); percent-encode all URL substitutions; do not log response body or auth header.",
+  "acceptance_criteria": "cargo test passes; happy-path, sha256 mismatch, and no-sha256 tests pass",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T09:48:10Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T09:58:58Z",
+  "closed_at": "2026-04-27T09:58:58Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yh4.6",
+      "depends_on_id": "jmap-chat-tui-yh4.4",
+      "type": "blocks",
+      "created_at": "2026-04-27T02:48:35Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-yh4.6",
+      "depends_on_id": "jmap-chat-tui-yh4.2",
+      "type": "blocks",
+      "created_at": "2026-04-27T02:48:34Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-yh4.6",
+      "depends_on_id": "jmap-chat-tui-yh4",
+      "type": "parent-child",
+      "created_at": "2026-04-27T02:48:09Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-yh4.6",
+      "depends_on_id": "jmap-chat-tui-yh4.1",
+      "type": "blocks",
+      "created_at": "2026-04-27T02:48:33Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

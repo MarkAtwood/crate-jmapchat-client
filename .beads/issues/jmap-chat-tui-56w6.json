@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-56w6",
+  "title": "Convert ChatKind/ChatMemberRole/OwnerPresence Unknown to Unknown(String)",
+  "description": "Three enums with #[serde(other)] Unknown (unit variant) appear in outbound serialized fields. Fix by converting each to Unknown(String) with manual serde, matching the PushUrgency/BodyType pattern already in the file. Outbound paths: ChatKind in ChatQueryInput.filter_kind (chat.rs:38) and ChatPushConfig.kinds (misc.rs:194); ChatMemberRole in AddMemberInput.role (chat.rs:278) and UpdateMemberRoleInput.role (chat.rs:304, non-optional); OwnerPresence in PresenceStatusPatch.presence (misc.rs:101).",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:23:02Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:26:32Z",
+  "closed_at": "2026-04-27T19:26:32Z",
+  "close_reason": "Closed"
+}

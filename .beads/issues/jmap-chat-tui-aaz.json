@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-aaz",
+  "title": "Add ULID generation dependency",
+  "description": "Add ulid crate to jmap-chat Cargo.toml. Alternatively use uuid v4 (already ecosystem-common) and format as a ULID-like string. Verify the generated IDs satisfy the spec requirement: unique per request, suitable as JMAP create map key. Document the choice.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T14:31:55Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T15:10:41Z",
+  "close_reason": "Closed"
+}

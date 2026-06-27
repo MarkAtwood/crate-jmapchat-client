@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-r4c.10",
+  "title": "design: conditional filter building omits null fields safely",
+  "description": "message_query (lines 62-82 in methods/message.rs) builds a filter map conditionally, inserting only keys with Some values. When empty, it sends filter:null instead of filter:{}. This is safer than sending explicit nulls because: (1) JMAP spec allows filter:null (means 'no filter'), (2) some servers reject unknown null fields, (3) matches the pattern used in custom_emoji_query (which deliberately omits filter when not set). The test body matcher (Test 35, lines 1373-1384) validates that both presence and absence are correct.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T08:19:29Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T08:24:01Z",
+  "closed_at": "2026-04-27T08:24:01Z",
+  "close_reason": "Design decision: good design, no action needed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-r4c.10",
+      "depends_on_id": "jmap-chat-tui-r4c",
+      "type": "parent-child",
+      "created_at": "2026-04-27T01:19:29Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

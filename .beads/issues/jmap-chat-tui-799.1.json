@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-799.1",
+  "title": "auto-mark-read block duplicated in SelectChat and SendMessage handlers",
+  "description": "The 15-line mark-read block (get last_msg_id, check read_positions, call read_position_set, report error) is copy-pasted verbatim in both the SelectChat and SendMessage arms of the command loop in client_task.rs. The AppCommand::MarkRead handler has a different and more complete path (retry after refreshing read_positions if the chat_id is not found); the two inline copies do not. Three separate update points means any logic change (e.g. adding the retry, changing the error message, or adding telemetry) must be applied in all three places. Extract a helper fn try_mark_read(client, api_url, account_id, read_positions, chat_id, msg_id, tx, ctx) that contains the shared logic and is called from all three sites.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:44:28Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:49:11Z",
+  "closed_at": "2026-04-26T09:49:11Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintenance",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-799.1",
+      "depends_on_id": "jmap-chat-tui-799",
+      "type": "parent-child",
+      "created_at": "2026-04-26T02:44:27Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

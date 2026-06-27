@@ -1,0 +1,31 @@
+{
+  "id": "jmap-chat-tui-5n5.1.1",
+  "title": "CALL_ID constant hidden coupling: build_request + extract_response",
+  "description": "Any contributor adding multi-call batching will see the CALL_ID constant comment ('do not change without updating both') but nothing in the type system enforces that extract_response and build_request stay in sync. When batch support arrives, the coupling is invisible to tools — maintenance consequence: the bug will only appear at runtime when a response call_id doesn't match, with no compile-time signal.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:20:22Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:31:23Z",
+  "closed_at": "2026-04-27T07:31:23Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-5n5.1.1",
+      "depends_on_id": "jmap-chat-tui-5n5.1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:20:22Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

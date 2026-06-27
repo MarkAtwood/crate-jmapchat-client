@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-yz5",
+  "title": "Apply Patch\u003cT\u003e to ChatUpdateInput nullable fields",
+  "description": "Replace in ChatUpdateInput:\n  Option\u003cOption\u003c\u0026'a UTCDate\u003e\u003e mute_until -\u003e Patch\u003c\u0026'a UTCDate\u003e\n  Option\u003cOption\u003c\u0026'a str\u003e\u003e     description -\u003e Patch\u003c\u0026'a str\u003e\n  Option\u003cOption\u003c\u0026'a str\u003e\u003e     avatar_blob_id -\u003e Patch\u003c\u0026'a str\u003e\n\nUpdate chat_set_update implementation to use Patch::into_json (or equivalent). Update fixture tests.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T14:31:40Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T15:10:40Z",
+  "closed_at": "2026-04-27T15:10:40Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yz5",
+      "depends_on_id": "jmap-chat-tui-ctb",
+      "type": "blocks",
+      "created_at": "2026-04-27T07:32:56Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

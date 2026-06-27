@@ -1,0 +1,32 @@
+{
+  "id": "jmap-chat-tui-8lgk.2",
+  "title": "Add supports_ephemeral field to AppEvent::SessionReady",
+  "description": "## Why\n\nAppEvent::SessionReady currently carries only api_url and account_id. The UI has no way to know whether ephemeral events will ever be delivered. This results in a typing indicator area that is permanently empty on servers that do not support the feature, with no explanation.\n\n## What to do\n\nIn crates/jmap-chat-egui/src/event.rs, add the field:\n\n```rust\nAppEvent::SessionReady {\n    api_url: String,\n    account_id: String,\n    supports_ephemeral: bool,  // true iff typing indicators and presence will be delivered\n},\n```\n\nIn client_task.rs, derive the value from ws_url (which is computed by the tracing bead):\n\n```rust\nsend_event(\u0026tx, \u0026ctx, AppEvent::SessionReady {\n    api_url: ...,\n    account_id: ...,\n    supports_ephemeral: ws_url.is_some(),\n});\n```\n\nUpdate the match arm in app.rs that handles AppEvent::SessionReady to accept the new field (store it in AppState — see sibling bead).\n\n## Acceptance criteria\n\n- Compiles with no warnings\n- AppEvent::SessionReady carries the field\n- client_task.rs sets it from ws_url.is_some()",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T22:57:19Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T23:00:32Z",
+  "close_reason": "supports_ephemeral field added to AppEvent::SessionReady; set from ws_url.is_some()",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-8lgk.2",
+      "depends_on_id": "jmap-chat-tui-8lgk",
+      "type": "parent-child",
+      "created_at": "2026-04-27T15:57:18Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-8lgk.2",
+      "depends_on_id": "jmap-chat-tui-8lgk.1",
+      "type": "blocks",
+      "created_at": "2026-04-27T15:57:23Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

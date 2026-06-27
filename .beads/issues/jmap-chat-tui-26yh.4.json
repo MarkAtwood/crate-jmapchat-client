@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-26yh.4",
+  "title": "base_url path check relies on undocumented url::Url path() invariant",
+  "description": "The check 'if path \\!= \"/\"' works because url::Url (WHATWG URL standard) always returns \"/\" as the path for authority-based URLs with no path component. This is correct but non-obvious: a contributor reading 'path \\!= \"/\"' would expect it rejects the root path, but it actually accepts it. The comment '// Store without trailing slash' on the line after the check is about the stored form, not about the path validation logic. Add a comment above the check: // url::Url returns \"/\" for authority-based URLs with no path component (WHATWG URL spec §6.1); this rejects any non-root path like \"/api\" or \"/jmap\"",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T20:28:59Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T22:41:39Z",
+  "closed_at": "2026-04-27T22:41:39Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-26yh.4",
+      "depends_on_id": "jmap-chat-tui-26yh",
+      "type": "parent-child",
+      "created_at": "2026-04-27T13:28:58Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

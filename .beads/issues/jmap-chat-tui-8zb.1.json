@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-8zb.1",
+  "title": "BodyType: add as_str() to deduplicate Serialize/Display arms",
+  "description": "Serialize, Display, and Deserialize each repeat the same 4-arm BodyType→MIME-string mapping independently. EndpointType already uses as_uri() as the single source of truth; BodyType should follow the same pattern. A shared as_str(\u0026self)-\u003e\u0026str method lets Serialize and Display call it, reduces maintenance surface when a new variant is added, and opens the door to a visit_str-based deserializer that avoids the String allocation for known variants. Scale: every Message deserialized allocates a String for body_type that is immediately freed for the three known values; low absolute cost but a real unnecessary allocation per message.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T18:24:28Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T18:27:41Z",
+  "closed_at": "2026-04-27T18:27:41Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-8zb.1",
+      "depends_on_id": "jmap-chat-tui-8zb",
+      "type": "parent-child",
+      "created_at": "2026-04-27T11:24:28Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

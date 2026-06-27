@@ -1,0 +1,25 @@
+{
+  "id": "jmap-chat-tui-x2d",
+  "title": "Epic: Space methods (full Space API)",
+  "description": "Why: Zero Space methods exist in the current codebase. Spaces (federated multi-chat containers) are a core JMAP Chat concept. Without Space support the client cannot participate in federated channels or manage Space membership.\\n\\nWhat:\\n- Space/get and Space/changes\\n- Space/set: create Space, update metadata (name, description, avatar, membershipPolicy), destroy Space\\n- Space/query and Space/queryChanges\\n- Space join flow: SpaceInvite/set accept action triggers membership\\n- Permission checks for channel-scoped operations (pin permission gating)\\n- Fixture tests for all methods\\n\\nDepends on: types.rs upgrades epic (jmap-chat-tui-1aq), methods refactor epic",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:15:19Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T09:06:19Z",
+  "close_reason": "all steps complete",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-x2d",
+      "depends_on_id": "jmap-chat-tui-5n5",
+      "type": "blocks",
+      "created_at": "2026-04-26T21:17:55Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

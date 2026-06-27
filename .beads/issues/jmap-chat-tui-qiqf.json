@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-qiqf",
+  "title": "EndpointType naming/API polish: Other→Unknown, as_uri→as_str, add Display",
+  "description": "Three small polish items deferred from the enum-wiring epic review: (1) rename EndpointType::Other(String) to Unknown(String) to match BodyType/PushUrgency pattern; (2) rename EndpointType::as_uri() to as_str() for consistency with BodyType; (3) add impl Display for EndpointType delegating to as_str(). These are pure API consistency improvements with no correctness or behavior change.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:21:55Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T22:41:39Z",
+  "closed_at": "2026-04-27T22:41:39Z",
+  "close_reason": "Closed"
+}

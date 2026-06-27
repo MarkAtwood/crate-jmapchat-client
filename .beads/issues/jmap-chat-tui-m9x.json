@@ -1,0 +1,25 @@
+{
+  "id": "jmap-chat-tui-m9x",
+  "title": "Split bundled _set methods into separate _create/_destroy",
+  "description": "custom_emoji_set, space_ban_set, and space_invite_set each take both a create input AND a destroy list, forcing callers to supply both even when they only want one. Every other resource (chat, message, space) has separate _create and _destroy methods. Split these three into custom_emoji_create/custom_emoji_destroy, space_ban_create/space_ban_destroy, space_invite_create/space_invite_destroy for consistency.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T15:32:03Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T15:38:57Z",
+  "closed_at": "2026-04-27T15:38:57Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-m9x",
+      "depends_on_id": "jmap-chat-tui-d2t",
+      "type": "parent-child",
+      "created_at": "2026-04-27T08:33:10Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

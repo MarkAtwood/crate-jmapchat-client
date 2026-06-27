@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-ixld.6",
+  "title": "DefaultTransport name implies configurability it lacks",
+  "description": "DefaultTransport is a unit struct whose only behaviour is to call the private helper default_reqwest_client(). The name 'DefaultTransport' implies it is one option among many configurable transports, but because it is a ZST with a single fixed implementation it is really just a named entry-point for that helper. Two alternatives: (a) delete DefaultTransport entirely and expose a free function JmapChatClient::new_with_default_transport (or a Default impl on TransportConfig via a blanket) so callers don't need to name an otherwise-opaque type; (b) if the ZST must stay because it is the most common public API entry, rename it PlainTransport or StandardTransport to signal 'publicly-trusted TLS, no customisation' rather than implying it is the fallback/configurable baseline. Suggested rewrite of the factory site: instead of JmapChatClient::new(DefaultTransport, NoneAuth, url) expose JmapChatClient::new_plain(auth, url) that internally calls default_reqwest_client() without surfacing the ZST in caller code.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T01:03:54Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T01:29:48Z",
+  "closed_at": "2026-04-28T01:29:48Z",
+  "close_reason": "Added new_plain(auth, url) convenience constructor to JmapChatClient; DefaultTransport hidden from common-case call sites",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "opinion",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-ixld.6",
+      "depends_on_id": "jmap-chat-tui-ixld",
+      "type": "parent-child",
+      "created_at": "2026-04-27T18:03:54Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

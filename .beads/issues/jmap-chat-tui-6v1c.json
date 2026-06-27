@@ -1,0 +1,16 @@
+{
+  "id": "jmap-chat-tui-6v1c",
+  "title": "Add QuotaScope enum, replace Quota.scope: String",
+  "description": "Quota.scope in methods/quota.rs is a String. RFC 8620 §6.2 defines quota scopes as 'account', 'domain', 'global'. An enum QuotaScope { Account, Domain, Global, Unknown(String) } with the Unknown catch-all would type this field correctly.",
+  "notes": "Part of epic jmap-chat-tui-hqb: jmap-chat wire up enums — eliminate stringly-typed spec fields",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T18:51:28Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:05:11Z",
+  "closed_at": "2026-04-27T19:05:11Z",
+  "close_reason": "Closed"
+}

@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-4u4.33",
+  "title": "message_query allows empty filter that spec forbids",
+  "description": "message_query sends filter: null when both chat_id and has_mention are None. Spec says servers MUST return unsupportedFilter in this case. A caller who passes neither will get a server error with no explanation at the call site. The constraint is only documented in a doc comment, not enforced by the type system or validated before sending.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:08:43Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:19:32Z",
+  "closed_at": "2026-04-26T07:19:32Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4u4.33",
+      "depends_on_id": "jmap-chat-tui-4u4",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:08:42Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

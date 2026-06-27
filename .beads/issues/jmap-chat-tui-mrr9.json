@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-mrr9",
+  "title": "refactor: call_batch erases type info — reconsider API",
+  "description": "## Problem\\ncall_batch returns HashMap\u003cString, serde_json::Value\u003e, erasing all type information after the HTTP call. Callers must then manually serde_json::from_value to recover types, partially duplicating what the typed call + extract_response pattern already handles cleanly.\\n\\n## Solution\\nEvaluate whether call_batch is pulling its weight or should be removed in favor of callers assembling typed responses via extract_response. If kept, document clearly why it exists and when to prefer it over the typed path. A typed batch helper (e.g. accepting a tuple of expected response types) could replace it.\\n\\n## Acceptance\\n- call_batch is either removed, replaced with a typed variant, or documented with a clear rationale for its existence\\n- No regression in batch-request functionality",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T00:33:08Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-28T00:52:38Z",
+  "close_reason": "Closed"
+}

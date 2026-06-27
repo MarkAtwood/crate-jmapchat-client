@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-3ph.5",
+  "title": "message_get does not enforce non-empty ids precondition",
+  "description": "message_get documents 'ids is required (non-empty); fetching all messages is impractical' but does not enforce this. A caller passing an empty \u0026[] will produce a Message/get request with ids:[] and receive a server-side error (likely unsupportedFilter or similar) rather than a clear ClientError::InvalidArgument at the call site. This is inconsistent with message_query, which validates its precondition and returns InvalidArgument. Fix: add a guard at the top of message_get: if ids.is_empty() { return Err(ClientError::InvalidArgument('message_get: ids must not be empty'.into())); }",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:44:06Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:47:06Z",
+  "closed_at": "2026-04-26T07:47:06Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-3ph.5",
+      "depends_on_id": "jmap-chat-tui-3ph",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:44:05Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

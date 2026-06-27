@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-9vk.3",
+  "title": "per-frame UTCDate::to_string() alloc in message render",
+  "description": "main.rs line 169: msg.sent_at.to_string() allocates a new String on every frame for every visible message. UTCDate already implements AsRef\u003cstr\u003e and Deref\u003cTarget=str\u003e, so ui.label() can accept \u0026*msg.sent_at or msg.sent_at.as_str() with zero allocation. Hot path: runs at egui frame rate (typically 60 fps) times the number of visible messages. At 100 visible messages this is 6000 heap allocations/sec for no reason.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:00:47Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:11:10Z",
+  "closed_at": "2026-04-26T09:11:10Z",
+  "close_reason": "Closed",
+  "labels": [
+    "efficiency",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-9vk.3",
+      "depends_on_id": "jmap-chat-tui-9vk",
+      "type": "parent-child",
+      "created_at": "2026-04-26T02:00:47Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

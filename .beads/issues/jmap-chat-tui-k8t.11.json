@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-k8t.11",
+  "title": "PresenceStatusSetInput::default() produces id:empty-string causing invalid patch key",
+  "description": "Trigger: caller uses PresenceStatusSetInput::default() (or forgets to set id) and calls presence_status_set. Bad behavior: id defaults to empty string \"\", so the JMAP update map has key \"\" which is not a valid JMAP object ID. The server will return notFound or invalidArguments. Default is derived for ergonomics but id has no valid default. Fix: remove the Default derive from PresenceStatusSetInput so callers must supply id explicitly, or make id an Option\u003c\u0026str\u003e and error at call time if None.",
+  "status": "closed",
+  "priority": 0,
+  "issue_type": "bug",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:51:41Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:59:30Z",
+  "closed_at": "2026-04-27T07:59:30Z",
+  "close_reason": "Closed",
+  "labels": [
+    "correctness",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-k8t.11",
+      "depends_on_id": "jmap-chat-tui-k8t",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:51:41Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

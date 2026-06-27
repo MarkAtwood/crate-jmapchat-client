@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-5ag",
+  "title": "blob: VAPID key extraction from session capability",
+  "description": "Extract VAPID public key from session capabilities for push service registration:\\n- Capability urn:ietf:params:jmap:webpush-vapid in session\\n- Expose as JmapSession::vapid_public_key() -\u003e Option\u003c\u0026str\u003e\\n- Test: parse fixture session JSON with webpush-vapid capability\\n\\nFixture file: tests/fixtures/session_with_vapid.json",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:20:46Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T04:21:42Z",
+  "closed_at": "2026-04-27T04:21:42Z",
+  "close_reason": "duplicate of ffm (ffm is canonical)",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-5ag",
+      "depends_on_id": "jmap-chat-tui-9tm",
+      "type": "blocks",
+      "created_at": "2026-04-26T21:20:56Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

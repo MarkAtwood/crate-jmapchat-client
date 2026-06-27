@@ -1,0 +1,14 @@
+{
+  "id": "jmap-chat-tui-1ot",
+  "title": "types: Session extensions and capability structs",
+  "description": "## What\nUpdate crates/jmap-chat/src/jmap.rs Session struct and add capability structs.\n\nSession new fields (spec §Capability):\n- owner_user_id: Option\u003cString\u003e — MUST be present in federation deployments\n- owner_login: Option\u003cString\u003e\n- owner_endpoints: Option\u003cVec\u003cEndpoint\u003e\u003e\n- Add capability detection helpers: fn websocket_capability(\u0026self) -\u003e Option\u003c\u0026WebSocketCapability\u003e, fn chat_push_capability(\u0026self) -\u003e Option\u003c\u0026ChatPushCapability\u003e\n\nNew structs:\n- ChatCapability { max_body_bytes: u64, max_attachment_bytes: u64, max_attachments_per_message: u64, max_group_members: u64, max_space_members: u64, max_roles_per_space: u64, max_channels_per_space: u64, max_categories_per_space: u64, supported_body_types: Vec\u003cString\u003e, supports_threads: bool }\n- WebSocketCapability { url: String, supports_push: bool } — for 'urn:ietf:params:jmap:websocket'\n- ChatWebSocketCapability {} — for 'urn:ietf:params:jmap:chat:websocket' (empty object)\n- ChatPushCapability { max_snippet_bytes: u64, supported_urgency_values: Vec\u003cString\u003e, max_messages_per_push: Option\u003cu64\u003e }\n\nThe Session.accounts map values should carry accountCapabilities including ChatCapability.\nAdd fn chat_capability(\u0026self, account_id: \u0026str) -\u003e Option\u003c\u0026ChatCapability\u003e\n\n## Tests\nUpdate session.json fixture to include ownerUserId, ownerLogin, capability objects\nAssert: all capability fields parse correctly\nAssert: chat_account_id() still works\nAssert: chat_capability() returns the ChatCapability for the primary account",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:12:09Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T11:04:32Z",
+  "closed_at": "2026-04-27T11:04:32Z",
+  "close_reason": "Implementation and tests already present from prior work"
+}

@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-wju9.3",
+  "title": "EndpointType uses as_uri()/from_uri() naming instead of as_str()",
+  "description": "crates/jmap-chat/src/types.rs lines 159-200 — EndpointType uses as_uri() and from_uri() as its canonical accessor names, while every other string enum in the file (ChatMemberRole, ChatKind, BodyType, OwnerPresence, PushUrgency) uses as_str(). The divergence breaks structural uniformity and makes a future impl_string_enum\\! macro harder to write without a special-case for EndpointType. The values are URIs semantically, but as_str() is the file-wide convention for 'give me the wire string'. Consider renaming to as_str()/from_str() (with a doc comment noting the values are URIs) or at minimum documenting the naming divergence explicitly.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:28:31Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:33:31Z",
+  "closed_at": "2026-04-27T19:33:31Z",
+  "close_reason": "Tracked in jmap-chat-tui-qiqf (EndpointType polish bead)",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-wju9.3",
+      "depends_on_id": "jmap-chat-tui-wju9",
+      "type": "parent-child",
+      "created_at": "2026-04-27T12:28:31Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-tbs.12",
+  "title": "Fixture-based test oracle is correct: spec example payload used verbatim",
+  "description": "chat_message_push.json is transcribed directly from the spec example in §4 and the test asserts against known-good values rather than round-tripping through the code under test. This is exactly the right approach. A contributor might suggest 'simplifying' to just check deserialization succeeds without asserting field values — that would prove nothing. The field-by-field assertions are what makes the test meaningful as a spec conformance check.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T09:29:52Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T09:34:53Z",
+  "closed_at": "2026-04-27T09:34:53Z",
+  "close_reason": "decision record: confirmed correct behavior",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-tbs.12",
+      "depends_on_id": "jmap-chat-tui-tbs",
+      "type": "parent-child",
+      "created_at": "2026-04-27T02:29:51Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

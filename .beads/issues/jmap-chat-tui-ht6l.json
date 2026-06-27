@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-ht6l",
+  "title": "Review: feat(egui): clear supports_ephemeral after WS failures",
+  "notes": "Confidence: 10% chance of missed bug. The ws_backoff_idx asymmetry is real and was missed; no other bugs detected. Uncertainty driven by: ws task lifecycle not fully exercisable without a live server; cannot observe whether ws_handle is leaked for the never-disabled path. Would raise confidence if: an integration test exercised the 5-failure→disable path with a mock WS server.\nMaintainer risk: LOW — only one real bug (backoff reset asymmetry); logic is straightforward, well-scoped, and mirrors the existing SSE pattern.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T23:12:38Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T23:16:57Z",
+  "close_reason": "all steps complete",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

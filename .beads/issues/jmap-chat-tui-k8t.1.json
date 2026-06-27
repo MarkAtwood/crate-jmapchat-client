@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-k8t.1",
+  "title": "Option\u003cOption\u003cT\u003e\u003e for nullable JMAP patch fields in PresenceStatusSetInput is correct",
+  "description": "PresenceStatusSetInput uses Option\u003cOption\u003c\u0026str\u003e\u003e for status_text, status_emoji, and expires_at. This correctly encodes three states: None = omit field from JMAP patch (leave server value unchanged), Some(None) = include field as JSON null (clear the value), Some(Some(v)) = include field with a value (set it). A future contributor might simplify this to Option\u003c\u0026str\u003e to remove the double wrapping, but that would conflate 'do not touch' with 'clear'. JMAP /set patch semantics require the distinction (RFC 8620 §5.3). The doc comment on the struct already explains this; the explanation should be kept.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:49:47Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T08:00:07Z",
+  "closed_at": "2026-04-27T08:00:07Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-k8t.1",
+      "depends_on_id": "jmap-chat-tui-k8t",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:49:47Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-g2f.8",
+  "title": "Document channel capacity 256 choice in main.rs",
+  "description": "main.rs lines 23-24 create two sync_channel::\u003c_\u003e(256) channels with no comment explaining the capacity. A contributor reading this will not know: (1) whether 256 was measured or guessed, (2) what the backpressure behavior is when the buffer fills (send() blocks the background task; if the UI thread is also blocked, deadlock is possible), (3) whether the same value for both directions was intentional. Add a comment stating the rationale: e.g. 'capacity chosen to buffer bursts of SSE state-change events without blocking the client task; if the UI falls more than 256 events behind, the client task will block' — or whatever the actual reasoning is.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:41:12Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:23:36Z",
+  "closed_at": "2026-04-26T09:23:36Z",
+  "close_reason": "Already documented in code comments",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-g2f.8",
+      "depends_on_id": "jmap-chat-tui-g2f",
+      "type": "parent-child",
+      "created_at": "2026-04-26T01:41:12Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

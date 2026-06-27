@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-yof.33",
+  "title": "session_parts helper centralizes API-URL + account-ID extraction across all method wrappers",
+  "description": "Every method wrapper (chat_get, message_query, message_create, etc.) calls session_parts(session) as its first step to extract (api_url, account_id) and return a uniform InvalidSession error if the session has no primary JMAP Chat account. This is correct because the alternative — inlining the extraction at each call site — would scatter 10+ copies of the same boilerplate and make it easy for a future method to forget the account-ID check. A future contributor might suggest passing api_url and account_id directly as parameters instead of a Session, to avoid the per-call extraction. That would push the extraction responsibility onto every caller and lose the uniform error path. The session_parts helper is private and its contract is documented in the function comment.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:42:33Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:01:47Z",
+  "closed_at": "2026-04-27T07:01:47Z",
+  "close_reason": "Decision record — no action needed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yof.33",
+      "depends_on_id": "jmap-chat-tui-yof",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:42:33Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

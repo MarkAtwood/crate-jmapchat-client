@@ -1,0 +1,16 @@
+{
+  "id": "jmap-chat-tui-0s4",
+  "title": "Message.body_type should be BodyType not String",
+  "description": "Message.body_type is typed as String but the BodyType enum exists exactly for this field. MessageCreateInput.body_type already uses BodyType correctly, making Message the odd one out. Callers matching on inbound message body types must do string comparison instead of enum dispatch, and the type system gives no help with future spec extensions. Fix: change Message.body_type from String to BodyType in types.rs:644 and update tests accordingly.",
+  "notes": "Epic: jmap-chat-tui-4pp (jmap-chat API idiomaticity: review findings)",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T17:53:55Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T18:13:09Z",
+  "closed_at": "2026-04-27T18:13:09Z",
+  "close_reason": "Closed"
+}

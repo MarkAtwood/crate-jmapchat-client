@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-k8t.6",
+  "title": "space_invite_set accepts Option\u003c\u0026SpaceInviteCreateInput\u003e to support destroy-only calls without a separate method",
+  "description": "space_invite_set takes input: Option\u003c\u0026SpaceInviteCreateInput\u003e. When None, the create map serializes as JSON null, producing a valid destroy-only /set request. The alternative — two methods, one for create+destroy and one for destroy-only — doubles the surface area and splits related semantics. The alternative of always requiring an input and passing a sentinel struct is worse API ergonomics. JMAP /set is inherently a multi-operation request; making create optional on a single method matches the protocol model cleanly. Importantly, SpaceBan does NOT do this (it always requires input for create) because bans are never destroy-only in practice; the asymmetry is intentional.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:50:16Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T08:00:14Z",
+  "closed_at": "2026-04-27T08:00:14Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-k8t.6",
+      "depends_on_id": "jmap-chat-tui-k8t",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:50:15Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

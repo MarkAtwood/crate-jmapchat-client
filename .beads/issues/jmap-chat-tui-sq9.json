@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-sq9",
+  "title": "Review: docs(jmap-chat): document Unknown variant serialization behavior",
+  "notes": "Maintainer risk: LOW — doc-only commit with one confirming test. No real findings. Stopping review loop: no actionable issues remain.\nConfidence: 98% clean. No uncertainty. If I filed more issues here it would be bikeshedding.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T05:06:25Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T05:06:45Z",
+  "closed_at": "2026-04-27T05:06:45Z",
+  "close_reason": "No findings with engineering basis. Review loop complete — bikeshedding threshold reached.",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

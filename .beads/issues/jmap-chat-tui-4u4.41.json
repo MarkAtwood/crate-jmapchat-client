@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-4u4.41",
+  "title": "parse_sse_block returns a 2-tuple instead of a named struct",
+  "description": "parse_sse_block returns (SseEvent, Option\u003cString\u003e). The second element is the SSE event id, which is semantically distinct from the event itself. At every call site, callers destructure the tuple or discard the id with _id. A 2-tuple carries no semantic labels; a reader must go to the doc comment to learn what the second element is. Rewrite: define pub struct SseFrame { pub event: SseEvent, pub id: Option\u003cString\u003e } and return SseFrame from parse_sse_block. This makes the pairing explicit, improves call sites (frame.event, frame.id), and eliminates the need for the doc comment to explain the tuple layout.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:09:17Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:32:36Z",
+  "closed_at": "2026-04-26T07:32:36Z",
+  "close_reason": "Closed",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4u4.41",
+      "depends_on_id": "jmap-chat-tui-4u4",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:09:17Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

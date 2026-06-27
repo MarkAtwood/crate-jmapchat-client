@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-7c2.14",
+  "title": "filter_presence uses ContactPresence not OwnerPresence — distinct protocol domains",
+  "description": "ContactPresence (ChatContact.presence) represents the server's observed state of a remote contact. OwnerPresence (PresenceStatus.presence) represents the owner's self-reported availability. The two enums have identical variants today but model different spec roles: contact presence is reported by the server from federation data; owner presence is explicitly set by the owner via PresenceStatus/set. ChatContactQueryInput.filter_presence filters on ChatContact.presence, so ContactPresence is the correct type. OwnerPresence was a type-domain error before the two were separated. Do not collapse them back into one enum to reduce apparent duplication. The spec treats them as distinct, and future spec versions could add states valid in one domain but not the other.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T18:18:22Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T18:22:39Z",
+  "closed_at": "2026-04-27T18:22:39Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-7c2.14",
+      "depends_on_id": "jmap-chat-tui-7c2",
+      "type": "parent-child",
+      "created_at": "2026-04-27T11:18:22Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

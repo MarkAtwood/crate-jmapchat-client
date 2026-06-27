@@ -1,0 +1,31 @@
+{
+  "id": "jmap-chat-tui-vqw.1",
+  "title": "Response types use String for JMAP IDs — Id newtype exists but is not applied",
+  "description": "GetResponse.account_id/not_found, QueryResponse.ids, ChangesResponse.created/updated/destroyed, SetResponse.destroyed, QueryChangesResponse.removed, AddedItem.id, SpaceJoinResponse.space_id — all use String where the Id newtype (jmap.rs) should be used. Id guarantees non-empty (RFC 8620 §1.2), has Display/AsRef/Deref/PartialEq\u003cstr\u003e. Attachment.blob_id and Span.user_id already use Id correctly. The inconsistency means callers get Id from some server-assigned fields and String from others with no API-level reason, and bugs where a server sends an empty ID string will silently propagate instead of returning a parse error. This is the most important before the API fossilizes.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T17:09:49Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T17:32:04Z",
+  "closed_at": "2026-04-27T17:32:04Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-vqw.1",
+      "depends_on_id": "jmap-chat-tui-vqw",
+      "type": "parent-child",
+      "created_at": "2026-04-27T10:09:48Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

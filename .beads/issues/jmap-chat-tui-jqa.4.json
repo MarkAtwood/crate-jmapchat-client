@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-jqa.4",
+  "title": "Remove _set_ prefix from update and destroy methods",
+  "description": "Six methods carry a redundant _set_ infix (from the underlying JMAP Chat/set operation) that adds noise without meaning to callers:\n\nchat_set_update  -\u003e chat_update\nchat_set_destroy -\u003e chat_destroy\nmessage_set_update  -\u003e message_update\nmessage_set_destroy -\u003e message_destroy\nspace_set_update  -\u003e space_update\nspace_set_destroy -\u003e space_destroy\n\nThe create variants (chat_create_direct, chat_create_group, etc.) correctly omit _set_ already, making the current naming internally inconsistent. Note: space_join, chat_typing, blob_lookup, blob_convert are already clean.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "epic",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T14:31:09Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T15:10:52Z",
+  "closed_at": "2026-04-27T15:10:52Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-jqa.4",
+      "depends_on_id": "jmap-chat-tui-jqa",
+      "type": "parent-child",
+      "created_at": "2026-04-27T07:31:09Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

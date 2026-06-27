@@ -1,0 +1,27 @@
+{
+  "id": "jmap-chat-tui-e8r.3",
+  "title": "presence_status_set: extract nullable-field-to-JSON helper",
+  "description": "misc.rs lines 99-125 repeat the same Option\u003cOption\u003cT\u003e\u003e-\u003eserde_json::Value pattern three times (status_text, status_emoji, expires_at). Each block is 4 lines of map.insert + .map(...).unwrap_or(Null). A small inline closure or a two-line helper fn opt_opt_to_value\u003cT: Into\u003cValue\u003e\u003e(v: Option\u003cOption\u003cT\u003e\u003e) -\u003e Option\u003cValue\u003e would collapse all three blocks to three one-liners and make adding future nullable fields trivial.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:50:03Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T08:01:26Z",
+  "closed_at": "2026-04-27T08:01:26Z",
+  "close_reason": "decision: nullable-field-to-JSON is straightforward enough (6 if-let arms) that a helper would add indirection without clarity; keep inline",
+  "labels": [
+    "elegance"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-e8r.3",
+      "depends_on_id": "jmap-chat-tui-e8r",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:50:02Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

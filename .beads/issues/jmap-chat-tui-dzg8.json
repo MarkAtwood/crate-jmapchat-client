@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-dzg8",
+  "title": "refactor: split AuthProvider transport from credential injection",
+  "description": "## Problem\\nAuthProvider conflates two concerns: HTTP client construction (TLS trust roots, connect timeouts) and per-request credential injection (Authorization header). Three of four impls call default_reqwest_client() because they have no transport variation — the method is boilerplate tax. Anyone needing mTLS + Bearer must fuse both concerns into one type. The blanket impls on Box\u003cdyn\u003e and Arc\u003cdyn\u003e exist only to paper over this coupling.\\n\\n## Solution\\nSeparate into two traits: one for transport config (build_client), one for credential injection (auth_header). JmapChatClient::new accepts both independently, enabling composition of any transport with any auth scheme without a combined type.\\n\\n## Acceptance\\n- Existing auth impls (NoneAuth, BearerAuth, BasicAuth, CustomCaAuth) still work\\n- mTLS + Bearer is composable without writing a combined struct\\n- default_reqwest_client() helper is eliminated or scoped to the transport trait",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T00:32:46Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-28T01:02:08Z",
+  "close_reason": "Closed"
+}

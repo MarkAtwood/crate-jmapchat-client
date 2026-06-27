@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-uku",
+  "title": "methods: split methods.rs into per-type-family modules",
+  "description": "Split crates/jmap-chat/src/methods.rs into a module tree:\\n- methods/mod.rs (re-exports all)\\n- methods/chat.rs (Chat/get, Chat/query, Chat/changes + new Chat/set, Chat/typing, Chat/queryChanges)\\n- methods/contact.rs (ChatContact/get + new /changes, /set, /query, /queryChanges)\\n- methods/message.rs (Message/get, /query, /changes, /set + new edit/delete/reactions/readAt, /queryChanges)\\n- methods/space.rs (new Space/* methods)\\n- methods/misc.rs (ReadPosition, PresenceStatus, SpaceInvite, SpaceBan, CustomEmoji)\\n\\nNo behavior change — this is pure restructure. All existing tests must still pass.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:16:16Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T07:12:11Z",
+  "close_reason": "Closed"
+}

@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-7p5.4",
+  "title": "build_request allocates two Strings per call after OnceLock removal",
+  "description": "The OnceLock that cached the 'using' Vec\u003cString\u003e was intentionally removed and replaced with a per-call Vec allocation in build_request. Every JMAP method call now allocates and frees two String heap objects for the urn: URNs. For a polling-heavy or high-throughput client this creates measurable per-call overhead. Simpler alternative: use \u0026'static str in JmapRequest.using and change the field type, or use a once_cell/LazyLock at the module level with a static slice reference.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T17:34:24Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T17:39:42Z",
+  "closed_at": "2026-04-27T17:39:42Z",
+  "close_reason": "Duplicate of 7p5.2; same decision applies.",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-7p5.4",
+      "depends_on_id": "jmap-chat-tui-7p5",
+      "type": "parent-child",
+      "created_at": "2026-04-27T10:34:24Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-fgr",
+  "title": "Message/set reactions: add and remove emoji reactions",
+  "description": "Add reaction management to Message/set in methods/message.rs:\\n- PatchObject update on reactions map: add entry (emoji -\u003e [reactionSet]), remove entry\\n- Reaction set semantics: each user has at most one reaction per emoji per message\\n- Handle SetError: invalidProperties\\n- Fixture test: add reaction, remove reaction\\n\\nFixture files: tests/fixtures/message_set_reaction_*.json",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:17:24Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T11:02:48Z",
+  "closed_at": "2026-04-27T11:02:48Z",
+  "close_reason": "Implementation and tests already present from prior work",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-fgr",
+      "depends_on_id": "jmap-chat-tui-9w3",
+      "type": "blocks",
+      "created_at": "2026-04-26T21:17:31Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

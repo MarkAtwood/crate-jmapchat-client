@@ -1,0 +1,26 @@
+{
+  "id": "jmap-chat-tui-4yc.1",
+  "title": "Add Cargo.toml deps for jmap-chat-egui",
+  "description": "Add all missing dependencies to crates/jmap-chat-egui/Cargo.toml so the crate can depend on jmap-chat, clap, and tokio.\n\nWhat: Update Cargo.toml to declare all needed workspace and non-workspace deps.\n\nAlgorithm:\n1. Add jmap-chat = { path = '../jmap-chat' } (local dep)\n2. Add tokio.workspace = true\n3. Add clap = { version = '4', features = ['derive'] } (not in workspace, add directly)\n4. Remove any duplicate/unused deps.\n5. Run cargo check -p jmap-chat-egui to confirm.\n\nDefensive rules:\n- No unwrap in any build.rs or proc-macro path.\n- Keep minimal features; do not pull in unnecessary tokio features.\n\nTests:\n- cargo check -p jmap-chat-egui must succeed with zero errors.\n- cargo clippy -p jmap-chat-egui must emit zero errors.",
+  "acceptance_criteria": "cargo check -p jmap-chat-egui exits 0; cargo clippy -p jmap-chat-egui exits 0",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:20:43Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-26T08:23:18Z",
+  "close_reason": "Cargo.toml updated with all deps; cargo check clean",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4yc.1",
+      "depends_on_id": "jmap-chat-tui-4yc",
+      "type": "parent-child",
+      "created_at": "2026-04-26T01:20:43Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

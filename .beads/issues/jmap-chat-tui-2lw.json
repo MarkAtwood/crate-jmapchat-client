@@ -1,0 +1,25 @@
+{
+  "id": "jmap-chat-tui-2lw",
+  "title": "Replace body_type string with BodyType enum in MessageCreateInput",
+  "description": "MessageCreateInput.body_type is \u0026str but the spec defines exactly two valid values: 'text/plain' and 'text/markdown'. An unrecognized value causes a server MethodError with no compile-time protection. Add a BodyType enum with Plain, Markdown, and Unknown(String) variants (consistent with ChatKind, ChatMemberRole etc in types::) and use it in MessageCreateInput and MessagePatch.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "feature",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T15:32:06Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T15:41:01Z",
+  "closed_at": "2026-04-27T15:41:01Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-2lw",
+      "depends_on_id": "jmap-chat-tui-d2t",
+      "type": "parent-child",
+      "created_at": "2026-04-27T08:33:11Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

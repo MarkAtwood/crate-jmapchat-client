@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-884.1",
+  "title": "quota_get: doc comment should note Quota/changes not yet implemented",
+  "description": "quota_get now returns GetResponse\u003cQuota\u003e exposing a state token, but there is no Quota/changes method. A caller who sees the state field and tries to use it for delta sync will find nothing to call. The doc comment should note that state is preserved for future Quota/changes support.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T16:59:01Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T17:00:50Z",
+  "closed_at": "2026-04-27T17:00:50Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-884.1",
+      "depends_on_id": "jmap-chat-tui-884",
+      "type": "parent-child",
+      "created_at": "2026-04-27T09:59:01Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

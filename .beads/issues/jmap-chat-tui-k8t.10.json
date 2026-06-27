@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-k8t.10",
+  "title": "no request body matchers in new set/get tests (16-28)",
+  "description": "Tests 16-28 only respond to any POST and assert on the response shape; none use wiremock body_json() to verify outgoing JMAP request wire format. A bug in how the request is built (wrong JSON key, missing field, extra null) will not be caught. Earlier tests (chat_query, message_query, contact_get, read_position_get) do use body_json() matchers. A contributor adding a new method will copy the later matcher-free tests, propagating the gap.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:51:38Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:59:42Z",
+  "closed_at": "2026-04-27T07:59:42Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-k8t.10",
+      "depends_on_id": "jmap-chat-tui-k8t",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:51:37Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

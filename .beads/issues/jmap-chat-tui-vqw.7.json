@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-vqw.7",
+  "title": "Invocation tuple (String, Value, String) is load-bearing wire format — defend against newtype pressure",
+  "description": "Invocation = (String, serde_json::Value, String) is the correct representation for RFC 8620 §3.2's 3-element JSON array wire format. A contributor might suggest a struct with named fields. Reject: serde's tuple serialization maps this directly to [methodName, args, callId] with zero extra code. Named-field structs require #[serde(rename_all)] and custom ordering. The positional access (.0/.1/.2) is only used in tests and internal extract_response — callers use destructuring.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T17:10:35Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T17:32:12Z",
+  "closed_at": "2026-04-27T17:32:12Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-vqw.7",
+      "depends_on_id": "jmap-chat-tui-vqw",
+      "type": "parent-child",
+      "created_at": "2026-04-27T10:10:34Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

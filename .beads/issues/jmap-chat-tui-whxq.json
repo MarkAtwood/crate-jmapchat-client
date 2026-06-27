@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-whxq",
+  "title": "SSE auth failure: continue causes immediate reconnect via None arm",
+  "description": "After SseNotification::AuthFailed, the code continue-s. The SSE task dropped its sse_tx, so sse_rx.recv() returns None next iteration, setting sse_needs_restart=true and triggering reconnect. Defeats the no-reconnect-after-auth-failure intent. Fix: track sse_auth_failed flag to suppress restart from the None arm.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T03:19:08Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T03:24:05Z",
+  "closed_at": "2026-04-28T03:24:05Z",
+  "close_reason": "Closed"
+}

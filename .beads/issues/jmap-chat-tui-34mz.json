@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-34mz",
+  "title": "JmapRequestBuilder: catch duplicate call IDs at build time",
+  "description": "## Why\n\nJmapRequestBuilder::add_call accepts any call ID string and does not validate uniqueness. A caller who adds two invocations with the same ID gets no error until call_batch receives the server response and finds duplicate keys. The builder has all the information to catch this at build() time.\n\n## What needs to be done\n\nChange build() to return Result\u003cJmapRequest, ClientError\u003e (InvalidArgument). During add_call, accumulate used call IDs in a HashSet. In build(), detect duplicates and return Err. Alternatively, panic in add_call with a clear message (the builder is not sent across await points, so panic is acceptable for programmer error). Update all call sites that call build() -- tests and production code -- to handle the new return type.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T01:44:25Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-28T02:15:02Z",
+  "close_reason": "Closed"
+}

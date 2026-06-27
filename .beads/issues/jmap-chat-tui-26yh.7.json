@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-26yh.7",
+  "title": "EndpointType visit_str visitor eliminates double-alloc and is correct serde idiom",
+  "description": "EndpointType Deserialize was rewritten to use a Visitor with visit_str() instead of deserializing to String then matching. A contributor might suggest reverting to the simpler String::deserialize approach. The visitor is correct: (1) for recognized variants (Vtc, Payment, Blob, etc.) no String allocation occurs at all — visit_str receives a borrowed \u0026str; (2) only the Other(s) branch allocates, and only for unknown variants; (3) this is the standard serde idiom for string-based enums with fallback variants (used throughout serde_json and similar crates). Do not revert to String::deserialize.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T20:29:42Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T22:33:25Z",
+  "closed_at": "2026-04-27T22:33:25Z",
+  "close_reason": "Decision record: current implementation is correct; no code change needed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-26yh.7",
+      "depends_on_id": "jmap-chat-tui-26yh",
+      "type": "parent-child",
+      "created_at": "2026-04-27T13:29:41Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

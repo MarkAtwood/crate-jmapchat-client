@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-7lbd",
+  "title": "main.rs: Runtime::new().expect() can panic on thread exhaustion",
+  "description": "tokio::runtime::Runtime::new().expect('tokio runtime') is in a production path. If the OS refuses thread allocation the spawned thread panics silently and the UI hangs. Fix: handle error, send StatusChanged(Disconnected) or print to stderr.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T03:19:10Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T03:24:06Z",
+  "closed_at": "2026-04-28T03:24:06Z",
+  "close_reason": "Closed"
+}

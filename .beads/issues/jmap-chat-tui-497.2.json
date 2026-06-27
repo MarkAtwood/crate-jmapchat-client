@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-497.2",
+  "title": "String boundary in AppEvent is correct: HashMap Borrow workarounds avoided",
+  "description": "Using String (not Id) for all event ID fields in AppEvent is correct. AppState.typing_indicators is HashMap\u003c(String,String),Instant\u003e and .presence is HashMap\u003cString,ContactPresence\u003e. HashMap::remove requires the key type or a Borrow impl. (String,String) does not implement Borrow\u003c(Id,Id)\u003e in std, so using Id for these keys would require .to_string() at every insert/remove anyway. The Id→String conversion at event construction (one per event) is the right place for it.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T17:47:58Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T17:48:24Z",
+  "closed_at": "2026-04-27T17:48:24Z",
+  "close_reason": "Decision recorded.",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-497.2",
+      "depends_on_id": "jmap-chat-tui-497",
+      "type": "parent-child",
+      "created_at": "2026-04-27T10:47:58Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

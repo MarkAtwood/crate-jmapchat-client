@@ -1,0 +1,27 @@
+{
+  "id": "jmap-chat-tui-e8r.11",
+  "title": "presence_status_get uses None::\u003c\u0026[\u0026str]\u003e without explanation",
+  "description": "misc.rs line 60: presence_status_get sends ids: None::\u003c\u0026[\u0026str]\u003e with an explicit type annotation that is absent from equivalent calls in other files (which just use ids: ids from a caller-supplied argument). The turbofish annotation is needed because serde_json::json! cannot infer the None type without it, but no comment explains this. Fix: add a brief comment such as // type annotation needed for json! macro inference or extract to a named variable.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:52:06Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T08:01:48Z",
+  "closed_at": "2026-04-27T08:01:48Z",
+  "close_reason": "decision: None::\u003c\u0026[\u0026str]\u003e at the call site is idiomatic for typed null in serde_json; consistent with spec (ids:null = all records)",
+  "labels": [
+    "readability"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-e8r.11",
+      "depends_on_id": "jmap-chat-tui-e8r",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:52:06Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

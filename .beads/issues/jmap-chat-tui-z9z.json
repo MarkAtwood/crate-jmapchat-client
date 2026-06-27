@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-z9z",
+  "title": "push: ChatMessagePush payload type and receive path",
+  "description": "Implement ChatMessagePush payload parsing and dispatch:\\n- Define ChatMessagePush struct: chatId, messageId, senderId, sentAt, snippet: Option\u003cString\u003e, isE2EE: bool\\n- Parse from push endpoint delivery (JSON body)\\n- On receive: surface as AppEvent::PushNotification before triggering Message/changes\\n- E2EE mode: snippet is absent; render notification as 'New message' without body\\n- Fixture test: parse ChatMessagePush JSON, assert all fields correct\\n\\nFixture file: tests/fixtures/chat_message_push.json",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:26:42Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T09:22:16Z",
+  "closed_at": "2026-04-27T09:22:16Z",
+  "close_reason": "superseded by 9gp.1 (ChatMessagePush type added to types.rs as part of 9gp epic)",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-z9z",
+      "depends_on_id": "jmap-chat-tui-1ik",
+      "type": "blocks",
+      "created_at": "2026-04-26T21:26:46Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

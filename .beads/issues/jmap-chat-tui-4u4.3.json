@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-4u4.3",
+  "title": "BearerAuth/BasicAuth silently sends unauthenticated request on non-ASCII credentials",
+  "description": "auth.rs BearerAuth::auth_header() and BasicAuth::auth_header(): when the token or credentials contain non-visible-ASCII bytes (e.g. a Unicode password), HeaderValue::from_str() fails; .ok() swallows the error and returns None, so the request is sent unauthenticated with no error surfaced to the caller. The caller believes auth is configured but the header is silently absent.",
+  "status": "closed",
+  "priority": 0,
+  "issue_type": "bug",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:07:28Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:20:28Z",
+  "closed_at": "2026-04-26T07:20:28Z",
+  "close_reason": "Closed",
+  "labels": [
+    "correctness",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4u4.3",
+      "depends_on_id": "jmap-chat-tui-4u4",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:07:28Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

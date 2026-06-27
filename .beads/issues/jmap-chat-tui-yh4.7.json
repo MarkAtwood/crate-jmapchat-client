@@ -1,0 +1,34 @@
+{
+  "id": "jmap-chat-tui-yh4.7",
+  "title": "Blob/lookup: JMAP method + types + test",
+  "description": "Why: The JMAP-BLOBEXT spec (urn:ietf:params:jmap:blob2) adds Blob/lookup for reverse lookup of blobIds to Message/FileNode references. Chat servers should support this for attachment management.\\n\\nWhat: Add to crates/jmap-chat/src/methods/blob.rs (new file):\\n- BlobLookupEntry { id: String, matched_ids: HashMap\u003cString, Vec\u003cString\u003e\u003e }\\n- BlobLookupResponse { account_id: String, list: Vec\u003cBlobLookupEntry\u003e, not_found: Option\u003cVec\u003cString\u003e\u003e }\\n- JmapChatClient::blob_lookup(session, blob_ids: \u0026[\u0026str], type_names: Option\u003c\u0026[\u0026str]\u003e) -\u003e Result\u003cBlobLookupResponse, ClientError\u003e\\n  * using array: ['urn:ietf:params:jmap:core', 'urn:ietf:params:jmap:blob2']\\n  * Uses build_request pattern from methods/mod.rs\\n- Add pub mod blob; to methods/mod.rs\\n- Add fixture: tests/fixtures/methods/blob_lookup_response.json\\n- Test: wiremock POST /api returning fixture; assert list[0].matched_ids parsed correctly\\n\\nDefensive rules: no unwrap(); #[non_exhaustive] on BlobLookupEntry and BlobLookupResponse (server-received types).",
+  "acceptance_criteria": "cargo test passes; blob_lookup test verifies matched_ids deserialization",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T09:48:24Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T10:00:22Z",
+  "closed_at": "2026-04-27T10:00:22Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yh4.7",
+      "depends_on_id": "jmap-chat-tui-yh4",
+      "type": "parent-child",
+      "created_at": "2026-04-27T02:48:24Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-yh4.7",
+      "depends_on_id": "jmap-chat-tui-yh4.1",
+      "type": "blocks",
+      "created_at": "2026-04-27T02:48:35Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

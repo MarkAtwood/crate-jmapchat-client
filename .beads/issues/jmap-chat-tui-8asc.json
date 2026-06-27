@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-8asc",
+  "title": "Add per-element empty-string validation to all /get and blob_lookup methods",
+  "description": "9 methods accept id arrays but only validate array-level non-empty, not per-element: chat_get, chat_contact_get, custom_emoji_get, read_position_get, space_get, space_ban_get, space_invite_get (all Option\u003c\u0026[\u0026str]\u003e with no check), plus message_get and blob_lookup (\u0026[\u0026str] with is_empty() check but no per-element check). All destroy methods were already fixed; /get methods were missed.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T04:10:56Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T04:13:08Z",
+  "closed_at": "2026-04-28T04:13:08Z",
+  "close_reason": "Closed"
+}

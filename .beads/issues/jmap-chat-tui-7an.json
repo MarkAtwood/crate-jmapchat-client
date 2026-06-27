@@ -1,0 +1,14 @@
+{
+  "id": "jmap-chat-tui-7an",
+  "title": "api: UTCDate::parse() returning chrono::DateTime\u003cUtc\u003e",
+  "description": "UTCDate is a validated string newtype. The timestamp coarsening requirement (IMPROVEMENTS.md §15.1) and sorting by timestamp both require parsing the RFC 3339 value. Without a parse() method, every UI crate re-implements RFC 3339 parsing independently.\\n\\nDesign:\\n  impl UTCDate {\\n      pub fn parse(\u0026self) -\u003e Result\u003cchrono::DateTime\u003cchrono::Utc\u003e, chrono::ParseError\u003e {\\n          chrono::DateTime::parse_from_rfc3339(\u0026self.0)\\n              .map(|dt| dt.with_timezone(\u0026chrono::Utc))\\n      }\\n  }\\n\\nAdd chrono to workspace dependencies (already present in Cargo.toml).\\n\\nOptionally add a UTCDate::now() constructor for creating sentAt timestamps in message_create.\\n\\nOptionally add a UTCDate::format_coarse() -\u003e String that implements §15.1 display rules (hour-granularity, relative strings like 'Today', 'Yesterday', 'Apr 14 09:00').\\n\\nTests: parse a known RFC 3339 string and assert year/month/day/hour match expected values. Use known test vectors, not output of the code under test.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:32:01Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:03:24Z",
+  "closed_at": "2026-04-27T07:03:24Z",
+  "close_reason": "Already implemented in feat(jmap-chat): \u0026Session... commit (fd7667b)"
+}

@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-g2f.3",
+  "title": "blanket impl Box\u003cdyn AuthProvider\u003e is a permanent API commitment",
+  "description": "jmap-chat now exports impl AuthProvider for Box\u003cdyn AuthProvider\u003e. Any future addition of a method to AuthProvider will silently break this blanket impl and every caller that stores Box\u003cdyn AuthProvider\u003e. Additionally, JmapChatClient::new takes impl AuthProvider and immediately Box::new()-wraps it, so passing a Box\u003cdyn AuthProvider\u003e produces a double-boxed Box\u003cBox\u003cdyn AuthProvider\u003e\u003e — an invisible indirection bug that can confuse contributors tracing allocation.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:40:52Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T08:58:23Z",
+  "closed_at": "2026-04-26T08:58:23Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-g2f.3",
+      "depends_on_id": "jmap-chat-tui-g2f",
+      "type": "parent-child",
+      "created_at": "2026-04-26T01:40:52Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

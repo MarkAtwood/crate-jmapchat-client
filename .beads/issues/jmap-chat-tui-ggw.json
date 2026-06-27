@@ -1,0 +1,31 @@
+{
+  "id": "jmap-chat-tui-ggw",
+  "title": "api: JmapChatClient Clone + Arc usage documentation",
+  "description": "JmapChatClient is not Clone. Every UI crate needs to share the client between a background polling task and UI event handlers. Without Clone, callers must manually wrap in Arc\u003cJmapChatClient\u003e.\\n\\nDesign options (choose one and document):\\n- Derive Clone if reqwest::Client is Clone (it is — it wraps Arc internally)\\n- OR wrap reqwest::Client in Arc\u003creqwest::Client\u003e and derive Clone manually\\n- After JmapSession is introduced (see session-aware client issue), JmapSession should hold Arc\u003cJmapChatClient\u003e internally so callers can clone sessions cheaply\\n\\nDocument the sharing pattern in lib.rs doc comment with an example showing:\\n  let session = Arc::new(client.connect().await?);\\n  let bg_session = Arc::clone(\u0026session);\\n  tokio::spawn(async move { bg_session.subscribe_events(...) });\\n\\nTest: assert JmapChatClient: Clone compiles.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:31:49Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T05:45:02Z",
+  "closed_at": "2026-04-27T05:45:02Z",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-ggw",
+      "depends_on_id": "jmap-chat-tui-8cl",
+      "type": "blocks",
+      "created_at": "2026-04-26T21:32:53Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-ggw",
+      "depends_on_id": "jmap-chat-tui-mmm.2",
+      "type": "supersedes",
+      "created_at": "2026-04-26T22:45:01Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

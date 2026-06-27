@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-xbt.12",
+  "title": "TypingPayload/PresencePayload have no spec reference",
+  "description": "The private structs TypingPayload and PresencePayload in sse.rs have no doc comment or inline comment linking them to the spec wire format. A maintainer reading these structs has no spec anchor to check correctness against. Add a brief comment to each: e.g. '// Wire shape: draft-atwood-jmap-chat-00 §7 \"typing\" event data.' Without this, a future spec update becomes a grep exercise to find where each field originates.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:35:42Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:40:37Z",
+  "closed_at": "2026-04-26T07:40:37Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-xbt.12",
+      "depends_on_id": "jmap-chat-tui-xbt",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:35:42Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

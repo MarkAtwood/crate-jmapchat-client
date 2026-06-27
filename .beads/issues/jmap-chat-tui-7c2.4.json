@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-7c2.4",
+  "title": "application/jmap-chat-rich maps to BodyType::Unknown — silent mismatch for rich body dispatch",
+  "description": "The rich body MIME type 'application/jmap-chat-rich' deserializes to BodyType::Unknown(String) with no dedicated variant. Callers writing match arms on BodyType will match Plain and Markdown explicitly and put rich bodies in the Unknown catch-all, silently dropping content. No doc warning on Message.body_type or BodyType calls this out. Every new contributor who adds body-type dispatch will hit this.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T18:15:10Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T18:22:02Z",
+  "closed_at": "2026-04-27T18:22:02Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-7c2.4",
+      "depends_on_id": "jmap-chat-tui-7c2",
+      "type": "parent-child",
+      "created_at": "2026-04-27T11:15:09Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "id": "jmap-chat-tui-1ex.3",
+  "title": "Step 3: JMAP Chat data types",
+  "description": "Implement types:: module: all ~20 JMAP Chat data types from draft-atwood-jmap-chat-00.md (Chat, Message, Space, ChatContact, ChatMember, SpaceRole, SpaceMember, Category, SpaceInvite, SpaceBan, ReadPosition, PresenceStatus, CustomEmoji, Attachment, Mention, MessageAction, Reaction, MessageRevision, Endpoint). Use #[non_exhaustive] on spec-mirroring enums. Unit tests for optional fields, enum variants, nested objects. Fixtures in crates/jmap-chat/tests/fixtures/.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T06:36:02Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-26T06:43:25Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-1ex.3",
+      "depends_on_id": "jmap-chat-tui-1ex.1",
+      "type": "blocks",
+      "created_at": "2026-04-25T23:36:21Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-1ex.3",
+      "depends_on_id": "jmap-chat-tui-1ex",
+      "type": "parent-child",
+      "created_at": "2026-04-25T23:36:02Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

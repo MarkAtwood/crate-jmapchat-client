@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-8lgk",
+  "title": "Surface ephemeral-event capability to UI (no silent WS degradation)",
+  "description": "## Why this issue exists\n\nWhen a server does not advertise `urn:ietf:params:jmap:chat:websocket`, the client silently skips spawning the WebSocket task. Typing indicators and presence updates are simply never delivered. The UI shows an empty typing area with no indication of whether that means 'nobody is typing' or 'this server does not support this feature.'\n\nThere are three indistinguishable silent outcomes today:\n1. Server has neither WebSocket capability → no WS task, no indicators\n2. Server has `jmap:websocket` but not `jmap:chat:websocket` → same outcome, different cause\n3. Server advertises both but upgrade silently fails in a reconnect loop → same observable result\n\n## What needs to be done\n\n- Add `supports_ephemeral: bool` to `AppEvent::SessionReady`, derived from `ws_url.is_some()`\n- Add tracing calls that distinguish the two 'not supported' sub-cases (no capability vs. partial capability)\n- Store `supports_ephemeral` in `AppState`\n- UI uses the flag to conditionally render typing indicator area and presence badges\n\n## Acceptance criteria\n\n- When a server has neither WS capability: log at INFO, UI hides typing/presence UI\n- When a server has `jmap:websocket` but not chat extension: log at WARN (misconfigured), UI hides typing/presence UI\n- When a server has both: behaviour unchanged\n- No new panic paths, no regression on servers that do support the extension",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T22:56:57Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T23:01:37Z",
+  "close_reason": "all steps complete"
+}

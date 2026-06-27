@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-30o.3",
+  "title": "30o: validate_sha256_format cites wrong RFC",
+  "description": "crates/jmap-chat/src/blob.rs line 177: validate_sha256_format doc comment says 'RFC 6570 / JMAP-CID'. RFC 6570 is the URI template spec and has nothing to do with SHA-256 format. The citation is misleading; the actual source is draft-ietf-jmap-blobext or JMAP-CID spec. Remove RFC 6570 from this comment.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T10:01:44Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T10:07:21Z",
+  "closed_at": "2026-04-27T10:07:21Z",
+  "close_reason": "fixed: validate_sha256_format doc comment updated",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-30o.3",
+      "depends_on_id": "jmap-chat-tui-30o",
+      "type": "parent-child",
+      "created_at": "2026-04-27T03:01:44Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

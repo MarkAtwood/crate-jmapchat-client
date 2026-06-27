@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-5y1i.5",
+  "title": "fetch_session: four repeated empty-url guards — extract helper",
+  "description": "client.rs:89-100 has four nearly identical if-empty blocks for api_url, event_source_url, upload_url, download_url. The repetition obscures the intent and will drift if a new URL field is added. Rewrite: a local closure or macro: let require_non_empty = |field: \u0026str, name: \u0026str| { if field.is_empty() { Err(ClientError::InvalidSession(name)) } else { Ok(()) } }; then call it for each field.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T20:13:51Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T22:41:34Z",
+  "closed_at": "2026-04-27T22:41:34Z",
+  "close_reason": "Closed",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-5y1i.5",
+      "depends_on_id": "jmap-chat-tui-5y1i",
+      "type": "parent-child",
+      "created_at": "2026-04-27T13:13:51Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

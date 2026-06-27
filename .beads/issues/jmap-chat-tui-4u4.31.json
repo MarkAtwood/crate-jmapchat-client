@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-4u4.31",
+  "title": "chat_capability() returns None on malformed capability JSON, indistinguishable from absent capability",
+  "description": "jmap.rs Session::chat_capability(): serde_json::from_value(raw.clone()).ok() silently discards deserialization errors. If a server returns a chat capability object that is present but has wrong types (e.g. maxBodyBytes as a string instead of u64), the method returns None. The caller cannot distinguish 'server does not support chat' from 'server returned malformed capability'. Callers that treat None as 'no chat support' will silently fail to use a chat-capable account.",
+  "status": "closed",
+  "priority": 0,
+  "issue_type": "bug",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:08:34Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:20:00Z",
+  "closed_at": "2026-04-26T07:20:00Z",
+  "close_reason": "Closed",
+  "labels": [
+    "correctness",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4u4.31",
+      "depends_on_id": "jmap-chat-tui-4u4",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:08:33Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

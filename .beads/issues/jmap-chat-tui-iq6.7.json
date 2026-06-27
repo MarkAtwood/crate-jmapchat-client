@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-iq6.7",
+  "title": "MarkRead comment 'If still no record' is inside the Some(rp_id) arm",
+  "description": "In client_task.rs, the MarkRead handler (around line 350): the comment '// If still no record, the chat genuinely has no read-position object on the server; silently skip.' is placed inside the 'if let Some(rp_id) = read_positions.get(\u0026chat_id)' arm, after the inner error-handling block closes. It describes the implicit else case (where get() returns None on the second attempt), but it appears inside the Some arm where rp_id is already bound. A reader must trace the brace nesting carefully to realize the comment is referring to what would happen if the block were not entered. The fix is to move the comment to the implicit else position — either add an explicit else {} block with the comment inside, or restructure as a match so the None arm is explicit.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:14:15Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:18:48Z",
+  "closed_at": "2026-04-26T09:18:48Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-iq6.7",
+      "depends_on_id": "jmap-chat-tui-iq6",
+      "type": "parent-child",
+      "created_at": "2026-04-26T02:14:14Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

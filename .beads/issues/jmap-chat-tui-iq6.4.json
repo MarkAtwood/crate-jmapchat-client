@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-iq6.4",
+  "title": "Good: SSE abort-before-channel-recreate prevents phantom StreamEnded",
+  "description": "In client_task.rs, sse_handle.abort() is called before the channel is recreated (sse_rx = new_rx). This is a non-obvious but correct ordering: if the old task is not aborted before the channel swap, the old task could deliver StreamEnded on the new sse_rx (because the new_tx/new_rx pair was created before abort, meaning the old task's sse_tx still points to the new channel). By aborting first and only then creating the new channel pair, any in-flight send from the old task goes to the now-dropped old sse_tx and is silently discarded. The comment at line 192-194 correctly explains this, but the insight is worth preserving: wrong ordering here would cause an immediate spurious reconnect loop.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:14:03Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:21:36Z",
+  "closed_at": "2026-04-26T09:21:36Z",
+  "close_reason": "Positive observation; already implemented correctly",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-iq6.4",
+      "depends_on_id": "jmap-chat-tui-iq6",
+      "type": "parent-child",
+      "created_at": "2026-04-26T02:14:03Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

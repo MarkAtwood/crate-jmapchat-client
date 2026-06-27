@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-t6n1.7",
+  "title": "serde(other) Unknown variants silently lose original wire value on re-serialization",
+  "description": "Six enums use #[serde(other)] Unknown: ChatKind, DeliveryState, ChatMemberRole, ChannelPermissionTargetType, ContactPresence, OwnerPresence. When one of these receives an unrecognized wire value and then serializes it back (e.g. in a JMAP set or a proxy path), the original string is lost and the literal string 'unknown' is emitted instead. This is documented in inline comments but is still a correctness hazard for any code path that reads and re-emits server state. BodyType and EndpointType already show the correct pattern: Unknown(String) with a manual serde impl that preserves the original string. Suggested rewrite: convert the six #[serde(other)] Unknown variants to Unknown(String) with manual Serialize/Deserialize impls (or a shared macro) matching the BodyType pattern. If any of these enums truly never need to round-trip unknown values, the doc comment should say so explicitly instead of warning that the value is lost.",
+  "notes": "Investigation confirmed: ChatKind, ChatMemberRole, OwnerPresence all have outbound serialization paths. Filed as separate epic jmap-chat-tui-yw6v. ContactPresence is already guarded (contact.rs:87-91). DeliveryState, ChannelPermissionTargetType are safe (inbound only).",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:07:00Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:15:52Z",
+  "closed_at": "2026-04-27T19:15:52Z",
+  "close_reason": "Pre-existing issue; tracked in jmap-chat-tui-yw6v. Out of scope for enum-wiring epic.",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-t6n1.7",
+      "depends_on_id": "jmap-chat-tui-t6n1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T12:06:59Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

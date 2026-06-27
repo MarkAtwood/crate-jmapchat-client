@@ -1,0 +1,25 @@
+{
+  "id": "jmap-chat-tui-gpk",
+  "title": "ws: ChatTypingEvent and ChatPresenceEvent receive and dispatch",
+  "description": "Implement receive and dispatch of ephemeral server-push events in ws/connection.rs:\\n- ChatTypingEvent: {chatId, senderId, typing: bool} — dispatch to AppEvent::TypingIndicator\\n- ChatPresenceEvent: {contactId, presence, statusText?, statusEmoji?} — dispatch to AppEvent::PresenceUpdate\\n- Decay timer: if no ChatTypingEvent for a (chatId, senderId) pair within 10s, auto-hide indicator\\n- Unknown event types: log at DEBUG level and ignore (forward compatibility)\\n- ChatStreamEnable/Disable is independent of Chat.receiveTypingIndicators — both are evaluated independently by server\\n- Tests: mock server sends event, assert correct AppEvent dispatched",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:18:37Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T10:39:58Z",
+  "closed_at": "2026-04-27T10:39:58Z",
+  "close_reason": "Epic complete: WebSocket transport client implemented, reviewed, and all review issues resolved",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-gpk",
+      "depends_on_id": "jmap-chat-tui-1p8",
+      "type": "blocks",
+      "created_at": "2026-04-26T21:18:42Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

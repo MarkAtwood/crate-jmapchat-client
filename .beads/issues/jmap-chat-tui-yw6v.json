@@ -1,0 +1,16 @@
+{
+  "id": "jmap-chat-tui-yw6v",
+  "title": "Pre-existing: serde(other) Unknown on outbound enum fields",
+  "description": "Three pre-existing enums use #[serde(other)] Unknown (unit variant, no String payload) but appear in outbound serialized structs. Unknown serializes as the literal 'unknown' string — a wire-invalid value. Affects: ChatKind (ChatQueryInput.filter_kind, ChatPushConfig.kinds), ChatMemberRole (AddMemberInput.role, UpdateMemberRoleInput.role — non-optional, highest risk), OwnerPresence (PresenceStatusPatch.presence). ContactPresence is already guarded. DeliveryState and ChannelPermissionTargetType are inbound-only and safe.",
+  "notes": "Review converged after 1 round. Final review: jmap-chat-tui-wju9.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:15:42Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:33:57Z",
+  "closed_at": "2026-04-27T19:33:57Z",
+  "close_reason": "Closed"
+}

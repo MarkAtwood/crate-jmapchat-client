@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-30o.20",
+  "title": "30o: test templates omit {type}; bug not covered",
+  "description": "Location: crates/jmap-chat/tests/blob_test.rs, all download_blob tests (lines 138-238).\n\nWhat is wrong: All four download_blob test cases use a URL template without the {type} variable: '{base}/download/{accountId}/{blobId}/{name}'. Because {type} is absent from the test template, the missing substitution bug (see companion issue 30o.19) is not caught by the test suite. Per RFC 8620 §6.2 the download URL MUST contain {accountId}, {blobId}, {type}, and {name}. Tests that use a non-conforming template cannot detect failures that only appear with a spec-conforming template.\n\nWhy it matters: The test oracle is insufficient — it passes silently even though the production code would fail against a real JMAP server. This is a test-coverage gap that allows the RFC 8620 §6.2 violation to ship undetected.\n\nFix required: Update the download test template to include {type} (e.g. '{base}/download/{accountId}/{blobId}/{name}?accept={type}') once download_blob gains the content_type parameter. Verify the wiremock path matcher is updated to match the full expanded path including the accept query parameter.",
+  "status": "closed",
+  "priority": 0,
+  "issue_type": "bug",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T10:04:10Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T10:09:32Z",
+  "closed_at": "2026-04-27T10:09:32Z",
+  "close_reason": "fixed: added test 7 (download_blob_with_type_substitution) using accept_type=Some; unit tests already cover percent-encoding of slashes",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-30o.20",
+      "depends_on_id": "jmap-chat-tui-30o",
+      "type": "parent-child",
+      "created_at": "2026-04-27T03:04:10Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

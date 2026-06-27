@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-0y8",
+  "title": "Split ChatUpdateInput: id -\u003e param, rename to ChatPatch, derive Default",
+  "description": "Current: chat_set_update(\u0026session, \u0026ChatUpdateInput { id, muted, ... })\nAfter: chat_update(\u0026session, id, \u0026ChatPatch { muted: Some(true), ..Default::default() })\n\nSteps:\n1. Rename ChatUpdateInput -\u003e ChatPatch, remove id field, derive Default\n2. Change chat_set_update signature: add id: \u0026str parameter\n3. Update implementation\n4. Update all tests",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T14:32:08Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T15:10:42Z",
+  "close_reason": "Closed"
+}

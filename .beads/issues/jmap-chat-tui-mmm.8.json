@@ -1,0 +1,82 @@
+{
+  "id": "jmap-chat-tui-mmm.8",
+  "title": "E2E: cargo test + clippy + fmt clean for all API ergonomics changes",
+  "description": "What: Full workspace validation after all API ergonomics changes are landed.\n\nAlgorithm:\n1. cargo fmt --all  (fix any formatting issues introduced by the changes)\n2. cargo clippy --all-features --workspace -- -D warnings  (zero warnings)\n3. cargo test --workspace  (all tests pass)\n4. cargo doc --no-deps --all-features --workspace  (docs build without errors)\n5. Run typos on crates/jmap-chat/src/ and crates/jmap-chat-egui/src/ (fix any typos introduced)\n6. Verify:\n   - No #[allow(clippy::too_many_arguments)] remain in methods.rs\n   - No raw api_url: \u0026str or account_id: \u0026str remain as method parameters in methods.rs\n   - SetResponse is now SetResponse\u003cT\u003e with generic T\n   - SenderIdOrSelf enum exists and is used in Message.sender_id and Reaction.sender_id\n   - UTCDate has a parse() method\n   - JmapChatClient implements Clone\n   - filter_kind uses Option\u003cChatKind\u003e\n7. Close this bead.\n\nDefensive rules:\n- Do not modify tests to make them pass — fix the implementation.\n- cargo fmt changes are committed alongside any other fixes.\n- If any step fails, identify root cause and fix it.",
+  "acceptance_criteria": "cargo test --workspace exits 0. cargo clippy --all-features --workspace -- -D warnings exits 0. cargo fmt --all --check exits 0. All 8 API ergonomics changes verified present.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T05:44:05Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:03:36Z",
+  "closed_at": "2026-04-27T06:03:36Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-mmm.8",
+      "depends_on_id": "jmap-chat-tui-mmm.7",
+      "type": "blocks",
+      "created_at": "2026-04-26T22:44:19Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-mmm.8",
+      "depends_on_id": "jmap-chat-tui-mmm.3",
+      "type": "blocks",
+      "created_at": "2026-04-26T22:44:16Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-mmm.8",
+      "depends_on_id": "jmap-chat-tui-mmm.5",
+      "type": "blocks",
+      "created_at": "2026-04-26T22:44:17Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-mmm.8",
+      "depends_on_id": "jmap-chat-tui-mmm.1",
+      "type": "blocks",
+      "created_at": "2026-04-26T22:44:14Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-mmm.8",
+      "depends_on_id": "jmap-chat-tui-mmm.2",
+      "type": "blocks",
+      "created_at": "2026-04-26T22:44:15Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-mmm.8",
+      "depends_on_id": "jmap-chat-tui-mmm.6",
+      "type": "blocks",
+      "created_at": "2026-04-26T22:44:18Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-mmm.8",
+      "depends_on_id": "jmap-chat-tui-mmm",
+      "type": "parent-child",
+      "created_at": "2026-04-26T22:44:04Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-mmm.8",
+      "depends_on_id": "jmap-chat-tui-mmm.4",
+      "type": "blocks",
+      "created_at": "2026-04-26T22:44:17Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-x9a3.3",
+  "title": "impl_string_newtype! macro: correct full set of cross-type PartialEq impls",
+  "description": "The macro generates all four symmetry-necessary PartialEq directions (T==str, T==\u0026str, \u0026str==T, String==T, T==String) plus Display, AsRef, Deref. All eight impls were present before the macro; the macro is an exact isomorphic replacement, not a simplification that dropped any impl. A contributor might try to trim 'obvious' impls — verify the full set is still needed before accepting any PR that touches this macro.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T22:43:42Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T22:44:15Z",
+  "closed_at": "2026-04-27T22:44:15Z",
+  "close_reason": "Decision record — no code change needed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-x9a3.3",
+      "depends_on_id": "jmap-chat-tui-x9a3",
+      "type": "parent-child",
+      "created_at": "2026-04-27T15:43:42Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

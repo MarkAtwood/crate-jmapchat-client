@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-iq6.3",
+  "title": "load_chats: no fallback if server rejects ids:[] in Chat/get",
+  "description": "load_chats calls chat_get(Some(\u0026[])) when chat_query returns no IDs, serializing to {\"ids\":[]}. RFC 8620 §5.1 permits ids:[] (returns empty list plus state), but some JMAP server implementations reject an empty ids array as an invalid argument rather than returning an empty list with a state token. If the server rejects ids:[], load_chats propagates the ClientError, chat_state remains None, and every subsequent SSE StateChange triggers a full reload via chat_delta_sync (which calls load_chats again, hitting the same rejection loop). The code has no fallback to calling chat_get(None) (fetch-all) when the empty-ids call fails. The load_chats doc comment explains the intent but does not document this server-rejection risk or the absence of a fallback. Fix: either add a fallback to chat_get(None) on error, or document the assumption explicitly with a note that known-good servers (kith) accept ids:[] and that the absence of a fallback is intentional for those targets.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:13:58Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:18:47Z",
+  "closed_at": "2026-04-26T09:18:47Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-iq6.3",
+      "depends_on_id": "jmap-chat-tui-iq6",
+      "type": "parent-child",
+      "created_at": "2026-04-26T02:13:58Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

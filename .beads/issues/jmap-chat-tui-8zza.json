@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-8zza",
+  "title": "Add missing rejection tests for new input guards",
+  "description": "Multiple guards were added in rounds 6-7 (reply_to, filter_space_id, add_channels name, add_members ID, update_member_roles ID) but no tests verify they reject empty inputs. Per CLAUDE.md test philosophy, each guard needs a test. Also add AppState tests for EphemeralUnavailable and ChatsDelta events which have no test coverage.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T03:35:13Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T03:38:09Z",
+  "closed_at": "2026-04-28T03:38:09Z",
+  "close_reason": "Closed"
+}

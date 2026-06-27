@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-884",
+  "title": "Review: API idiomaticity round 2",
+  "notes": "Maintainer risk: LOW — all changes are additive derives or cleanup of a no-op serde attr; only breaking change is quota_get return type which has no existing callers.\nConfidence: 97% chance of no missed bug. Changes are small, targeted, mechanical (adds derives, removes dead attr, renames type). Tests pass 202/202. Uncertainty: quota fixture tests notFound:null but not notFound:absent.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T16:56:42Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T17:00:54Z",
+  "close_reason": "all steps complete",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

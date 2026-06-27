@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-6hp.1",
+  "title": "SenderIdOrSelf: bespoke serde with empty-string rejection is correct",
+  "description": "SenderIdOrSelf has hand-written Serialize/Deserialize implementations rather than deriving them. The deserializer explicitly rejects an empty string with a structured error ('sender_id must not be empty'). A future contributor might suggest replacing this with #[serde(rename = \"self\")] on one variant and letting derive handle the rest, but that does not work: serde's derive cannot disambiguate a catch-all string variant from a named string variant on the same enum. The manual impl is also the only place where the empty-string invariant is enforced — without it, a malformed server response would silently produce a Contact(\"\") that later code would treat as a valid contact id. The Display impl mirrors the serializer exactly, which is also load-bearing for logging and UI. This complexity is justified and must not be replaced with a derive.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:05:37Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:33:39Z",
+  "closed_at": "2026-04-27T06:33:39Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-6hp.1",
+      "depends_on_id": "jmap-chat-tui-6hp",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:05:36Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

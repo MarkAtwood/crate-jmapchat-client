@@ -1,0 +1,31 @@
+{
+  "id": "jmap-chat-tui-ucdp.6",
+  "title": "SseFrameTooLarge and invalid-UTF-8 SSE paths have no tests",
+  "description": "subscribe_events() in client.rs has two error paths with no test coverage: (1) buf.len() \u003e 1024*1024 returns ClientError::SseFrameTooLarge (primary defense against hostile server OOM attack); (2) String::from_utf8 failure returns ClientError::Parse('invalid UTF-8 in SSE stream') (stated policy to reject rather than replace). Neither is exercised by any test. A regression silently removes the guard.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T02:39:03Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T02:45:42Z",
+  "closed_at": "2026-04-28T02:45:42Z",
+  "close_reason": "Added subscribe_events_yields_sse_frame_too_large and subscribe_events_yields_parse_error_on_invalid_utf8 tests in client.rs",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-ucdp.6",
+      "depends_on_id": "jmap-chat-tui-ucdp",
+      "type": "parent-child",
+      "created_at": "2026-04-27T19:39:03Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-yof.26",
+  "title": "Option\u003cOption\u003cString\u003e\u003e for partial-update fields in ChatPresenceEvent is the correct three-state encoding",
+  "description": "ChatPresenceEvent.status_text and status_emoji use Option\u003cOption\u003cString\u003e\u003e with a custom deserializer (deserialize_optional_nullable_string) to represent three distinct states: field absent (outer None = no change), field null (Some(None) = explicit clear), field string (Some(Some(s)) = update). This is the correct encoding for the spec's partial-update semantics: a presence push event updates only the fields that are present; absent fields must not overwrite cached state. A future contributor might suggest simplifying to Option\u003cString\u003e (treating null and absent as equivalent) or flattening to String with a sentinel value. Option\u003cString\u003e silently conflates 'no change' with 'clear', which would incorrectly wipe cached status when a presence update arrives that does not touch those fields. The three-state semantics are tested with fixture-backed tests: test_chat_presence_event_null_clears_status, test_chat_presence_event_absent_status_means_no_change, and test_deserialize_optional_nullable_string_rejects_non_string.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:39:31Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:01:07Z",
+  "closed_at": "2026-04-27T07:01:07Z",
+  "close_reason": "Decision record — no action needed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yof.26",
+      "depends_on_id": "jmap-chat-tui-yof",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:39:31Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

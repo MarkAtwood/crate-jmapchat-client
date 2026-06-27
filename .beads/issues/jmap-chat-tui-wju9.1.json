@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-wju9.1",
+  "title": "EndpointType missing Display impl inconsistent with other enums",
+  "description": "crates/jmap-chat/src/types.rs — EndpointType (lines 138-200) is the only string enum in the file without an impl std::fmt::Display. All five other enums in the same pattern (ChatMemberRole, ChatKind, BodyType, OwnerPresence, PushUrgency) implement Display via f.write_str(self.as_str()). EndpointType uses as_uri() instead of as_str(), but that is not a reason to omit Display; callers who want fmt formatting get a compiler gap. Add impl std::fmt::Display for EndpointType delegating to self.as_uri().",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:28:23Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:33:28Z",
+  "closed_at": "2026-04-27T19:33:28Z",
+  "close_reason": "Tracked in jmap-chat-tui-qiqf (EndpointType polish bead)",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-wju9.1",
+      "depends_on_id": "jmap-chat-tui-wju9",
+      "type": "parent-child",
+      "created_at": "2026-04-27T12:28:23Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-30o.5",
+  "title": "30o: compute_sha256_hex uppercase+lowercase mismatch unexplained",
+  "description": "crates/jmap-chat/src/blob.rs lines 189-198: compute_sha256_hex calls hex_digit (which emits uppercase A-F) and then chains .to_lowercase(). There is no comment explaining why the uppercase path is used and then lowercased, rather than using a lowercase digit path directly. A reader must trace through hex_digit to understand the output is lowercase. Add a comment explaining the choice, or unify the encoding so .to_lowercase() is not needed.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T10:01:50Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T10:07:25Z",
+  "closed_at": "2026-04-27T10:07:25Z",
+  "close_reason": "fixed as part of 30o.17",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-30o.5",
+      "depends_on_id": "jmap-chat-tui-30o",
+      "type": "parent-child",
+      "created_at": "2026-04-27T03:01:49Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

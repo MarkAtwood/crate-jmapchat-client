@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-gdc",
+  "title": "Review R4: jmap-chat-egui after P3 refactoring",
+  "notes": "Confidence: 8% chance of missed bug. Uncertainty driven by: (1) MarkRead command exists in AppCommand/client_task but is never sent by the UI — dead plumbing that could mask a real unread-count bug if someone wires it up wrongly later; (2) Unicode format characters (U+200B zero-width space, directional marks) are not stripped by strip_control_chars because is_control() returns false for them — could cause visual oddities in egui but not crashes; (3) sync_channel(256) could theoretically block the egui paint thread if 256 commands pile up, but this is not realistic. Would raise confidence if: the MarkRead send-path was exercised in an integration test, and if strip_control_chars tests covered at least one Unicode format character. The open issue jmap-chat-tui-gdc.1 (parallel vecs unenforced by type system) is real engineering but P3 — all three vecs are set atomically in the single MessagesLoaded arm and cleared together on chat switch; no runtime length mismatch is possible in current code. Calling it P1 in the tracker is an overstatement; it is a refactor improvement, not a bug. CONVERGED: yes. No P0/P1 bugs found. Remaining open issue is P3 (nice-to-have type-system enforcement). Ready to ship to public GitHub.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:30:35Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-26T09:43:01Z",
+  "close_reason": "all steps complete",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

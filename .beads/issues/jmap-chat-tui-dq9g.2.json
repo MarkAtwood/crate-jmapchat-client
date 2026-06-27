@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-dq9g.2",
+  "title": "call_batch doc cites RFC 8620 §3.3 for response-side duplicate call-id check",
+  "description": "client.rs call_batch doc says 'Returns ClientError::Parse if the server returns duplicate call ids, which violates RFC 8620 §3.3 (\"each method call id MUST be unique within a request\").' The check is on the server response, not the client request. RFC 8620 §3.3 governs client-side call id uniqueness in the request; §3.4 describes the methodResponses array structure where duplicate call ids from the server would be anomalous. The parenthetical quote is from §3.3 (correct), but citing it to justify a server-response check misleads contributors about which section of the spec covers response-side behavior. Future contributors debugging the error path will look in the wrong section of the RFC.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T01:17:01Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T01:23:23Z",
+  "closed_at": "2026-04-28T01:23:23Z",
+  "close_reason": "Fixed: Patch\u003cT\u003e doc updated to cover both patterns; RFC citation corrected to §3.4; tests added for duplicate call_id and duplicate accountId",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-dq9g.2",
+      "depends_on_id": "jmap-chat-tui-dq9g",
+      "type": "parent-child",
+      "created_at": "2026-04-27T18:17:00Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-k8t.13",
+  "title": "SpaceBan has no /changes method — incremental sync gap",
+  "description": "space_ban.rs implements only space_ban_get and space_ban_set. If the spec defines SpaceBan/changes (RFC 8620 §5.2 applies to all JMAP object types), there is no method to incrementally sync ban records after an SSE StateChange event. The TUI client_task would fall back to a full space_ban_get on every state change event, which scales poorly for spaces with many bans. This is a missing-method gap that a maintainer must add later when integrating ban management into the TUI event loop.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:51:56Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:59:36Z",
+  "closed_at": "2026-04-27T07:59:36Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-k8t.13",
+      "depends_on_id": "jmap-chat-tui-k8t",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:51:56Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

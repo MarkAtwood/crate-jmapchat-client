@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-9vk.18",
+  "title": "Abort + channel recreation on SSE reconnect: prevents stale StreamEnded on new channel",
+  "description": "On SSE reconnect, the code aborts the old JoinHandle and creates a new (sse_tx, sse_rx) pair before re-spawning. Without the abort, the old task could still be executing and send StreamEnded into the new sse_rx after the new connection is already alive, triggering a spurious second reconnect cycle. Without the channel recreation, any messages queued in the old sse_rx (including that stale StreamEnded) would be visible to the new select\\! arm. The two-step sequence — abort then drop+recreate channel — is the only correct solution. A future contributor might 'simplify' by just re-spawning on the same channel, or by skipping the abort assuming the old task will die on its own, introducing the double-reconnect bug documented in the spawn_sse_task comment.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:01:38Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:21:42Z",
+  "closed_at": "2026-04-26T09:21:42Z",
+  "close_reason": "Already implemented in current codebase",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-9vk.18",
+      "depends_on_id": "jmap-chat-tui-9vk",
+      "type": "parent-child",
+      "created_at": "2026-04-26T02:01:38Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-t6n1.12",
+  "title": "EndpointType uses Other(String) with hand-rolled serde to preserve unknown URIs for round-trip",
+  "description": "EndpointType::Other(String) carries the original wire URI string so clients can forward or log endpoint capabilities they do not understand. The hand-rolled Serialize/Deserialize impls (via as_uri()/from_uri()) are required because #[serde(other)] on a unit variant erases the original value — deserializing 'urn:example:custom' would produce Other but as_uri() would have no string to return. A future contributor might suggest simplifying to #[serde(rename_all)] plus #[serde(other)] like the other enums in this file. That would be a regression: any unknown endpoint type URI would be silently discarded at deserialization, breaking round-trip for clients that relay or display endpoints they do not recognize. The same pattern is applied consistently to BodyType for the same reason.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:07:27Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:21:05Z",
+  "closed_at": "2026-04-27T19:21:05Z",
+  "close_reason": "Decision recorded",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-t6n1.12",
+      "depends_on_id": "jmap-chat-tui-t6n1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T12:07:27Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

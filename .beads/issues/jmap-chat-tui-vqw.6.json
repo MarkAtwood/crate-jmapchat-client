@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-vqw.6",
+  "title": "chat_using() OnceLock is overengineered for what it does",
+  "description": "chat_using() returns \u0026'static [String] via OnceLock\u003cVec\u003cString\u003e\u003e to avoid allocating the two capability URI strings on every request. But build_request() calls .to_vec() on the result anyway, so we're paying for two heap allocations per call regardless. The OnceLock saves the initial String allocs but adds static state and a lazy-init pattern that has to be understood and maintained. Simpler: just return the vec directly. Two short strings per request is noise.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T17:10:25Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T17:32:11Z",
+  "closed_at": "2026-04-27T17:32:11Z",
+  "close_reason": "Closed",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-vqw.6",
+      "depends_on_id": "jmap-chat-tui-vqw",
+      "type": "parent-child",
+      "created_at": "2026-04-27T10:10:25Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

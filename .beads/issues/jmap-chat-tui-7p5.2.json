@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-7p5.2",
+  "title": "build_request allocs two Strings per call after OnceLock removal",
+  "description": "The chat_using() OnceLock was removed in this commit and replaced with an inline vec![...to_string(), ...to_string()] inside build_request(). This means every JMAP method call now allocates two String objects on the heap for the 'using' array.\n\nThe OnceLock approach allocated exactly once for the process lifetime. The current approach allocates on every method call — including high-frequency paths like load_chats pagination loops and SSE-triggered delta syncs.\n\nRewrite:\n  static CHAT_USING: \u0026[\u0026str] = \u0026[\"urn:ietf:params:jmap:core\", \"urn:ietf:params:jmap:chat\"];\n\nand change JmapRequest.using from Vec\u003cString\u003e to Vec\u003c\u0026'static str\u003e (or Cow\u003c'static, str\u003e), or keep using Vec\u003cString\u003e but initialise once and clone a \u0026[String] reference into each request. The simplest fix without changing JmapRequest is to restore the OnceLock and call .to_vec() — a single clone of a two-element Vec — instead of allocating fresh Strings each time.\n\nFile: crates/jmap-chat/src/methods/mod.rs, fn build_request (line 682).",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T17:34:17Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T17:39:39Z",
+  "closed_at": "2026-04-27T17:39:39Z",
+  "close_reason": "Won't fix: two String allocs per JMAP call are negligible versus network latency (\u003e1ms). Re-adding OnceLock would add complexity for zero measurable benefit.",
+  "labels": [
+    "efficiency",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-7p5.2",
+      "depends_on_id": "jmap-chat-tui-7p5",
+      "type": "parent-child",
+      "created_at": "2026-04-27T10:34:17Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

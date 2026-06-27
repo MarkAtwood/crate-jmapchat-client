@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-g2f.18",
+  "title": "overlapping SSE tasks cause double StreamEnded and double reconnect",
+  "description": "Trigger: SSE stream disconnects (sends StreamEnded) and the main loop immediately spawns a new SSE task. The old task may still be running (e.g. in subscribe_events setup) and also sends StreamEnded when it eventually exits. Condition: spawn_sse_task() clones sse_tx before the old task has exited; both tasks hold a sender to the same sse_rx. Bad behavior: sse_rx receives two StreamEnded notifications in sequence, causing two reconnect cycles back-to-back, doubling the number of concurrent SSE tasks on each disconnect event.",
+  "status": "closed",
+  "priority": 0,
+  "issue_type": "bug",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:41:36Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T08:57:35Z",
+  "closed_at": "2026-04-26T08:57:35Z",
+  "close_reason": "Closed",
+  "labels": [
+    "correctness",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-g2f.18",
+      "depends_on_id": "jmap-chat-tui-g2f",
+      "type": "parent-child",
+      "created_at": "2026-04-26T01:41:36Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

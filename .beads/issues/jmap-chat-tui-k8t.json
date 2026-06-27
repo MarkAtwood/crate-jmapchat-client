@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-k8t",
+  "title": "Review round 1: e8r secondary type methods",
+  "notes": "Maintainer risk: MEDIUM — The response-deserialization layer is solid and well-tested; the main gap is that tests 16-28 do not verify outgoing wire format (no body_json matchers), so a serialization bug in the new methods would not be caught. Secondary issues: custom_emoji_query sends filter:null instead of omitting the key, PresenceStatusSetInput::default() yields a silently wrong empty id, and SpaceBan has no /changes method. None of these are security holes, but together they represent a class of bugs that will only surface at runtime against a real server.\nConfidence: 80% chance of no missed bugs. Uncertainty driven by: (1) message.rs and chat.rs /changes methods were also not tested with a body_json matcher that would catch maxChanges:null being sent — the tests pass None and the mock ignores the request body, so the bug in k8t.8 does not cause test failures; (2) contact.rs was not part of this review scope so space_ban and chat_contact modules were only partially checked; (3) no runtime execution against a real JMAP Chat server — only wiremock, which accepts any request body. Would raise confidence if: (1) body_json matchers were added to every /changes test verifying that maxChanges is absent from the wire payload when None; (2) a real JMAP Chat server (or strict wiremock body_json matcher) was used to catch the null-vs-absent distinction; (3) custom_emoji_query_changes already uses the correct conditional-insert pattern, confirming the fix direction is known to the codebase.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:48:36Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T08:00:19Z",
+  "close_reason": "all steps complete",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

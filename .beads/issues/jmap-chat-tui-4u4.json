@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-4u4",
+  "title": "Review round 1: Phase 1 Protocol Library (jmap-chat crate)",
+  "notes": "Maintainer risk: MEDIUM — public credential fields, silent auth-header drops, and an undocumented call-id invariant will generate user-facing 401 issues and contributor mistakes; the unvalidated Id/UTCDate aliases and duplicate type definitions are API surface that will fossilize wrong before 1.0\nConfidence: 80% chance of no missed bugs among the P0/P1/P2 issues. Uncertainty driven by: (1) code was not run or compiled during review — type-checking issues like 4u4.39 (Chat invalid field combinations) and 4u4.3/4u4.27 (auth encoding failures) were inferred structurally, not confirmed by test failures; (2) the SSE implementation was analyzed by code reading only, no live server to confirm the frame-too-large and last_event_id behaviors; (3) methods.rs was not seen — 4u4.33 (empty filter spec violation) and 4u4.42 (CHAT_USING allocation) were filed from architecture inference. Would raise confidence if: cargo test run against a live or mock JMAP server confirmed the P0 auth encoding and SSE bugs; fixture-based serialization tests verified Invocation wire format. Running out of real complaints: YES — 4u4.42 was the only P3 I labeled OPINION, and all remaining issues have an engineering basis I can articulate. The P3/P4 bucket is dominated by 'defend existing design decisions' issues (4u4.8, 4u4.11, 4u4.14, 4u4.20, 4u4.23, 4u4.26, 4u4.29, 4u4.35, 4u4.38, 4u4.40) rather than new complaints, which is a sign the review is near exhaustion.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:06:24Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-26T07:33:41Z",
+  "close_reason": "All P0/P1/P2 findings fixed; P3/P4 resolved or deferred; committed 238b818",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

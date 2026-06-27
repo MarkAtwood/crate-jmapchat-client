@@ -1,0 +1,14 @@
+{
+  "id": "jmap-chat-tui-1ik",
+  "title": "push: PushSubscription/set with chatPush property",
+  "description": "Implement PushSubscription/set with chatPush extension in methods/misc.rs:\\n- ChatPushFilter: per-chat urgency overrides, mention-only mode, excluded chatIds\\n- PushSubscription create/update: include chatPush field when capability is present\\n- Urgency: 'high' for mentions, 'normal' for regular messages\\n- Fixture test: PushSubscription/set request with chatPush, assert correct wire shape\\n\\nFixture file: tests/fixtures/push_subscription_set.json",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:26:41Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T09:22:07Z",
+  "close_reason": "superseded by 9gp.2 (push_subscription_set implemented as part of 9gp epic)"
+}

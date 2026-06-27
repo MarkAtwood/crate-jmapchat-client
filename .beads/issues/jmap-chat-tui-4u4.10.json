@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-4u4.10",
+  "title": "build_request allocates Vec\u003cString\u003e from compile-time constant per call",
+  "description": "methods.rs build_request: CHAT_USING.iter().map(|s| s.to_string()).collect() converts a \u0026[\u0026str] compile-time constant into a Vec\u003cString\u003e of heap-allocated Strings on every method invocation. Every chat_get, message_query, message_create etc. call pays this allocation. Fix: define CHAT_USING as a fn returning Vec\u003cString\u003e once, or store the using list as Vec\u003cString\u003e in a lazy_static/OnceLock, or have JmapRequest use Vec\u003c\u0026'static str\u003e (the using field is never mutated after construction).",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:07:48Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:19:41Z",
+  "closed_at": "2026-04-26T07:19:41Z",
+  "close_reason": "Closed",
+  "labels": [
+    "efficiency",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4u4.10",
+      "depends_on_id": "jmap-chat-tui-4u4",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:07:47Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

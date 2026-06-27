@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-30o.2",
+  "title": "30o: OpenSSL as SHA-256 oracle in tests",
+  "description": "The SHA-256 test vector (SHA256_ABC = ba7816bf...) is derived from 'echo -n abc | openssl dgst -sha256', which is independent of the sha2 crate used in production. This satisfies the project's independent-oracle rule: a test that hashes with sha2 and verifies with sha2 proves only internal consistency, not spec conformance. Using OpenSSL as the oracle means the test would catch a regression if the sha2 crate were swapped for a broken implementation, or if compute_sha256_hex introduced a bug in its hex-encoding path.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T10:01:40Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T10:06:53Z",
+  "closed_at": "2026-04-27T10:06:53Z",
+  "close_reason": "decision record: OpenSSL oracle is correct approach",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-30o.2",
+      "depends_on_id": "jmap-chat-tui-30o",
+      "type": "parent-child",
+      "created_at": "2026-04-27T03:01:39Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

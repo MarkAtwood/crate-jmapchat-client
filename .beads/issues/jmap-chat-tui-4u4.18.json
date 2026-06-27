@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-4u4.18",
+  "title": "SSE parse helpers should use typed structs not manual field extraction",
+  "description": "parse_typing_data and parse_presence_data both do the same .get().and_then(|x| x.as_str()) dance for each field with an early-return-on-None for required fields. This is the shape of typed-struct deserialization done by hand, which is worse than the real thing: it is verbose, easy to get wrong on new fields, and does not document the shape of the expected JSON. Rewrite: define private #[derive(Deserialize)] structs TypingPayload and PresencePayload with the exact fields, mark optional ones as Option\u003cString\u003e, and replace the manual extraction with serde_json::from_str::\u003cTypingPayload\u003e(data). This also eliminates the asymmetry where parse_state_data goes through serde_json::from_value for its inner map while the other two functions do manual extraction.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:08:03Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:32:32Z",
+  "closed_at": "2026-04-26T07:32:32Z",
+  "close_reason": "Closed",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4u4.18",
+      "depends_on_id": "jmap-chat-tui-4u4",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:08:03Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

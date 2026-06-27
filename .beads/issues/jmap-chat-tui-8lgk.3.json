@@ -1,0 +1,32 @@
+{
+  "id": "jmap-chat-tui-8lgk.3",
+  "title": "Store supports_ephemeral in AppState, use it in UI render",
+  "description": "## Why\n\nOnce AppEvent::SessionReady carries supports_ephemeral, AppState needs to store it so the render pass can make conditional decisions. Without this, the field is received and discarded.\n\n## What to do\n\nIn crates/jmap-chat-egui/src/app.rs:\n\n1. Add field to AppState:\n```rust\npub supports_ephemeral: bool,  // false until SessionReady received\n```\nDefault: false (safe: hides the feature until server confirms support).\n\n2. In the SessionReady match arm:\n```rust\nAppEvent::SessionReady { api_url, account_id, supports_ephemeral } =\u003e {\n    self.api_url = api_url;\n    self.account_id = account_id;\n    self.supports_ephemeral = supports_ephemeral;\n}\n```\n\n3. In the UI render pass (ui.rs), gate the typing indicator row and presence badges:\n```rust\nif app.supports_ephemeral {\n    // render typing indicator row\n    // render presence badge on contact list items\n}\n```\n\nIf the render pass does not currently show typing or presence UI at all (stub), just ensure the field exists and is threaded — the gating can be a comment placeholder until UI work is done.\n\n## Acceptance criteria\n\n- AppState.supports_ephemeral initialises to false\n- Set to true only when SessionReady carries supports_ephemeral: true\n- UI does not render typing/presence elements when false\n- cargo test passes",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T22:57:20Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T23:01:36Z",
+  "closed_at": "2026-04-27T23:01:36Z",
+  "close_reason": "supports_ephemeral stored in AppState; UI render gated on flag",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-8lgk.3",
+      "depends_on_id": "jmap-chat-tui-8lgk.2",
+      "type": "blocks",
+      "created_at": "2026-04-27T15:57:23Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-8lgk.3",
+      "depends_on_id": "jmap-chat-tui-8lgk",
+      "type": "parent-child",
+      "created_at": "2026-04-27T15:57:19Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

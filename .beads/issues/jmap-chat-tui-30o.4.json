@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-30o.4",
+  "title": "30o: blob module split transport vs JMAP method",
+  "description": "Blob transport (HTTP upload/download per RFC 8620 §6.1-6.2) lives in src/blob.rs, while the JMAP Blob/lookup method (draft-ietf-jmap-blobext-01 §6) lives in methods/blob.rs. This mirrors the architectural boundary between raw HTTP blob I/O (which bypasses the JMAP method-call layer entirely and talks directly to a URL template) and structured JMAP method dispatch (which goes through JmapRequest/JmapResponse). Mixing them would obscure that upload/download are not JMAP method calls and would make it harder to swap or mock one layer independently.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T10:01:46Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T10:06:56Z",
+  "closed_at": "2026-04-27T10:06:56Z",
+  "close_reason": "decision record: transport/JMAP split is correct architecture",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-30o.4",
+      "depends_on_id": "jmap-chat-tui-30o",
+      "type": "parent-child",
+      "created_at": "2026-04-27T03:01:46Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

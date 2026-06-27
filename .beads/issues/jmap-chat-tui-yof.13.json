@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-yof.13",
+  "title": "GetResponse and ChangesResponse use String for IDs bypassing Id invariant",
+  "description": "methods.rs GetResponse::account_id, QueryResponse::ids, ChangesResponse::created/updated/destroyed all use String or Vec\u003cString\u003e rather than Id. This bypasses the non-empty validation enforced by Id's Deserialize impl. A server returning an empty string in any of these fields will produce an empty-string ID that passes silently through the type system and causes downstream failures (e.g. an empty chat_id in a message_query filter). The maintenance consequence is: contributors adding new method wrappers will copy this pattern, since it matches the existing response types, and the non-empty invariant will be absent from all new ID fields in response types.",
+  "status": "deferred",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:38:34Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:49:43Z",
+  "defer_until": "2026-06-01T00:00:00Z",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yof.13",
+      "depends_on_id": "jmap-chat-tui-yof",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:38:34Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

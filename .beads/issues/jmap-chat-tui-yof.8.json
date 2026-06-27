@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-yof.8",
+  "title": "deserialize_optional_nullable_string allocates intermediate Value",
+  "description": "deserialize_optional_nullable_string (types.rs:23) deserializes into serde_json::Value as an intermediate step before dispatching on Null vs String. This causes a heap allocation on every ChatPresenceEvent field deserialization. Two fields use this deserializer (status_text, status_emoji), so each presence event triggers two intermediate Value allocations. A visitor-based implementation that dispatches directly on Null vs String without materializing an intermediate Value would eliminate these allocations from the hot SSE event path.",
+  "status": "deferred",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:38:12Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:49:42Z",
+  "defer_until": "2026-06-01T00:00:00Z",
+  "labels": [
+    "efficiency",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yof.8",
+      "depends_on_id": "jmap-chat-tui-yof",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:38:11Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

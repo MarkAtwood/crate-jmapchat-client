@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-93x.1",
+  "title": "enums with #[non_exhaustive] but no serde catch-all will fail on unknown wire values",
+  "description": "Trigger: server sends any unknown string for ChatKind, ChatMemberRole, DeliveryState, OwnerPresence, or ChannelPermissionTargetType (e.g. a future 'thread' ChatKind, 'owner' role, 'bounced' DeliveryState, 'dnd' OwnerPresence). Bad behavior: entire parent object deserialization fails with serde error, crashing the update cycle. These enums have #[non_exhaustive] which prevents exhaustive match in Rust but does nothing for serde — only #[serde(other)] on a unit variant handles unknown wire values. ContactPresence correctly has Unknown catch-all; the others do not. Fix: add #[serde(other)] Unknown/Other unit variant to each enum, consistent with ContactPresence pattern.",
+  "status": "closed",
+  "priority": 0,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:59:06Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T05:01:44Z",
+  "closed_at": "2026-04-27T05:01:44Z",
+  "close_reason": "Added #[serde(other)] Unknown catch-all to ChatKind, ChatMemberRole, DeliveryState, OwnerPresence, ChannelPermissionTargetType. Added tests for each. 84 unit tests passing.",
+  "labels": [
+    "correctness",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-93x.1",
+      "depends_on_id": "jmap-chat-tui-93x",
+      "type": "parent-child",
+      "created_at": "2026-04-26T21:59:05Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-6hp.22",
+  "title": "\u0026Session param requires callers to always hold a full Session — testing friction",
+  "description": "Every method in methods.rs takes session: \u0026Session to extract api_url and account_id. Session derives only Deserialize; there is no constructor. Test code must build Session via serde_json::from_value with a full fixture JSON, which is workable but friction-heavy. Any caller that wants to use a hardcoded api_url (e.g. for integration testing against a local server without a full session bootstrap) must fake a complete Session object. Consider whether account_id and api_url could instead be stored on JmapChatClient after fetch_session, reducing the per-call parameter burden and making the client self-contained for callers who call fetch_session once and then issue many method calls.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:06:42Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:11:15Z",
+  "closed_at": "2026-04-27T06:11:15Z",
+  "close_reason": "Our chosen design: \u0026Session per call is simpler than JmapSession wrapper. The test_session helper in tests covers the testing use case.",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-6hp.22",
+      "depends_on_id": "jmap-chat-tui-6hp",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:06:42Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

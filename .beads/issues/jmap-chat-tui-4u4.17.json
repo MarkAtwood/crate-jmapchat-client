@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-4u4.17",
+  "title": "SSE UTF-8 decode silently corrupts frame data on invalid byte sequences",
+  "description": "client.rs subscribe_events(): String::from_utf8_lossy(\u0026bytes) replaces any invalid UTF-8 byte sequences with U+FFFD REPLACEMENT CHARACTER before appending to buf. If a server sends malformed UTF-8 (e.g. a truncated multi-byte sequence split across two HTTP chunks), the data is silently corrupted, the JSON parse fails, and the event is returned as SseEvent::Unknown. The caller cannot distinguish a corrupted frame from a keepalive. The correct behavior is to return an error on invalid UTF-8, not silently replace bytes.",
+  "status": "closed",
+  "priority": 0,
+  "issue_type": "bug",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:08:01Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:22:10Z",
+  "closed_at": "2026-04-26T07:22:10Z",
+  "close_reason": "Closed",
+  "labels": [
+    "correctness",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4u4.17",
+      "depends_on_id": "jmap-chat-tui-4u4",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:08:01Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

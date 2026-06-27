@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-5y1i.2",
+  "title": "Invocation struct fields lack doc comments",
+  "description": "Invocation.call_id, .method, and .args have no doc comments. RFC 8620 §3.2 requires call_id to be unique within a request — a contributor adding a second manual Invocation to a batch would not see this constraint. Add field-level docs explaining the uniqueness requirement for call_id and the role of each field.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T20:13:43Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T22:41:33Z",
+  "closed_at": "2026-04-27T22:41:33Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-5y1i.2",
+      "depends_on_id": "jmap-chat-tui-5y1i",
+      "type": "parent-child",
+      "created_at": "2026-04-27T13:13:42Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

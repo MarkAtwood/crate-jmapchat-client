@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-ixld.7",
+  "title": "Patch::Keep serializer returns hard Err, not debug_assert+silent null",
+  "description": "Patch::Keep being serialized directly is a programmer error: it means the field struct is missing #[serde(skip_serializing_if = \"Patch::is_keep\")]. In the old code, Patch::Keep serialized as null in release builds (the debug_assert fired only in debug). That silently cleared the server-side field, which is the exact wrong behavior — Keep means leave unchanged. The hard Err surfaced at integration time, not silently in production. A contributor might suggest reverting to the debug_assert to avoid a serializer error. Do not: silent data corruption is worse than a loud failure.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T01:03:59Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T01:25:49Z",
+  "closed_at": "2026-04-28T01:25:49Z",
+  "close_reason": "Decision recorded during idfq epic implementation; design intentionally retained as-is.",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-ixld.7",
+      "depends_on_id": "jmap-chat-tui-ixld",
+      "type": "parent-child",
+      "created_at": "2026-04-27T18:03:59Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

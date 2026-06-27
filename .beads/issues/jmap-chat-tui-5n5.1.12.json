@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-5n5.1.12",
+  "title": "position/limit Option\u003cu64\u003e sends null not absent in /query calls",
+  "description": "chat_query and message_query pass position/limit as Option\u003cu64\u003e into serde_json::json!(), which serializes None as JSON null. RFC 8620 §5.5 defines position as UnsignedInt (not UnsignedInt|null) with default 0, and limit as UnsignedInt. Sending null for these fields is non-conformant; a strict server SHOULD return invalidArguments. The fix is to omit null fields using skip_serializing_if or by building the JSON object conditionally. Affected: methods/chat.rs lines 48-53, methods/message.rs lines 73-80. The wiremock integration tests do not validate outgoing request bodies so this bug is not caught by the current test suite.",
+  "status": "closed",
+  "priority": 0,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:23:10Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:31:03Z",
+  "closed_at": "2026-04-27T07:31:03Z",
+  "close_reason": "Closed",
+  "labels": [
+    "correctness",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-5n5.1.12",
+      "depends_on_id": "jmap-chat-tui-5n5.1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:23:10Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

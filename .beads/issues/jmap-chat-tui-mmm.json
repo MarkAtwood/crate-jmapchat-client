@@ -1,0 +1,25 @@
+{
+  "id": "jmap-chat-tui-mmm",
+  "title": "Epic: API ergonomics for cross-platform reuse",
+  "description": "Why: The jmap-chat library will be the shared foundation for jmap-chat-tui, jmap-chat-egui, jmap-chat-iced, jmap-chat-slint, and jmap-chat-tauri. Several API design problems were identified by reviewing the current code that will cause persistent boilerplate and friction in every UI adapter layer:\\n\\n1. api_url + account_id threaded through every method (both come from Session)\\n2. Too-many-arguments on method calls — needs input structs\\n3. JmapChatClient is not Clone — forces manual Arc wrapping in every UI crate\\n4. UTCDate is opaque string — no parse() method, every UI crate re-implements RFC 3339 parsing\\n5. SetResponse.created is untyped serde_json::Value — not SetResponse\u003cT\u003e\\n6. filter_kind: Option\u003c\u0026str\u003e instead of Option\u003cChatKind\u003e\\n7. Message.sender_id is String instead of a typed SenderIdOrSelf enum\\n8. build_request hardcodes using array — cannot vary per capability\\n\\nThese must be resolved before the method epics build on top, or every method will inherit the bad shape.\\n\\nDepends on: types.rs upgrades epic (jmap-chat-tui-1aq)",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:31:23Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T06:03:38Z",
+  "close_reason": "all steps complete",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-mmm",
+      "depends_on_id": "jmap-chat-tui-1aq",
+      "type": "blocks",
+      "created_at": "2026-04-26T21:32:51Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

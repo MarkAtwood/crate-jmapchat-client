@@ -1,0 +1,25 @@
+{
+  "id": "jmap-chat-tui-9s8",
+  "title": "Add SessionClient newtype to eliminate \u0026Session parameter threading",
+  "description": "Every one of ~40 JmapChatClient methods takes session: \u0026Session as its first argument even though it never varies within a connection's lifetime. Add a SessionClient\u003c's\u003e newtype returned by client.with_session(session) that holds both references, and move all methods onto it. Callers then write client.with_session(\u0026session).chat_get(...) without repeating the session argument. This is a breaking API change and requires updating jmap-chat-egui as well.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "feature",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T15:32:10Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T15:52:55Z",
+  "closed_at": "2026-04-27T15:52:55Z",
+  "close_reason": "SessionClient newtype fully implemented, all tests passing",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-9s8",
+      "depends_on_id": "jmap-chat-tui-d2t",
+      "type": "parent-child",
+      "created_at": "2026-04-27T08:33:12Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "id": "jmap-chat-tui-ajj",
+  "title": "SpaceBan methods: get, set + fixture tests",
+  "description": "Why: SpaceBan type has no method coverage at all. Banning and unbanning Space members, and tracking the ban list, requires all three standard JMAP methods.\\n\\nWhat:\\n- SpaceBan/get: fetch ban records by id or all bans for a Space\\n- SpaceBan/changes: track ban list changes for real-time sync\\n- SpaceBan/set: create bans (ban member) and destroy bans (unban member)\\n- Fixture tests for all three methods",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:18:14Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:48:20Z",
+  "closed_at": "2026-04-27T07:48:20Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-ajj",
+      "depends_on_id": "jmap-chat-tui-9w3",
+      "type": "blocks",
+      "created_at": "2026-04-26T21:18:20Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

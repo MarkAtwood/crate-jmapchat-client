@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-9vk.15",
+  "title": "document merge semantics in ChatsDelta apply_event handler",
+  "description": "app.rs lines 58-72: the ChatsDelta match arm implements an upsert-and-prune merge (retain chats whose id is not in destroyed, then replace-or-append each item in created_or_updated), but there is no comment naming this strategy. A contributor adding a new code path that modifies self.chats has to reverse-engineer the merge contract from the loop bodies. The event.rs variant doc says 'incremental delta: chats created/updated and destroyed since last state' which describes the data, not the merge rule. A brief comment in the match arm (e.g. '// Upsert: replace existing entry by id or append if new') would make the intent explicit.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:01:30Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:11:25Z",
+  "closed_at": "2026-04-26T09:11:25Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-9vk.15",
+      "depends_on_id": "jmap-chat-tui-9vk",
+      "type": "parent-child",
+      "created_at": "2026-04-26T02:01:29Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

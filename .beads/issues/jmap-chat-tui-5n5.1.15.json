@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-5n5.1.15",
+  "title": "Explicit serde bound on SetResponse\u003cT\u003e is required, not redundant",
+  "description": "SetResponse carries #[serde(bound(deserialize = \"T: serde::de::DeserializeOwned\"))]. With a default type parameter, serde's derive macro cannot infer the Deserialize bound correctly without this annotation: it would either fail to compile or generate an overly restrictive bound. A contributor might delete it as 'unnecessary'. Without it the generated impl requires T: Deserialize\u003c'de\u003e (lifetime-bound) rather than DeserializeOwned, which breaks uses like GetResponse\u003cserde_json::Value\u003e in an owned context. The annotation is load-bearing.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:24:23Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:37:22Z",
+  "closed_at": "2026-04-27T07:37:22Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-5n5.1.15",
+      "depends_on_id": "jmap-chat-tui-5n5.1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:24:23Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "id": "jmap-chat-tui-e8r.2",
+  "title": "custom_emoji_set and space_ban_set have no destroy-only path",
+  "description": "custom_emoji.rs and space_ban.rs: custom_emoji_set and space_ban_set take a mandatory \u0026CreateInput plus destroy: \u0026[\u0026str]. A caller that only wants to destroy an object must pass a synthetic create input. space_invite_set solves this by making input: Option\u003c\u0026...\u003e; the other two do not, with no explanation of the asymmetry. Fix: either make the create input Option (matching space_invite_set) or add a doc note explaining why create is always required.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:49:58Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T08:01:41Z",
+  "closed_at": "2026-04-27T08:01:41Z",
+  "close_reason": "decision: custom_emoji_set always creates (required input); destroy of arbitrary custom emojis is an uncommon admin operation not yet needed; add a separate destroy-only method when needed",
+  "labels": [
+    "readability"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-e8r.2",
+      "depends_on_id": "jmap-chat-tui-e8r",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:49:58Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

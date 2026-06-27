@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-7c2.12",
+  "title": "BodyType uses Unknown(String) not serde(other) because it is serialized as an outbound field",
+  "description": "BodyType is used for both inbound deserialization (Message.body_type from server) and outbound serialization (MessageCreateInput.body_type, MessagePatch.body_type sent to server). A unit Unknown variant via serde(other) would silently discard the original wire string on deserialization, making it impossible to echo a non-standard MIME type back in a patch or create call. The hand-rolled Serialize/Deserialize is intentional: it maps text/plain and text/markdown to typed variants and stores any other string in Unknown(String) for lossless preservation. Do not replace with serde(other) to match the other catch-all enums. Those are deserialization-only objects (DeliveryState, ChatKind, ChatMemberRole, etc.), whereas BodyType must survive a round-trip through both directions of the wire.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T18:17:57Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T18:22:44Z",
+  "closed_at": "2026-04-27T18:22:44Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-7c2.12",
+      "depends_on_id": "jmap-chat-tui-7c2",
+      "type": "parent-child",
+      "created_at": "2026-04-27T11:17:57Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

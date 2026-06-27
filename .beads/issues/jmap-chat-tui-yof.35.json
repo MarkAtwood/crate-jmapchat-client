@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-yof.35",
+  "title": "AuthFailed still triggers reconnect via queued StreamEnded",
+  "description": "Trigger: SSE server returns 401/403. run_sse_stream sends SseNotification::AuthFailed then returns; spawn_sse_task unconditionally sends SseNotification::StreamEnded after run_sse_stream returns. The main loop receives AuthFailed (no restart set, continue), then receives StreamEnded (sets sse_needs_restart=true, continue), then at loop top calls reconnect_sse and spawns a new SSE task. The new task also gets 401/403 and the cycle repeats. Bad behavior: infinite reconnect loop with exponential backoff despite intent to halt on auth failure; repeated Error + Reconnecting/Disconnected events emitted forever.",
+  "status": "closed",
+  "priority": 0,
+  "issue_type": "bug",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:57:42Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:59:29Z",
+  "closed_at": "2026-04-27T06:59:29Z",
+  "close_reason": "Closed",
+  "labels": [
+    "correctness",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yof.35",
+      "depends_on_id": "jmap-chat-tui-yof",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:57:42Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

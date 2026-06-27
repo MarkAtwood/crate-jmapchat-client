@@ -1,0 +1,16 @@
+{
+  "id": "jmap-chat-tui-tba",
+  "title": "Design decision: enum vs separate methods for chat_create_*",
+  "description": "Record a design decision before implementing. Two options:\n\nOption A — single method with enum input:\n  pub enum ChatCreate\u003c'a\u003e { Direct { contact_id }, Group { name, members, ... }, Channel { space_id, name, ... } }\n  client.chat_create(\u0026session, \u0026ChatCreate::Direct { contact_id: 'x' })\n  Pro: one entry point, exhaustive, matches spec's single Chat/set method\n  Con: larger enum type, callers must import variant names\n\nOption B — rename to chat_direct / chat_group / chat_channel:\n  Pro: minimal change, clear per-kind\n  Con: still not consistent with space_create (no per-kind variants)\n\nRecommendation: Option A if callers will match on the kind at runtime; Option B if callers always know the kind at compile time (TUI use case). For a general library, Option A is more idiomatic — it mirrors how serde enums work.",
+  "design": "Option A: single chat_create(input: \u0026ChatCreateInput\u003c'a\u003e) with ChatCreateInput as an enum. Matches existing SpaceJoinInput enum pattern in this codebase. Variants: Direct { client_id, contact_id }, Group { client_id, name, member_ids, description, avatar_blob_id, message_expiry_seconds }, Channel { client_id, space_id, name, description }. Remove chat_create_direct, chat_create_group, chat_create_channel methods.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T14:32:30Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T15:11:36Z",
+  "close_reason": "Closed"
+}

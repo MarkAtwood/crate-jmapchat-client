@@ -1,0 +1,33 @@
+{
+  "id": "jmap-chat-tui-yov.2",
+  "title": "impl: chat_contact_changes, set, query, queryChanges",
+  "description": "What: Add 4 methods to impl JmapChatClient in methods/contact.rs.\n\nAlgorithm:\n1. chat_contact_changes(\u0026self, session, since_state: \u0026str, max_changes: Option\u003cu64\u003e) -\u003e Result\u003cChangesResponse, ClientError\u003e:\n   Standard /changes. Sends maxChanges: max_changes (None=null per chat_changes pattern — max_changes in serde_json::json! serializes None as null).\n2. chat_contact_set(\u0026self, session, input: \u0026ChatContactSetInput\u003c'_\u003e) -\u003e Result\u003cSetResponse, ClientError\u003e:\n   Build patch Map. If Some(b): insert 'blocked'. If Some(dn): insert 'displayName' = dn.map(from).unwrap_or(Null). Send update:{input.id: patch}.\n3. chat_contact_query(\u0026self, session, input: \u0026ChatContactQueryInput\u003c'_\u003e) -\u003e Result\u003cQueryResponse, ClientError\u003e:\n   Build filter Map. If Some(b): insert 'blocked'. If Some(p): insert 'presence'. filter_val = Null if empty, else Object.\n   Build sort array: if sort_property is Some(s): [{property:s, isAscending: sort_ascending.unwrap_or(false)}], else omit sort key.\n   Conditional position/limit (Pattern B: omit when None).\n4. chat_contact_query_changes(\u0026self, session, since_query_state: \u0026str, max_changes: Option\u003cu64\u003e) -\u003e Result\u003cQueryChangesResponse, ClientError\u003e:\n   Mirror message_query_changes exactly. Omit maxChanges when None (Pattern B).\n\nUpdate import in contact.rs to include all needed types from super.\nRun cargo fmt, clippy, test. Close bead.",
+  "acceptance_criteria": "cargo test passes; 4 methods on JmapChatClient in contact.rs; clippy clean",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T08:45:29Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T08:47:43Z",
+  "close_reason": "chat_contact_changes, chat_contact_set, chat_contact_query, chat_contact_query_changes added to contact.rs",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yov.2",
+      "depends_on_id": "jmap-chat-tui-yov.1",
+      "type": "blocks",
+      "created_at": "2026-04-27T01:45:34Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-yov.2",
+      "depends_on_id": "jmap-chat-tui-yov",
+      "type": "parent-child",
+      "created_at": "2026-04-27T01:45:29Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

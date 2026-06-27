@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-3bs.9",
+  "title": "chat_set_update: AddMemberInput/UpdateMemberRoleInput serialization not covered by tests",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T08:40:32Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T08:43:09Z",
+  "closed_at": "2026-04-27T08:43:09Z",
+  "close_reason": "Added test 42: chat_set_update_with_add_members_role_serializes_correctly — exercises serde_json::to_value(role) path with body_json matcher asserting role:\"admin\"",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-3bs.9",
+      "depends_on_id": "jmap-chat-tui-3bs",
+      "type": "parent-child",
+      "created_at": "2026-04-27T01:40:32Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

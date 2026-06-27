@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-xokm",
+  "title": "client_task: reset sse_auth_failed when SSE StateChange arrives",
+  "description": "The sse_auth_failed flag is set to true when SSE auth fails (correctly suppressing reconnect). However, it is never reset to false. If future code changes allow credential refresh mid-session, a past auth failure would permanently suppress reconnect even after success. Defensively reset sse_auth_failed = false in the SseNotification::StateChange arm.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T03:30:46Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T03:31:33Z",
+  "closed_at": "2026-04-28T03:31:33Z",
+  "close_reason": "Closed"
+}

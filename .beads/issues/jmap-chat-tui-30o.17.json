@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-30o.17",
+  "title": "30o: compute_sha256_hex uppercase then to_lowercase",
+  "description": "Location: crates/jmap-chat/src/blob.rs lines 189-198. compute_sha256_hex builds hex output via hex_digit() which produces uppercase A-F (lines 63-64), then calls .to_lowercase() on the final string. This is not dead code but is internally contradictory: the digit-building function produces uppercase, the caller immediately lowercases. Why burden: a maintainer reading hex_digit() sees uppercase output and must separately find the to_lowercase() call to understand the actual output contract. If hex_digit() is ever changed to produce lowercase directly, the to_lowercase() becomes a silent no-op that may be missed in review. Suggested fix: either produce lowercase in hex_digit() directly (change b'A' to b'a') and remove the to_lowercase() call, making the intent clear at the source.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T10:02:21Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T10:06:25Z",
+  "closed_at": "2026-04-27T10:06:25Z",
+  "close_reason": "fixed: hex_digit now takes uppercase bool, compute_sha256_hex passes false",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-30o.17",
+      "depends_on_id": "jmap-chat-tui-30o",
+      "type": "parent-child",
+      "created_at": "2026-04-27T03:02:20Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

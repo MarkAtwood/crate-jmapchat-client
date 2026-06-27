@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-t6n1.15",
+  "title": "ChatStreamDataType::Unknown misleading doc — implies safe to send",
+  "description": "ChatStreamDataType::Unknown doc says 'Unrecognized value — silently ignored per spec.' The phrase 'silently ignored per spec' describes server behavior when an unrecognized string appears in the data_types array of a ChatStreamEnable the client sends. However, because Unknown is a variant a client can construct (e.g., from_str returning Unknown, or matching and re-using it), a contributor may read this comment and conclude it is safe to put Unknown into data_types when constructing a ChatStreamEnable message. The actual behavior is that Unknown serializes as the literal string \"unknown\", which is unlikely to match any server-side capability string and will be silently dropped — but the contributor has no warning that constructing or serializing Unknown is not meaningful. Fix: reword to 'Catch-all for unrecognized wire values received from the server. Do not construct this variant; it serializes as the literal string \"unknown\" which is not a valid data type.' (or equivalent).",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:07:41Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:21:43Z",
+  "closed_at": "2026-04-27T19:21:43Z",
+  "close_reason": "Valid polish; deferred. Tracked in follow-up bead jmap-chat-tui-yw6v or standalone.",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-t6n1.15",
+      "depends_on_id": "jmap-chat-tui-t6n1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T12:07:41Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

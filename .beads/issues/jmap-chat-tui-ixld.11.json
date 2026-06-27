@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-ixld.11",
+  "title": "fetch_session URL joins via format\\! relying on url::Url trailing slash",
+  "description": "client.rs line 106: format\\!(\"{}.well-known/jmap\", self.base_url) works only because url::Url Display always appends a trailing '/' for origin-only URLs, making the result 'https://host/.well-known/jmap'. This is an implicit contract on url::Url Display that is not visible at the call site. A reader must know url crate internals to confirm correctness. Suggested rewrite: use self.base_url.join(\".well-known/jmap\").expect(\"static path is valid\").to_string() or self.base_url.as_str().trim_end_matches('/').to_string() + \"/.well-known/jmap\". The join approach makes the intent unambiguous and survives any future change to the path validation.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T01:04:18Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T01:05:53Z",
+  "closed_at": "2026-04-28T01:05:53Z",
+  "close_reason": "ixld.10 already documents the url::Url trailing-slash join behavior as a known decision. ixld.11 is redundant.",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-ixld.11",
+      "depends_on_id": "jmap-chat-tui-ixld",
+      "type": "parent-child",
+      "created_at": "2026-04-27T18:04:18Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

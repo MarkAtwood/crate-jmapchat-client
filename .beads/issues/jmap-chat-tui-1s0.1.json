@@ -1,0 +1,25 @@
+{
+  "id": "jmap-chat-tui-1s0.1",
+  "title": "types: ChatCreateDirectInput, ChatCreateGroupInput, ChatUpdateInput, TypingResponse",
+  "description": "What: Define all new input types for Chat set methods and the TypingResponse struct in methods/mod.rs.\n\nAlgorithm:\n1. Add TypingResponse struct (account_id: String, #[serde(rename_all=\"camelCase\")]) to mod.rs — used by chat_typing.\n2. Add AddMemberInput\u003c'a\u003e struct: id: \u0026'a str, role: Option\u003ccrate::types::ChatMemberRole\u003e\n3. Add UpdateMemberRoleInput\u003c'a\u003e struct: id: \u0026'a str, role: crate::types::ChatMemberRole\n4. Add ChatCreateDirectInput\u003c'a\u003e: client_id: \u0026'a str, contact_id: \u0026'a str\n5. Add ChatCreateGroupInput\u003c'a\u003e: client_id: \u0026'a str, name: \u0026'a str, member_ids: \u0026'a [\u0026'a str], description: Option\u003c\u0026'a str\u003e, avatar_blob_id: Option\u003c\u0026'a str\u003e, message_expiry_seconds: Option\u003cu64\u003e\n6. Add ChatUpdateInput\u003c'a\u003e: id: \u0026'a str, muted: Option\u003cbool\u003e, mute_until: Option\u003cOption\u003c\u0026'a crate::jmap::UTCDate\u003e\u003e, receive_typing_indicators: Option\u003cbool\u003e, pinned_message_ids: Option\u003c\u0026'a [\u0026'a str]\u003e, message_expiry_seconds: Option\u003cu64\u003e, receipt_sharing: Option\u003cbool\u003e, name: Option\u003c\u0026'a str\u003e, description: Option\u003cOption\u003c\u0026'a str\u003e\u003e, avatar_blob_id: Option\u003cOption\u003c\u0026'a str\u003e\u003e, add_members: \u0026'a [AddMemberInput\u003c'a\u003e], remove_members: \u0026'a [\u0026'a str], update_member_roles: \u0026'a [UpdateMemberRoleInput\u003c'a\u003e]\n7. All slices default to \u0026[] when unused; Option fields are None when unused. No #[derive(Default)] — id has no safe default.\n\nDefensive programming rules:\n- Use lifetime 'a on all struct fields that borrow strings\n- All slice fields use \u0026'a [T] not Vec\u003cT\u003e (consistent with MessageUpdateInput pattern)\n- No unwrap(), no key material, structs derive Debug only\n\nAcceptance: cargo test passes, cargo clippy -D warnings clean, cargo fmt --check passes",
+  "acceptance_criteria": "cargo test passes; cargo clippy --all-features -- -D warnings clean; cargo fmt --check passes; TypingResponse, AddMemberInput, UpdateMemberRoleInput, ChatCreateDirectInput, ChatCreateGroupInput, ChatUpdateInput all defined in mod.rs",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T08:28:18Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T08:32:02Z",
+  "close_reason": "All 6 types added to mod.rs: TypingResponse, AddMemberInput, UpdateMemberRoleInput, ChatCreateDirectInput, ChatCreateGroupInput, ChatUpdateInput",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-1s0.1",
+      "depends_on_id": "jmap-chat-tui-1s0",
+      "type": "parent-child",
+      "created_at": "2026-04-27T01:28:18Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

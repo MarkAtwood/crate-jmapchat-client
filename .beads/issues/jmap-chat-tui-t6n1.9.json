@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-t6n1.9",
+  "title": "PushUrgency::Unknown missing serde round-trip caveat",
+  "description": "PushUrgency::Unknown uses #[serde(other)] but its doc comment says only 'Unrecognized urgency value.' with no warning that serializing it emits the literal string \"unknown\" rather than preserving the original wire value. Every other #[serde(other)] Unknown variant in the file carries the caveat 'If serialized, produces the literal string \"unknown\" — not the original wire value.' PushUrgency is particularly exposed because PushUrgency appears in ChatPushConfig, which clients actively construct (not just deserialize). A contributor who reads an unknown urgency from the server and echoes it back via PushUrgency::Unknown will silently send \"unknown\" to the server instead of the original string. Fix: add the standard caveat to the Unknown variant doc comment.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:07:10Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:18:03Z",
+  "closed_at": "2026-04-27T19:18:03Z",
+  "close_reason": "Fixed by round 1 PushUrgency/EndpointType fixes",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-t6n1.9",
+      "depends_on_id": "jmap-chat-tui-t6n1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T12:07:09Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

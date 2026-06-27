@@ -1,0 +1,25 @@
+{
+  "id": "jmap-chat-tui-1s0",
+  "title": "Epic: Chat methods (set, typing, queryChanges)",
+  "description": "Why: Current codebase has Chat/get, Chat/query, Chat/changes but lacks Chat/set (create/update chats), Chat/typing (new formal JMAP method), and Chat/queryChanges. These are required for a writable chat experience.\\n\\nWhat:\\n- Chat/set: create direct/group/channel chats, update metadata, pin messages, receiveTypingIndicators, receiptSharing, slowModeSeconds\\n- Chat/typing: send typing indicator (debounce ~1s, respect 3s server rate limit)\\n- Chat/queryChanges\\n- Handle rateLimited SetError from slow mode enforcement\\n- Fixture tests for all methods\\n\\nDepends on: types.rs upgrades epic (jmap-chat-tui-1aq), methods refactor epic",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:15:05Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T08:43:34Z",
+  "close_reason": "All 5 methods implemented (chat_create_direct, chat_create_group, chat_set_update, chat_typing, chat_query_changes), 42 tests passing, review converged in 1 round",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-1s0",
+      "depends_on_id": "jmap-chat-tui-5n5",
+      "type": "blocks",
+      "created_at": "2026-04-26T21:17:03Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

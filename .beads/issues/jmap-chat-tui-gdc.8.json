@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-gdc.8",
+  "title": "show_chat_list clears three vecs without invariant comment",
+  "description": "show_chat_list() in main.rs clears messages, message_bodies, and message_timestamps on chat switch (lines 71-73) but carries no comment linking this to the three-vec parallel invariant documented on AppState in app.rs. A contributor adding a fourth parallel vec would see apply_event (MessagesLoaded) as the canonical model and replicate it there, but would silently miss the second clearing site in show_chat_list(), leaving stale data in the new vec after every chat switch. Fix: add a comment to the three clear() calls in show_chat_list() stating that all parallel message vecs must be cleared here and referencing the invariant on AppState.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:33:03Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:40:46Z",
+  "closed_at": "2026-04-26T09:40:46Z",
+  "close_reason": "Stale: chat switch now clears message_entries (one vec) not three separate parallel vecs",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-gdc.8",
+      "depends_on_id": "jmap-chat-tui-gdc",
+      "type": "parent-child",
+      "created_at": "2026-04-26T02:33:02Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

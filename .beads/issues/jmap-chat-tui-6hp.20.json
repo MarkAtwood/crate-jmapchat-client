@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-6hp.20",
+  "title": "#[non_exhaustive] + #[serde(other)] Unknown catch-all on all wire enums is correct",
+  "description": "Every enum that mirrors a spec-defined string set (ChatKind, DeliveryState, ContactPresence, OwnerPresence, ChatMemberRole, SpanType, ChannelPermissionTargetType) carries both #[non_exhaustive] and an Unknown catch-all variant with #[serde(other)]. A future contributor might remove Unknown variants on the grounds that they clutter match arms and force wildcard branches. This is the wrong tradeoff. #[serde(other)] means the client does not panic or return a deserialization error when a server running a newer spec version sends a value not yet in this crate — it degrades gracefully. #[non_exhaustive] ensures that when a new known variant IS added to the enum, all match arms in downstream code break at compile time rather than silently falling through the Unknown arm. The two attributes are complementary and must be kept together. The documented caveat that Unknown re-serializes as the literal string 'unknown' (not the original wire value) is also correctly documented and tested.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:06:32Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:34:03Z",
+  "closed_at": "2026-04-27T06:34:03Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-6hp.20",
+      "depends_on_id": "jmap-chat-tui-6hp",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:06:32Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "id": "jmap-chat-tui-6hp",
+  "title": "Review round 1: API ergonomics for cross-platform reuse",
+  "description": "Review of commits for jmap-chat-tui-mmm: API ergonomics changes. Covers SenderIdOrSelf enum, SetResponse\u003cT\u003e, filter_kind:ChatKind, JmapChatClient Clone, UTCDate::parse(), \u0026Session method params, MessageQueryInput/MessageCreateInput structs.",
+  "notes": "SEC0 completed. Two P0 correctness bugs filed: jmap-chat-tui-6hp.10 (SenderIdOrSelf::Contact empty string passes serialization) and jmap-chat-tui-6hp.12 (message_query accepts chat_id=Some(\"\") past input validation). All other reviewed items are correct: UTCDate::parse to_utc() handles non-UTC offsets correctly; unwrap_or_default() on chat_account_id at lines 123 and 700 of client_task.rs is unreachable given the guard at line 100-116; SetResponse\u003cT=serde_json::Value\u003e default type param works correctly; #[non_exhaustive] + manual serde impls interact correctly; filter_kind=None correctly sends filter:null; Contact(\"\") deserialization is correctly rejected. Test suite passes.\nMaintainer risk: MEDIUM — Five findings filed. The two most actionable before API freezes: (1) MessageCreateInput.sent_at is \u0026str not UTCDate, bypassing the validation the new parse() method enables (issue 6hp.2); (2) chat_query uses flat positional params while message_query uses an input struct — the inconsistency will produce a breaking change the first time a filter field is added (issue 6hp.21). The Arc/Box blanket impl mirroring (6hp.9) is a build-time catch, not a silent failure, but is recurring friction on every AuthProvider method addition. SenderIdOrSelf::Contact(String) (6hp.18) is correct for the current binary spec but is a semantic trap if a third sender category appears. The \u0026Session per-call param (6hp.22) is a usability issue for testing and future self-contained client use. No security or correctness bugs found — all findings are ergonomic/extensibility risks that will fossilize if the API ships as-is.\nConfidence: 15% chance of missed bug. Uncertainty driven by: (1) no integration test exercising the full session-\u003emethod-\u003eresponse path end-to-end with a real JMAP server; (2) the two unwrap_or_default() calls in client_task.rs are provably non-panicking but their silent-empty-string fallback behavior could hide SSE event mismatches if the session guard is ever bypassed by future refactoring; (3) MessageCreateInput.sent_at typed as \u0026str means malformed timestamps reach the wire and are only rejected server-side — server behavior on malformed sentAt is not tested; (4) chat_query still uses flat params while message_query uses an input struct, so future extension of chat_query filter fields could silently miss conditions similar to the message_query empty-string footgun. Would raise confidence if: (a) the two P0 issues (empty Contact id, empty chat_id) are fixed and their test coverage is verified; (b) sent_at is typed as UTCDate; (c) chat_query is given a ChatQueryInput struct parallel to MessageQueryInput; (d) handle_state_change is given a hard assertion or typed precondition that chat_account_id is present rather than silently substituting an empty string.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:04:25Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T06:34:09Z",
+  "close_reason": "Round 1 complete. All P0/P1/P2 fixed and committed.",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

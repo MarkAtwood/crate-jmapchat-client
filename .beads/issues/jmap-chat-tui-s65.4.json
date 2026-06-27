@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-s65.4",
+  "title": "JmapRequestBuilder consuming-self pattern is well-suited for this use case",
+  "description": "add_call takes mut self and returns Self. This enables fn-chain syntax without borrow-checker friction. \u0026mut Self chains break because build(self) needs ownership. The consuming pattern is correct; conditional builds use builder = builder.add_call(...) reassignment. Future contributors should not suggest reverting to \u0026mut Self.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T10:50:31Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T10:51:35Z",
+  "closed_at": "2026-04-27T10:51:35Z",
+  "close_reason": "Fixed: to_value() uses json! macro, call_batch() detects duplicate call_ids, new() docstring updated",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-s65.4",
+      "depends_on_id": "jmap-chat-tui-s65",
+      "type": "parent-child",
+      "created_at": "2026-04-27T03:50:30Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

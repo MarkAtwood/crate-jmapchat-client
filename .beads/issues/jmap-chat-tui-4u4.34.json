@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-4u4.34",
+  "title": "BearerAuth/BasicAuth credential fields are pub with no log-safety warning on the struct",
+  "description": "BearerAuth::token, BasicAuth::username, and BasicAuth::password are pub fields. The auth_header() method has a doc comment 'must not log the returned value', but the struct fields have no such warning. A contributor adding debug tracing of the auth provider (e.g. tracing::debug\\!(\"{:?}\", auth)) would not see any signal that the struct contains credentials. The log-safety contract is documented on the method, not on the data. Add a struct-level doc comment or field-level comment on the credential fields stating they must not be logged.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:08:49Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:09:51Z",
+  "closed_at": "2026-04-26T07:09:51Z",
+  "close_reason": "duplicate of .1",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4u4.34",
+      "depends_on_id": "jmap-chat-tui-4u4",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:08:49Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

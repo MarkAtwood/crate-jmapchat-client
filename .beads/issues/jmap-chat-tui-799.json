@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-799",
+  "title": "Review R5: jmap-chat-egui convergence check",
+  "notes": "Confidence: 90%. P0=0 P1=1. CONVERGED: no. One real P1: auto-mark-read logic duplicated in SelectChat and SendMessage handlers with diverging retry behavior vs MarkRead handler. Three P4 doc gaps filed (.2, .3, .4): full_reload_chats missing when-to-call doc, read_positions staleness on new-chat SSE path undocumented, AppState cache-consistency invariant only on chat_display not chats. All P4s have engineering basis; none are opinion. Out of real complaints after these four. Remaining blocker: P1 .1 refactor.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:43:17Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-26T09:49:16Z",
+  "close_reason": "all steps complete",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

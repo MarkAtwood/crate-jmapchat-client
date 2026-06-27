@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-yof.7",
+  "title": "Unknown catch-all variants serialize as literal unknown not original wire value",
+  "description": "Six enums (ChatKind, DeliveryState, OwnerPresence, ChatMemberRole, ChannelPermissionTargetType, ContactPresence) use #[serde(other)] Unknown variants. When serialized, Unknown round-trips as the string 'unknown' rather than the original wire value. Any code path that deserializes a server object then re-serializes and re-transmits it (e.g. a relay, cached update, or forwarded message) will corrupt the field. The behavior is documented in a comment and test but the type system provides no warning. Maintenance consequence: contributors adding serialization paths will not discover this until a real server rejects 'unknown' as an invalid enum value.",
+  "status": "deferred",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:37:57Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:49:41Z",
+  "defer_until": "2026-06-01T00:00:00Z",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yof.7",
+      "depends_on_id": "jmap-chat-tui-yof",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:37:57Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

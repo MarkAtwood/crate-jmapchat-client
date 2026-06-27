@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-r4c",
+  "title": "Review round 1: mph Message methods",
+  "notes": "Calibration review complete. Confidence: 95% no correctness bugs missed. All four methods (message_set_update, message_set_destroy, message_query_changes, message_query) correctly implement RFC 8620 §5.3/5.6 with proper validation guards, conditional patch building, and JSON structure. Tests: 92/92 pass. Known issue: ReactionChange lacks #[non_exhaustive] (forward-compat risk, not correctness bug). Unexamined: ReactionChange::Remove untested but code is correct. Running out of real complaints: yes.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T08:17:29Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T08:24:08Z",
+  "close_reason": "all steps complete",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

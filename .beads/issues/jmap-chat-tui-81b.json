@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-81b",
+  "title": "Review round 4: jmap-chat crate",
+  "notes": "R4 calibration: P0 findings: 1 (subscribe_events panics on non-ASCII UTF-8 char boundary in scan_from offset — regression introduced by R2 scan_from optimization). P1 findings: 0. P2 findings: 1 (chrono and ulid are dead production dependencies). P3/P4 findings: 0 filed (SSE trim() vs RFC 8895 one-space rule is P4 at most and benign for JSON). Confidence: 85% chance of no further bugs. Running out of real complaints: YES. Recommendation: STOP.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:47:41Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-26T07:55:23Z",
+  "close_reason": "Fixed R4 findings; committed cbc4cfb"
+}

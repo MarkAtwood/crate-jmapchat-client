@@ -1,0 +1,25 @@
+{
+  "id": "jmap-chat-tui-e8r",
+  "title": "Epic: Secondary type methods (SpaceInvite, SpaceBan, CustomEmoji, PresenceStatus)",
+  "description": "Why: Several type families have no method coverage at all or are missing critical methods: SpaceInvite (missing /changes, /set), SpaceBan (no methods), CustomEmoji (missing /queryChanges for cache maintenance), ReadPosition (missing /changes), PresenceStatus (missing /set and /changes). These are needed for a full-featured client.\\n\\nWhat:\\n- SpaceInvite/get, SpaceInvite/changes (new per IMPROVEMENTS.md §7), SpaceInvite/set (accept/decline/create)\\n- SpaceBan/get, SpaceBan/set (ban/unban members)\\n- CustomEmoji/get, CustomEmoji/changes, CustomEmoji/set, CustomEmoji/query, CustomEmoji/queryChanges (new per IMPROVEMENTS.md §8)\\n- ReadPosition/changes\\n- PresenceStatus/set (update statusText, statusEmoji, presence, receiptSharing) and PresenceStatus/changes\\n- Fixture tests for all methods\\n\\nDepends on: types.rs upgrades epic (jmap-chat-tui-1aq), methods refactor epic",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:15:27Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T08:01:50Z",
+  "close_reason": "all steps complete",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-e8r",
+      "depends_on_id": "jmap-chat-tui-5n5",
+      "type": "blocks",
+      "created_at": "2026-04-26T21:18:19Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-o4t",
+  "title": "Rename chat_set_update -\u003e chat_update, chat_set_destroy -\u003e chat_destroy",
+  "description": "Pure rename. Update method name in client impl, update all callers in tests. No signature change.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T14:32:17Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T15:10:44Z",
+  "closed_at": "2026-04-27T15:10:44Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-o4t",
+      "depends_on_id": "jmap-chat-tui-0y8",
+      "type": "blocks",
+      "created_at": "2026-04-27T07:33:00Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-5y1i.17",
+  "title": "base_url is validated at construction time via url::Url::parse",
+  "description": "JmapChatClient::new validates base_url by calling url::Url::parse and also checks that no path component is present. This means invalid base_urls fail immediately at construction with a clear InvalidArgument error rather than silently producing malformed request URLs at first use. A contributor might suggest deferring validation ('constructors should not fail'), returning a builder or making new infallible by accepting a pre-parsed Url. Deferring would push the error into async code mid-session, making it harder to attribute. The construction-time validation also rejects subtle bugs like 'https://host/api' which would double the path on every request.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T20:14:52Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T22:33:28Z",
+  "closed_at": "2026-04-27T22:33:28Z",
+  "close_reason": "Decision record: current implementation is correct; no code change needed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-5y1i.17",
+      "depends_on_id": "jmap-chat-tui-5y1i",
+      "type": "parent-child",
+      "created_at": "2026-04-27T13:14:52Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-saj",
+  "title": "AppState struct and egui render skeleton",
+  "description": "## Why\nThe UI needs a place to hold all mutable state and a render pass to display it.\n\n## What\n- AppState struct: session info, chat list, selected chat id, messages for selected chat, contacts map, input buffer, connection status, typing indicators map, presence map\n- eframe App impl with update() calling render helpers\n- Three-panel layout: chat list (left), message view (centre), compose bar (bottom)\n- Status bar (top): server URL, owner identity, connection status\n- Renders placeholder/empty state cleanly with no panics",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T03:26:15Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T04:05:29Z",
+  "close_reason": "Superseded; replaced by issues under jmap-chat-tui-s2e (egui) and new TUI epic",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-saj",
+      "depends_on_id": "jmap-chat-tui-ddk",
+      "type": "blocks",
+      "created_at": "2026-04-26T20:27:06Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

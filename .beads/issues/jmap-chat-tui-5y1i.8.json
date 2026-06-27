@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-5y1i.8",
+  "title": "build_request allocs Vec\u003cString\u003e on every JMAP call",
+  "description": "build_request() unconditionally does vec\\![\"urn:ietf:params:jmap:core\".to_string()] plus one .push(cap.to_string()) per extra cap, producing a heap-allocated Vec\u003cString\u003e on every single JMAP method call (48 call sites, all passing exactly \u0026[\"urn:ietf:params:jmap:chat\"]). The resulting JmapRequest.using field is serialized once and discarded. Since all capability URIs are \u0026'static str, the using field could be typed as Vec\u003c\u0026'static str\u003e or Cow\u003c'static, [\u0026'static str]\u003e, eliminating 2 heap allocations per API call with no behavioral change. Impact: every Chat/get, Message/set, etc. call pays two unnecessary String clones before the HTTP request is even constructed.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T20:14:03Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T20:22:35Z",
+  "closed_at": "2026-04-27T20:22:35Z",
+  "close_reason": "Closed",
+  "labels": [
+    "efficiency",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-5y1i.8",
+      "depends_on_id": "jmap-chat-tui-5y1i",
+      "type": "parent-child",
+      "created_at": "2026-04-27T13:14:03Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

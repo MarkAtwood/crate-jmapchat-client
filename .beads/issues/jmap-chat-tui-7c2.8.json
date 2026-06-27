@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-7c2.8",
+  "title": "explain why OwnerPresence and ContactPresence are separate types",
+  "description": "types.rs has OwnerPresence and ContactPresence with identical variants and serde attributes. No comment explains why two separate types exist rather than a shared enum. A first-time reader will assume accidental duplication. Add a doc comment to each explaining the semantic distinction: OwnerPresence is the account owner self-reporting their own status; ContactPresence is the server-observed state of a remote contact.",
+  "notes": "opinion: stylistic preference. OwnerPresence and ContactPresence are semantically correct as separate types — the distinction between owner self-reported status and server-observed contact status is real. The issue asks only for a doc comment explaining the distinction. No code is wrong; this is a documentation style preference. A reviewer would not require this to pass.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T18:16:22Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T18:23:03Z",
+  "closed_at": "2026-04-27T18:23:03Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-7c2.8",
+      "depends_on_id": "jmap-chat-tui-7c2",
+      "type": "parent-child",
+      "created_at": "2026-04-27T11:16:22Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

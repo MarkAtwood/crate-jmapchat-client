@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-t6n1.8",
+  "title": "ChatStreamDataType::Unknown missing serde round-trip caveat",
+  "description": "ChatStreamDataType::Unknown uses #[serde(other)] but its doc comment says only 'Unrecognized value — silently ignored per spec.' It does not warn that serializing Unknown emits the literal string \"unknown\" rather than the original wire value, unlike every other Unknown variant in types.rs (ChatMemberRole, ChatKind, DeliveryState, OwnerPresence, ChannelPermissionTargetType) which all carry the note: 'If serialized, produces the literal string \"unknown\" — not the original wire value.' A contributor who round-trips a ChatStreamEnable through serde will silently corrupt any unrecognized data_type entry. Fix: add the standard caveat to the Unknown variant doc comment.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:07:02Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:18:00Z",
+  "closed_at": "2026-04-27T19:18:00Z",
+  "close_reason": "Fixed by round 1 PushUrgency/EndpointType fixes",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-t6n1.8",
+      "depends_on_id": "jmap-chat-tui-t6n1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T12:07:02Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

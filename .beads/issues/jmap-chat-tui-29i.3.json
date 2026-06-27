@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-29i.3",
+  "title": "SetError.server_retry_after has skip_serializing_if on a deserialize-only type",
+  "description": "SetError is only ever deserialized from server responses, never serialized. The #[serde(skip_serializing_if = \"Option::is_none\")] attribute on server_retry_after has zero effect on deserialization. The attribute is factually wrong and misleads readers into thinking SetError participates in serialization. Option\u003cT\u003e fields are already None when absent in JSON without any annotation. Fix: remove the skip_serializing_if line entirely. Optionally add #[serde(default)] for explicitness, though serde already defaults Option to None.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T16:46:19Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T16:56:03Z",
+  "closed_at": "2026-04-27T16:56:03Z",
+  "close_reason": "Closed",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-29i.3",
+      "depends_on_id": "jmap-chat-tui-29i",
+      "type": "parent-child",
+      "created_at": "2026-04-27T09:46:19Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

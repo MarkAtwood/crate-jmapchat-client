@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-wju9.4",
+  "title": "Unknown-variant tests: missing combined deserialize→serialize round-trip",
+  "description": "test_unknown_tuple_variants_preserve_original_string (line 1844) only calls serde_json::to_string on a manually-constructed Unknown(\"...\"). It never touches the deserializer. The deserialization side for unknowns is covered by separate tests (test_chat_kind_unknown_wire_value_becomes_unknown, etc.) but those only assert the resulting enum variant — they do not re-serialize. The two halves are never chained in a single test. PushUrgency has exactly this combined test (test_push_urgency_unknown_preserves_original_string): it does from_str then to_string in sequence, which is the only test that would catch a bug where deserialize captures the string but as_str() accidentally returns a hardcoded fallback. The three new enums should each have an equivalent combined round-trip test, or the existing test should be extended to chain both directions.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:28:35Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:33:24Z",
+  "closed_at": "2026-04-27T19:33:24Z",
+  "close_reason": "Fixed: combined round-trip tests added in last commit",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-wju9.4",
+      "depends_on_id": "jmap-chat-tui-wju9",
+      "type": "parent-child",
+      "created_at": "2026-04-27T12:28:34Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

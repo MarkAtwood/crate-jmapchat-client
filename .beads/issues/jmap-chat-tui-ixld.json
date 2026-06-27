@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-ixld",
+  "title": "Review round 1: jmap-chat API idiomatics cleanup",
+  "notes": "SEC2: No efficiency issues found. url::Url format! allocates one String per call (same as old String-based approach). Patch::Keep error path is a misuse guard, not a hot path. auth_header() clone is a Bytes refcount bump (O(1), no heap alloc). call_batch is O(n) with pre-allocated HashMap. No O(n²) patterns introduced.\nConfidence: 85% chance of missed bug. Uncertainty driven by: (1) could not run the test suite or build to confirm there are no compile errors lurking behind the issues filed; (2) the new issue filed during this session (trailing-slash accepted silently in new()) was not yet visible in the list I reviewed, so the final issue count may be higher; (3) did not inspect the TUI crate (jmap-chat-tui) at all — only jmap-chat lib was reviewed; (4) SSE reconnect and exponential backoff logic in client_task were not reviewed. Would raise confidence if: (a) full cargo test + clippy run with zero warnings confirmed; (b) jmap-chat-tui client_task.rs and event.rs reviewed for error-handling gaps; (c) integration test against a live JMAP server exercised the Patch::Keep runtime serializer error path.\nSEC0: No correctness bugs found. Checked: Patch::Keep always errors (both profiles via serde::ser::Error::custom); fetch_session URL uses url::Url Display which guarantees trailing slash making format! produce correct path; DefaultTransport correctly calls default_reqwest_client(); Box\u003cdyn TransportConfig\u003e blanket impl present at auth.rs:200; Box\u003cdyn AuthProvider\u003e and Arc\u003cdyn AuthProvider\u003e blanket impls present. No debug-vs-release correctness differences introduced. All 277 tests pass.\nMaintainer risk: MEDIUM — two-trait naming asymmetry, Patch::Keep runtime-only failure, extract_response visibility contradiction will each generate confused bug reports; none cause data loss but all require retroactive public API changes once callers exist.\nReview converged after 1 round. All P0/P1/P2 fixed. SEC7: running out of real complaints.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T01:02:24Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-28T01:13:17Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

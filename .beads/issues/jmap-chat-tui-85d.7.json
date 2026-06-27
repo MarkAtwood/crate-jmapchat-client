@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-85d.7",
+  "title": "space_set_update: empty-patch behavior not documented in docstring",
+  "description": "chat_set_update explicitly documents that an all-None/empty input sends an empty patch and the server treats it as a no-op. space_set_update has no such note. A caller who constructs a SpaceUpdateInput with id set and all other fields as None/empty will send { update: { id: {} } } and get an 'updated' response — this is correct RFC 8620 behavior, but it is surprising. The docstring should add: 'If all fields are absent/empty, an empty patch is sent; the server treats this as a no-op per RFC 8620 §5.3.' This is a bus-factor issue: the next person to maintain this will wonder if the empty-patch case was forgotten.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T09:10:01Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T09:14:41Z",
+  "closed_at": "2026-04-27T09:14:41Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-85d.7",
+      "depends_on_id": "jmap-chat-tui-85d",
+      "type": "parent-child",
+      "created_at": "2026-04-27T02:10:00Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

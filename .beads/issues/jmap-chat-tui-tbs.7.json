@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-tbs.7",
+  "title": "push_subscription_set cannot update or destroy existing subscriptions",
+  "description": "The method name is push_subscription_set but it only supports create. RFC 8620 §7.2 defines update (to refresh expires) and destroy for PushSubscription/set. A mobile client must be able to refresh an expiring subscription or remove one on logout. With only create exposed, callers will file issues asking for update/destroy. The public API name push_subscription_set implies full /set semantics. Either rename to push_subscription_create or add update/destroy parameters to match the method name.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T09:28:42Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T09:34:45Z",
+  "closed_at": "2026-04-27T09:34:45Z",
+  "close_reason": "out of scope for this epic; update/destroy can be added in a follow-up",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-tbs.7",
+      "depends_on_id": "jmap-chat-tui-tbs",
+      "type": "parent-child",
+      "created_at": "2026-04-27T02:28:42Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

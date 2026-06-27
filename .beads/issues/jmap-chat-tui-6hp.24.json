@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-6hp.24",
+  "title": "test_session helper: 'account1' and empty accounts map are unexplained",
+  "description": "In methods_test.rs, test_session() hardcodes 'account1' in primaryAccounts but leaves accounts as {}. There is no comment explaining: (1) that 'account1' must match the fixture files; (2) that accounts is empty by design — the tests only exercise chat_account_id(), not chat_capability(); (3) that a test calling chat_capability() on this session would silently get Ok(None). A contributor writing a new test that needs capability data will be confused by the mismatch between primaryAccounts having 'account1' and accounts having no such key.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:06:53Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:32:47Z",
+  "closed_at": "2026-04-27T06:32:47Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-6hp.24",
+      "depends_on_id": "jmap-chat-tui-6hp",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:06:53Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "id": "jmap-chat-tui-yh4.2",
+  "title": "error: add BlobIntegrityMismatch variant",
+  "description": "Why: SHA-256 mismatch on download is a distinct security event (not a parse failure). Callers need to distinguish integrity failures from structural errors for security auditing and retry logic.\\n\\nWhat: Add ClientError::BlobIntegrityMismatch { expected: String, actual: String } to error.rs.\\n\\nAlgorithm:\\n1. Add variant with #[error] attribute: 'blob integrity check failed: expected {expected}, got {actual}'\\n2. Add doc comment explaining this is non-retriable without re-fetching metadata\\n3. Run cargo check",
+  "acceptance_criteria": "cargo check passes; variant is pub and accessible",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T09:47:35Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T09:53:12Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yh4.2",
+      "depends_on_id": "jmap-chat-tui-yh4.1",
+      "type": "blocks",
+      "created_at": "2026-04-27T02:48:29Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-yh4.2",
+      "depends_on_id": "jmap-chat-tui-yh4",
+      "type": "parent-child",
+      "created_at": "2026-04-27T02:47:35Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

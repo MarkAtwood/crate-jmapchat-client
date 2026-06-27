@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-ixld.10",
+  "title": "base_url stored as url::Url, parsed once at JmapChatClient::new",
+  "description": "Previously base_url was stored as String and url path assembly used trim_end_matches('/') ad-hoc at each call site. Now it is parsed to url::Url at construction time so: (a) validation happens once and fails fast, (b) url::Url Display appends a trailing slash on origin URLs, making format\\!(\"{}/.well-known/jmap\", self.base_url) produce correct double-slash-free paths without defensive trimming. A contributor might suggest reverting to String to reduce the url dependency — do not: the ad-hoc string trimming is fragile and the url crate is already a transitive dependency via reqwest.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T01:04:12Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T01:25:50Z",
+  "closed_at": "2026-04-28T01:25:50Z",
+  "close_reason": "Decision recorded during idfq epic implementation; design intentionally retained as-is.",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-ixld.10",
+      "depends_on_id": "jmap-chat-tui-ixld",
+      "type": "parent-child",
+      "created_at": "2026-04-27T18:04:11Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

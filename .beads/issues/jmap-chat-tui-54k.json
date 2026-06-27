@@ -1,0 +1,14 @@
+{
+  "id": "jmap-chat-tui-54k",
+  "title": "types: Endpoint new type variants and WebSocket/Push message types",
+  "description": "## What\n1. Endpoint type URIs: document the 4 new well-known types added in current spec:\n   - urn:jmap:chat:cap:calendar-event\n   - urn:jmap:chat:cap:availability\n   - urn:jmap:chat:cap:task\n   - urn:jmap:chat:cap:filenode\n   No code change needed (type is String, extensible) — but add constants:\n   pub const ENDPOINT_TYPE_VTC: \u0026str = 'urn:jmap:chat:cap:vtc';\n   pub const ENDPOINT_TYPE_PAYMENT: \u0026str = 'urn:jmap:chat:cap:payment';\n   pub const ENDPOINT_TYPE_BLOB: \u0026str = 'urn:jmap:chat:cap:blob';\n   pub const ENDPOINT_TYPE_CALENDAR_EVENT: \u0026str = 'urn:jmap:chat:cap:calendar-event';\n   pub const ENDPOINT_TYPE_AVAILABILITY: \u0026str = 'urn:jmap:chat:cap:availability';\n   pub const ENDPOINT_TYPE_TASK: \u0026str = 'urn:jmap:chat:cap:task';\n   pub const ENDPOINT_TYPE_FILENODE: \u0026str = 'urn:jmap:chat:cap:filenode';\n\n2. Add WebSocket message types (new module: src/wss.rs or src/websocket.rs):\n   - ChatStreamEnable { data_types: Vec\u003cString\u003e, chat_ids: Option\u003cVec\u003cString\u003e\u003e, contact_ids: Option\u003cVec\u003cString\u003e\u003e }\n   - ChatStreamDisable {}\n   - ChatTypingEvent { chat_id: String, sender_id: String, typing: bool }\n   - ChatPresenceEvent { contact_id: String, presence: String, last_active_at: Option\u003cUTCDate\u003e, status_text: Option\u003cserde_json::Value\u003e, status_emoji: Option\u003cserde_json::Value\u003e }\n   - WssClientMessage enum: StreamEnable(ChatStreamEnable), StreamDisable(ChatStreamDisable)\n   - WssServerEvent enum: TypingEvent(ChatTypingEvent), PresenceEvent(ChatPresenceEvent), Unknown\n\n   Serialization: @type field for all (serde tag)\n\n## Tests\nFixture tests/fixtures/wss/chat_stream_enable.json\nFixture tests/fixtures/wss/chat_typing_event.json\nFixture tests/fixtures/wss/chat_presence_event.json\nAssert: all round-trip against hand-written fixtures from spec examples\nAssert: unknown @type in WssServerEvent deserializes to Unknown variant (not error)",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:12:10Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T11:05:01Z",
+  "closed_at": "2026-04-27T11:05:01Z",
+  "close_reason": "EndpointType enum covers all 7 variants + tests; WS types (ChatStreamEnable, ChatTypingEvent, ChatPresenceEvent, WsFrame) fully implemented in types.rs and ws/mod.rs"
+}

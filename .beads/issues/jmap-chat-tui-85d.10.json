@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-85d.10",
+  "title": "space_set_update uses flat semantic patch keys, not JSON Pointer paths — correct for this spec",
+  "description": "Standard RFC 8620 /set uses JSON Pointer paths as patch keys (e.g. 'members/0/nick'). The JMAP Chat spec explicitly departs from this for Space/set updates, using named semantic mutation keys (addMembers, removeMembers, etc.) because the server needs to enforce permissions and ordering on each operation. space_set_update correctly builds a flat map of named keys rather than trying to construct pointer paths. A contributor familiar with RFC 8620 might 'fix' this to use JSON Pointers — that would be wrong. The spec note in the docstring ('Space uses semantic mutation keys') should be considered a mandatory comment, not a cleanup target.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T09:10:26Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T09:14:50Z",
+  "closed_at": "2026-04-27T09:14:50Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-85d.10",
+      "depends_on_id": "jmap-chat-tui-85d",
+      "type": "parent-child",
+      "created_at": "2026-04-27T02:10:25Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

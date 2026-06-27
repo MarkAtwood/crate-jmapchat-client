@@ -1,0 +1,27 @@
+{
+  "id": "jmap-chat-tui-e8r.7",
+  "title": "PresenceStatusSetInput derives Default with silent empty-string id",
+  "description": "mod.rs line 164: PresenceStatusSetInput derives Default. id: \u0026str defaults to \"\". A default-constructed PresenceStatusSetInput passed to presence_status_set sends a JMAP update keyed on the empty string with no client-side error. MessageCreateInput avoids this by not deriving Default (all fields required). Either remove Default from PresenceStatusSetInput (callers must supply id explicitly) or add a debug_assert!(!self.id.is_empty()) guard at the top of presence_status_set.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:50:45Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T08:01:12Z",
+  "closed_at": "2026-04-27T08:01:12Z",
+  "close_reason": "fixed in k8t review: Default removed from PresenceStatusSetInput",
+  "labels": [
+    "elegance"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-e8r.7",
+      "depends_on_id": "jmap-chat-tui-e8r",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:50:45Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

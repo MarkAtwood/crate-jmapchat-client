@@ -1,0 +1,31 @@
+{
+  "id": "jmap-chat-tui-iq6.5",
+  "title": "extract SSE reconnect block into helper function",
+  "description": "The SSE reconnect logic in run() (client_task.rs lines ~173-199) is 25 lines of inline code: abort old task, compute backoff delay, sleep, recreate the channel pair, re-assign sse_tx/sse_rx/sse_handle, re-spawn. This logic is non-trivial and its presence inside the top of the main select\\! loop makes the event-loop structure harder to follow at a glance. Extracting it to a helper (e.g. reconnect_sse) that takes the mutable handle, channel slots, backoff index, and event sender would make the loop body's intent immediately clear. The helper would return the new handle and updated channel endpoints. The caller retains sse_needs_restart and the backoff index.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:14:06Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:30:18Z",
+  "closed_at": "2026-04-26T09:30:18Z",
+  "close_reason": "Closed",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "opinion",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-iq6.5",
+      "depends_on_id": "jmap-chat-tui-iq6",
+      "type": "parent-child",
+      "created_at": "2026-04-26T02:14:06Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

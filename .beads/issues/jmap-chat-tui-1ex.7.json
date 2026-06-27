@@ -1,0 +1,33 @@
+{
+  "id": "jmap-chat-tui-1ex.7",
+  "title": "Step 7: JmapChatClient::subscribe_events() SSE",
+  "description": "Implement subscribe_events() on JmapChatClient: GET eventSourceUrl, return async stream of StateChange events per RFC 8620 §7.3. Test with a mock SSE server (wiremock or tokio test server). Handle reconnect with exponential backoff.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T06:36:07Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-26T07:00:48Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-1ex.7",
+      "depends_on_id": "jmap-chat-tui-1ex.5",
+      "type": "blocks",
+      "created_at": "2026-04-25T23:36:29Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-1ex.7",
+      "depends_on_id": "jmap-chat-tui-1ex",
+      "type": "parent-child",
+      "created_at": "2026-04-25T23:36:07Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

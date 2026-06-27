@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-t6n1.19",
+  "title": "deserialize_optional_nullable_string encodes three-state absent/null/present for partial-update fields",
+  "description": "ChatPresenceEvent.status_text and status_emoji use Option\u003cOption\u003cString\u003e\u003e with a custom deserializer. The three states have distinct semantics per spec: field absent = no change (keep current value); field null = explicit clear (set to None); field string = update to new value. A contributor might suggest simplifying to Option\u003cString\u003e (absent/null -\u003e None, string -\u003e Some). That collapses 'no change' and 'explicit clear' into the same None, making it impossible for the client to distinguish 'server did not send a status update' from 'server said clear the status'. The custom deserializer is also protected by a test (test_deserialize_optional_nullable_string_rejects_non_string) that rejects non-string non-null values, preventing silent misparse of malformed payloads.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:08:05Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:21:15Z",
+  "closed_at": "2026-04-27T19:21:15Z",
+  "close_reason": "Decision recorded",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-t6n1.19",
+      "depends_on_id": "jmap-chat-tui-t6n1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T12:08:05Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-s8m8.3",
+  "title": "JmapRequestBuilder: panic on duplicate call_id is correct programmer-error choice",
+  "description": "Duplicate call IDs are a programmer error (like indexing out of bounds) not an expected runtime condition. Panicking in add_call rather than returning Result from build() is correct: (1) builder methods are consumed synchronously, not across await points, so panic unwind is clean; (2) returning Result from build() would force every call site to handle an error that can only occur from programmer error; (3) this matches std::collections::HashMap::insert semantics. A future contributor might suggest Result\u003cJmapRequest, DuplicateCallIdError\u003e from build() — reject this.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T02:17:32Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T02:18:14Z",
+  "closed_at": "2026-04-28T02:18:14Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-s8m8.3",
+      "depends_on_id": "jmap-chat-tui-s8m8",
+      "type": "parent-child",
+      "created_at": "2026-04-27T19:17:32Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

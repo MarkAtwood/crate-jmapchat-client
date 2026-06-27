@@ -1,0 +1,25 @@
+{
+  "id": "jmap-chat-tui-6i1",
+  "title": "timestamp coarsening: sub-minute precision MUST NOT be displayed",
+  "description": "IMPROVEMENTS.md §15.1: Clients SHOULD NOT expose sub-minute precision for readAt, lastReadAt, or deviceDeliveredAt in the UI. Display relative or hour-granularity strings. Store full-precision values internally for sorting.\\n\\nThis applies to every client crate (TUI, egui, iced, slint, tauri).\\n\\nWhat:\\n- Add a format_receipt_timestamp(dt: \u0026UTCDate) -\u003e String helper in jmap-chat lib (or each client)\\n- Output format: 'Today', 'Yesterday', 'Mon 14:00', 'Apr 12' — never 'Apr 12 14:32:07'\\n- Internal sort/comparison always uses full-precision UTCDate\\n- Unit tests: given a UTCDate with seconds precision, assert formatted output lacks sub-minute detail",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:27:08Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T11:24:10Z",
+  "closed_at": "2026-04-27T11:24:10Z",
+  "close_reason": "implemented and tests passing",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-6i1",
+      "depends_on_id": "jmap-chat-tui-ec2",
+      "type": "blocks",
+      "created_at": "2026-04-26T21:27:10Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

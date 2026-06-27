@@ -1,0 +1,50 @@
+{
+  "id": "jmap-chat-tui-4yc.4",
+  "title": "client_task.rs: background JMAP async task",
+  "description": "Create crates/jmap-chat-egui/src/client_task.rs implementing the background tokio task.\n\nWhat: Async background task driving all JMAP network operations.\n\nAlgorithm:\n1. Function signature: pub async fn run(client: JmapChatClient, base_url: String, tx: mpsc::Sender\u003cAppEvent\u003e, mut rx: mpsc::Receiver\u003cAppCommand\u003e, ctx: egui::Context)\n2. On start:\n   a. Send StatusChanged(Connecting)\n   b. fetch_session() → Session; on error send Error(msg) and retry with backoff\n   c. Extract account_id = session.chat_account_id(); send SessionReady { api_url, account_id }\n   d. Load chats: chat_query(None, None, None, Some(100)) → chat_get(ids) → send ChatsLoaded\n   e. Load read positions: read_position_get(None) → store in local map\n   f. Send StatusChanged(Connected)\n3. Spawn SSE listener sub-task via tokio::spawn:\n   - subscribe_events(\u0026session.event_source_url, None) → stream\n   - For each SseFrame:\n     - StateChange { changed } → call chat_changes/message_changes for each type, send updated data\n     - Typing / Presence → send corresponding AppEvent (if added)\n     - Error: sleep backoff, reconnect\n4. Main select! loop on rx:\n   - AppCommand::SelectChat(id): message_query(Some(id)) → message_get(ids) → send MessagesLoaded; read_position_set if last message known\n   - AppCommand::SendMessage{chat_id, body}: message_create(chat_id, ULID, body, 'text/plain', now()) → on success refresh messages\n   - AppCommand::MarkRead{chat_id, msg_id}: read_position_set(read_pos_id, msg_id)\n5. On any channel closure, exit gracefully.\n\nDefensive rules:\n- Never log client tokens or auth headers.\n- All errors sent to UI via AppEvent::Error (never panic).\n- Backoff: 1s, 2s, 4s, 8s, 16s max on SSE reconnect.\n- Drain outstanding commands after SSE reconnect to avoid duplicate work.\n- egui::Context::request_repaint() after every AppEvent send.\n\nTests (integration, in tests/client_task_test.rs using wiremock):\n- startup_loads_chats: mock session + chat_query + chat_get → verify ChatsLoaded received\n- select_chat_loads_messages: mock message_query + message_get → verify MessagesLoaded\n- send_message_success: mock message_set → verify no error event sent\n- sse_state_change_triggers_refresh: mock SSE stream sending StateChange + /changes → verify updated chats received\nOracle: expected events derived from mock fixture JSON files, not from implementation.",
+  "acceptance_criteria": "cargo test -p jmap-chat-egui client_task exits 0; all 4 client_task tests pass",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:21:28Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-26T08:32:00Z",
+  "close_reason": "client_task.rs implemented; cargo check + clippy clean",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4yc.4",
+      "depends_on_id": "jmap-chat-tui-4yc",
+      "type": "parent-child",
+      "created_at": "2026-04-26T01:21:28Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-4yc.4",
+      "depends_on_id": "jmap-chat-tui-4yc.3",
+      "type": "blocks",
+      "created_at": "2026-04-26T01:22:13Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-4yc.4",
+      "depends_on_id": "jmap-chat-tui-4yc.1",
+      "type": "blocks",
+      "created_at": "2026-04-26T01:22:12Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-4yc.4",
+      "depends_on_id": "jmap-chat-tui-4yc.2",
+      "type": "blocks",
+      "created_at": "2026-04-26T01:22:12Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-t6n1.14",
+  "title": "EndpointType is reused for both Endpoint.endpointType and MessageAction.actionType",
+  "description": "The same EndpointType enum is the field type for both Endpoint.endpoint_type and MessageAction.action_type. This is correct because the spec (draft-atwood-jmap-chat-00 §4.3) explicitly states that MessageAction.type uses the same URI namespace as Endpoint.type (urn:jmap:chat:cap:*). A contributor might suggest splitting into two separate enums (EndpointCapabilityType and MessageActionType) for 'clarity', but that would duplicate the enum, its as_uri()/from_uri() logic, and its serde impls for no gain. The spec treats them as the same namespace; the type system should too.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:07:35Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:21:08Z",
+  "closed_at": "2026-04-27T19:21:08Z",
+  "close_reason": "Decision recorded",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-t6n1.14",
+      "depends_on_id": "jmap-chat-tui-t6n1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T12:07:34Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

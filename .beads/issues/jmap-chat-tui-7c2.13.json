@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-7c2.13",
+  "title": "Session::chat_capability Ok(None) conflates account-absent and capability-absent",
+  "description": "jmap.rs: Session::chat_capability returns Ok(None) both when account_id is not in session.accounts AND when the account exists but lacks the chat capability key. The doc comment only describes the second case. A caller cannot distinguish the two without calling session.accounts.contains_key separately. Either document the conflation explicitly in the doc comment, or split into two distinct return paths. Same issue applies to chat_push_capability.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T18:18:02Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T18:22:54Z",
+  "closed_at": "2026-04-27T18:22:54Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-7c2.13",
+      "depends_on_id": "jmap-chat-tui-7c2",
+      "type": "parent-child",
+      "created_at": "2026-04-27T11:18:02Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

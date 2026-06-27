@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-5n5.1.16",
+  "title": "message_query and message_get guard preconditions before any network call",
+  "description": "message_query returns ClientError::InvalidArgument immediately if neither chat_id nor has_mention=true is provided. message_get returns InvalidArgument immediately if ids is empty. A contributor might remove these guards on the grounds that the server will reject the request anyway. The guards are correct because: (1) the server error path requires a round-trip and may return a vague unsupportedFilter rather than a clear message; (2) the client tests for these guards use no mock server, proving the guard fires before any I/O — a valuable property for fast unit testing.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:24:42Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:37:41Z",
+  "closed_at": "2026-04-27T07:37:41Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-5n5.1.16",
+      "depends_on_id": "jmap-chat-tui-5n5.1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:24:42Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

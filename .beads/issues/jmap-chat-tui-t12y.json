@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-t12y",
+  "title": "Validate per-element IDs in destroy methods and role/category arrays",
+  "description": "Destroy methods (chat_destroy, message_destroy, custom_emoji_destroy, space_ban_destroy, space_invite_destroy) check ids.is_empty() but do not validate that individual array elements are non-empty strings. Similarly, role_ids arrays in SpaceAddMemberInput and SpaceUpdateMemberInput within space_update are not validated per-element. The optional category_id in SpaceAddChannelInput (an ID field) also lacks an empty-string guard. These are all ID parameters that reach the wire and should be validated before any network call.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T03:51:55Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T04:02:09Z",
+  "closed_at": "2026-04-28T04:02:09Z",
+  "close_reason": "Closed"
+}

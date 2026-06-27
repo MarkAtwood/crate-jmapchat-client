@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-g2f.4",
+  "title": "Document why now_rfc3339 avoids chrono/time crates",
+  "description": "now_rfc3339() and days_to_ymd() in client_task.rs implement a custom UTC formatter from scratch. A new contributor will immediately distrust this and wonder why chrono or the time crate wasn't used. The Hinnant algorithm reference is cited but the rationale for no external dep is absent. Add a comment above now_rfc3339() stating that jmap-chat-egui intentionally avoids adding chrono/time as a dependency (or vice versa, if there is another reason), so contributors know this was a deliberate tradeoff and not an oversight.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:40:56Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:24:01Z",
+  "closed_at": "2026-04-26T09:24:01Z",
+  "close_reason": "Obsolete: now_rfc3339 now uses chrono (added as workspace dep)",
+  "labels": [
+    "my-oss",
+    "opinion",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-g2f.4",
+      "depends_on_id": "jmap-chat-tui-g2f",
+      "type": "parent-child",
+      "created_at": "2026-04-26T01:40:56Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

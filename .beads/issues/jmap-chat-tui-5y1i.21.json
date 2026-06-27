@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-5y1i.21",
+  "title": "base_url with query/fragment accepted but produces malformed downstream URLs",
+  "description": "Trigger: JmapChatClient::new(auth, \"https://host?foo=1\") or JmapChatClient::new(auth, \"https://host#frag\"). The validator checks only path (which is \"/\" in both cases) and accepts the URL. The raw string is then stored and used as a base for all downstream requests. fetch_session constructs \"https://host?foo=1/.well-known/jmap\" or \"https://host#frag/.well-known/jmap\", which are malformed URLs — the query string or fragment is not part of the origin. The fix is to also reject base_url strings whose parsed URL has a non-empty query or non-empty fragment.",
+  "status": "closed",
+  "priority": 0,
+  "issue_type": "bug",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T20:15:10Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T20:21:22Z",
+  "closed_at": "2026-04-27T20:21:22Z",
+  "close_reason": "Closed",
+  "labels": [
+    "correctness",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-5y1i.21",
+      "depends_on_id": "jmap-chat-tui-5y1i",
+      "type": "parent-child",
+      "created_at": "2026-04-27T13:15:09Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

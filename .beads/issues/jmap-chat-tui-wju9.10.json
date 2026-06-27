@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-wju9.10",
+  "title": "EndpointType::from_uri causes double allocation on unknown URI path",
+  "description": "crates/jmap-chat/src/types.rs lines 175-199 — EndpointType::deserialize allocates a String via String::deserialize(d), then passes it as \u0026str to from_uri(), which on the unrecognized-URI path calls other.to_string() (line 184) — a second heap allocation for the same data. The five new enums (ChatMemberRole, ChatKind, BodyType, OwnerPresence, PushUrgency) all avoid this by moving the already-owned String directly into Unknown(raw). The fix is to inline the match in deserialize and do Unknown(s) rather than routing through from_uri(\u0026s). The from_uri(\u0026str) public API can be kept as-is for callers who have a \u0026str, but deserialize should not use it. Impact is one extra String clone per deserialized unknown EndpointType value — minor in practice but avoidable.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:29:09Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:32:47Z",
+  "closed_at": "2026-04-27T19:32:47Z",
+  "close_reason": "Closed",
+  "labels": [
+    "efficiency",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-wju9.10",
+      "depends_on_id": "jmap-chat-tui-wju9",
+      "type": "parent-child",
+      "created_at": "2026-04-27T12:29:09Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-t6n1.11",
+  "title": "PushUrgency variants Low/Normal/High lack doc comments",
+  "description": "PushUrgency::Low, ::Normal, and ::High have no doc comments at all. Only ::VeryLow has one ('Background-only delivery, minimal power impact'). PushUrgency is used in ChatPushConfig fields that clients actively set (urgency, mention_urgency), so contributors need to know what each level means operationally. RFC 8030 §5.3 defines these as a delivery precedence ladder: VeryLow (lowest precedence, deepest battery savings), Low, Normal (default), High (highest precedence, wakes device). Without inline comments, a contributor choosing between Low and Normal has no guidance. Fix: add a one-line doc comment to each of Low, Normal, and High describing their RFC 8030 §5.3 delivery semantics.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:07:25Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:21:40Z",
+  "closed_at": "2026-04-27T19:21:40Z",
+  "close_reason": "Valid polish; deferred. Tracked in follow-up bead jmap-chat-tui-yw6v or standalone.",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-t6n1.11",
+      "depends_on_id": "jmap-chat-tui-t6n1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T12:07:24Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

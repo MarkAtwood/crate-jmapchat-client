@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-30o.8",
+  "title": "30o: BlobLookupResponse.not_found Option vs Vec undocumented",
+  "description": "crates/jmap-chat/src/methods/blob.rs line 33: not_found is typed as Option\u003cVec\u003cString\u003e\u003e with #[serde(default)], meaning both a missing field and an explicit JSON null deserialize to None. The doc comment does not explain why it is Option rather than Vec (which is the typical JMAP notFound shape), nor what None means (field absent vs null). Add a doc comment explaining the deliberate choice.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T10:01:57Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T10:07:28Z",
+  "closed_at": "2026-04-27T10:07:28Z",
+  "close_reason": "fixed as part of 30o.14: Vec\u003cString\u003e with serde(default)",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-30o.8",
+      "depends_on_id": "jmap-chat-tui-30o",
+      "type": "parent-child",
+      "created_at": "2026-04-27T03:01:57Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

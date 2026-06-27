@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-7p5.8",
+  "title": "Commit message missing rationale for OnceLock removal",
+  "description": "The commit message lists 'Remove chat_using() OnceLock; inline the two-string vec' as a what, but gives no why. The tradeoff being made is: simplicity (no OnceLock, no helper function, fewer lines) at the cost of two heap allocations per JMAP method call.\n\nA reader doing archaeology via git log will not understand why the allocation was considered acceptable here, or whether it was an accidental omission of the OnceLock. The commit message (or a code comment near build_request) should explain the tradeoff — e.g. 'per-call allocation is acceptable for a network-bound path; the OnceLock added complexity without measurable benefit at this call volume.'\n\nThis is a documentation-of-intent issue, not a code change.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T17:34:47Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T17:39:45Z",
+  "closed_at": "2026-04-27T17:39:45Z",
+  "close_reason": "Won't fix: cannot amend a pushed commit. The rationale is captured in the beads epic instead.",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-7p5.8",
+      "depends_on_id": "jmap-chat-tui-7p5",
+      "type": "parent-child",
+      "created_at": "2026-04-27T10:34:46Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

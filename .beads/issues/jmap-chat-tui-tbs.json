@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-tbs",
+  "title": "Review: Rich Push Notifications (ChatMessagePush, PushSubscription/set)",
+  "notes": "Maintainer risk: MEDIUM — The correctness issues (items 1-4) are the real risk; none are exploitable for data exfiltration, but the encrypted-invariant gap and missing /set operations will generate user bug reports. The public API surface (PushSubscriptionSetResponse.created as Value, missing update/destroy) will fossilize immediately.\nConfidence: 15% chance of missed bug. Uncertainty driven by: (1) I have not seen the actual Web Push delivery layer — the client builds the subscription but nothing tests that the URL field is validated as https-only or that it survives server-side URL validation; (2) the interaction between chatPush and RFC 8620 update/verification flow (client secret, verificationCode) is entirely unimplemented and untested — the spec references RFC 8620 §7.2 which requires a verification round-trip that this implementation skips entirely. Would raise confidence if: full RFC 8620 §7.2 verification flow is implemented and tested; a test covers the empty chat_push case (no capability in using array); and the encrypted invariant enforcement is added.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T09:27:28Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T09:35:05Z",
+  "close_reason": "all steps complete",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

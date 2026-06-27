@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-ofy",
+  "title": "Review: recent jmap-chat feature additions (maxChanges, RateLimited, utils, blob_convert, chat fields)",
+  "notes": "Maintainer risk: LOW — The RateLimited/blob_convert/channel/destroy additions are well-scoped. Main risks are the UTC display footgun and format string stability which are documentation gaps, not logic bugs.\nConfidence: 90% chance of no missed logic bug. Uncertainty driven by: spec conformance for Blob/convert (exact field names not verified against draft). Would raise confidence if: ran against a live JMAP server or compared against a reference BLOBEXT implementation.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T11:24:44Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T11:29:13Z",
+  "close_reason": "all steps complete",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

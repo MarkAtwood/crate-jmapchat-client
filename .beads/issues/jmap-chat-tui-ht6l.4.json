@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-ht6l.4",
+  "title": "ws_consecutive_failures resets on TypingIndicator and PresenceUpdate, not just on StreamEnded absence",
+  "description": "The counter measures consecutive failures *without a successful frame*, so any received frame (TypingIndicator or PresenceUpdate) resets it. A future contributor might suggest only resetting on 'reconnect success' at the task-spawn level rather than on first frame. Frame-level reset is strictly better: it means a partially-broken WS that managed to deliver one frame does not permanently disable itself after 4 more disconnects.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T23:15:45Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T23:16:56Z",
+  "closed_at": "2026-04-27T23:16:56Z",
+  "close_reason": "fixed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-ht6l.4",
+      "depends_on_id": "jmap-chat-tui-ht6l",
+      "type": "parent-child",
+      "created_at": "2026-04-27T16:15:44Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

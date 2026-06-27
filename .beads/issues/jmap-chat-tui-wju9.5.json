@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-wju9.5",
+  "title": "EndpointType Deserialize inlines from_uri call; others inline match directly",
+  "description": "crates/jmap-chat/src/types.rs line 198 — EndpointType::deserialize delegates to EndpointType::from_uri(\u0026s), while every other enum (ChatMemberRole L411-415, ChatKind L581-586, BodyType L636-641, OwnerPresence L1089-1095, PushUrgency L1288-1294) inlines the match directly in the deserialize body. This is a minor structural divergence. Not wrong, but it means EndpointType is the odd one out both in naming (from_uri) and in impl structure. The from_uri method is also tested directly (test_endpoint_type_from_uri), so it earns its keep — but the asymmetry should be noted and resolved either by adding from_str helpers to the others or by inlining EndpointType similarly.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:28:40Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:33:18Z",
+  "closed_at": "2026-04-27T19:33:18Z",
+  "close_reason": "Opinion; no engineering basis",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "opinion",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-wju9.5",
+      "depends_on_id": "jmap-chat-tui-wju9",
+      "type": "parent-child",
+      "created_at": "2026-04-27T12:28:40Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

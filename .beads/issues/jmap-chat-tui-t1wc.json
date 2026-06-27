@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-t1wc",
+  "title": "SessionClient: remove lifetime by owning Client+Session",
+  "description": "## Why\n\nSessionClient\u003c'a\u003e borrows both JmapChatClient and Session by reference. This prevents storing SessionClient in any struct without propagating the 'a lifetime. Every app state struct, background task, and reconnection loop must hold client+session separately and call with_session() at each use site. JmapChatClient is already Clone (Arc internals); Session is a handful of strings and is cheap to clone.\n\n## What needs to be done\n\nChange SessionClient to hold owned JmapChatClient (cloned from the caller) and owned Session. Remove the 'a lifetime parameter from the struct and all method signatures. Update JmapChatClient::with_session to clone both. Update all SessionClient method impls and tests. Verify that Clone derives or manual impls are in place for Session.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T01:44:31Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-28T02:15:02Z",
+  "close_reason": "Closed"
+}

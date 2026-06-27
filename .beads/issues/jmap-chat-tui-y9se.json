@@ -1,0 +1,14 @@
+{
+  "id": "jmap-chat-tui-y9se",
+  "title": "refactor: remove Deref\u003cTarget=str\u003e from Id and UTCDate newtypes",
+  "description": "## Problem\\nimpl_string_newtype\\! adds Deref\u003cTarget=str\u003e to Id and UTCDate. This defeats the newtype by allowing \u0026Id to silently coerce to \u0026str at any \u0026str-expecting call site. The correct bound for 'can be viewed as a string' is AsRef\u003cstr\u003e, which requires explicit .as_ref() and preserves the type distinction.\\n\\n## Solution\\nRemove the Deref impl from impl_string_newtype\\!. Keep AsRef\u003cstr\u003e, Display, PartialEq\u003cstr\u003e, PartialEq\u003cString\u003e, and the symmetric impls. Update any call sites that relied on implicit coercion to use .as_str() or .as_ref() explicitly.\\n\\n## Acceptance\\n- Deref\u003cTarget=str\u003e removed from Id and UTCDate\\n- AsRef\u003cstr\u003e retained\\n- Compiler catches any formerly-implicit coercions; call sites updated\\n- All tests pass",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T00:32:55Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-28T00:52:37Z",
+  "close_reason": "Closed"
+}

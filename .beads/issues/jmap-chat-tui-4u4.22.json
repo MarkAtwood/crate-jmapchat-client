@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-4u4.22",
+  "title": "Id and UTCDate type aliases defined twice in jmap:: and types::",
+  "description": "pub type Id = String and pub type UTCDate = String are defined identically in both jmap.rs and types.rs. Both are exported from the crate. A contributor reading jmap::Id vs types::Id cannot tell if they are the same concept or intentionally distinct. In practice they are used interchangeably (types.rs structs use types::Id, jmap.rs uses jmap::Id) but there is nothing saying so. This will confuse anyone writing a method that bridges the two modules. Consolidate to one definition and re-export, or add a comment in each file explaining the intentional duplication and why unification is not done.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:08:13Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:09:41Z",
+  "closed_at": "2026-04-26T07:09:41Z",
+  "close_reason": "duplicate of .24",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4u4.22",
+      "depends_on_id": "jmap-chat-tui-4u4",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:08:12Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

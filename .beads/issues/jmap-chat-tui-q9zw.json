@@ -1,0 +1,81 @@
+{
+  "id": "jmap-chat-tui-q9zw",
+  "title": "epic: jmap-chat crate API idiomatics cleanup (round 2)",
+  "description": "## Purpose\n\nAddress idiomatic Rust issues surfaced in the second post-implementation API review. These are API design and type-system issues -- not protocol correctness bugs -- that would draw comment in a code review from anyone familiar with Rust library conventions.\n\n## Scope\n\nAll findings are in the jmap-chat library crate. No protocol spec changes required.\n\n## Issues (priority order)\n\n- stl1 (P1 bug): subscribe_events returns impl Stream -- not storable; should be BoxStream\n- eyh8 (P2 bug): Id/UTCDate missing Borrow\u003cstr\u003e -- HashMap queries require full Id construction\n- 34mz (P2 bug): JmapRequestBuilder does not catch duplicate call IDs at build time\n- t1wc (P2 bug): SessionClient lifetime borrows prevent storing in structs\n- axzv (P3 bug): BearerAuth/BasicAuth do not derive Clone despite HeaderValue: Clone\n- ijt0 (P3 bug): MessageQueryInput::sort_ascending lacks builder setter, inconsistent with peers\n- zo1u (P3 bug): Id::new/UTCDate::new return ClientError -- domain type coupled to network error\n- j1w7 (P4 bug): AuthProvider::auth_header couples trait to http::HeaderName/HeaderValue\n\n## Design notes\n\nThe P1 fix (BoxStream) is a breaking API change but the correct long-term shape for a library stream. The P2 fixes (Borrow\u003cstr\u003e, duplicate call ID detection, SessionClient owned) are also breaking but fix genuine ergonomics gaps. P3/P4 are non-breaking additions or internal cleanups.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "feature",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T01:45:17Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T02:18:20Z",
+  "closed_at": "2026-04-28T02:18:20Z",
+  "close_reason": "All 8 beads implemented, review loop complete, doc contract added",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-q9zw",
+      "depends_on_id": "jmap-chat-tui-34mz",
+      "type": "blocks",
+      "created_at": "2026-04-27T18:45:25Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-q9zw",
+      "depends_on_id": "jmap-chat-tui-stl1",
+      "type": "blocks",
+      "created_at": "2026-04-27T18:45:24Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-q9zw",
+      "depends_on_id": "jmap-chat-tui-zo1u",
+      "type": "blocks",
+      "created_at": "2026-04-27T18:45:28Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-q9zw",
+      "depends_on_id": "jmap-chat-tui-j1w7",
+      "type": "blocks",
+      "created_at": "2026-04-27T18:45:29Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-q9zw",
+      "depends_on_id": "jmap-chat-tui-axzv",
+      "type": "blocks",
+      "created_at": "2026-04-27T18:45:27Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-q9zw",
+      "depends_on_id": "jmap-chat-tui-eyh8",
+      "type": "blocks",
+      "created_at": "2026-04-27T18:45:24Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-q9zw",
+      "depends_on_id": "jmap-chat-tui-ijt0",
+      "type": "blocks",
+      "created_at": "2026-04-27T18:45:27Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-q9zw",
+      "depends_on_id": "jmap-chat-tui-t1wc",
+      "type": "blocks",
+      "created_at": "2026-04-27T18:45:26Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}
