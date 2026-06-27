@@ -1,0 +1,31 @@
+{
+  "id": "jmap-chat-tui-dlm",
+  "title": "api: input structs for multi-parameter methods (no more too_many_arguments)",
+  "description": "message_create has 8 positional \u0026str args (#[allow(clippy::too_many_arguments)]). message_query has 7. As filters grow (text, threadRootId, after/before, has_attachment), this gets worse across all 30+ methods.\\n\\nDesign: define typed input structs with Default for every method that takes more than ~4 parameters:\\n\\n  #[derive(Default)]\\n  pub struct MessageCreate\u003c'a\u003e {\\n      pub chat_id: \u0026'a Id,\\n      pub body: \u0026'a str,\\n      pub body_type: \u0026'a str,\\n      pub sent_at: \u0026'a UTCDate,\\n      pub reply_to: Option\u003c\u0026'a Id\u003e,\\n      pub client_id: Option\u003c\u0026'a str\u003e,\\n  }\\n\\n  #[derive(Default)]\\n  pub struct MessageQuery {\\n      pub chat_id: Option\u003cId\u003e,\\n      pub has_mention: Option\u003cbool\u003e,\\n      pub has_attachment: Option\u003cbool\u003e,\\n      pub text: Option\u003cString\u003e,\\n      pub thread_root_id: Option\u003cId\u003e,\\n      pub position: Option\u003cu64\u003e,\\n      pub limit: Option\u003cu64\u003e,\\n  }\\n\\nDefine structs for: MessageCreate, MessageQuery, ChatQuery, ChatSet, and each new method added in method epics. Place in a methods/args.rs module.\\n\\nRemove all #[allow(clippy::too_many_arguments)] after migration.\\n\\nTests: each struct must impl Default and construct correctly with partial initialization.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:31:41Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T05:45:03Z",
+  "closed_at": "2026-04-27T05:45:03Z",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-dlm",
+      "depends_on_id": "jmap-chat-tui-8cl",
+      "type": "blocks",
+      "created_at": "2026-04-26T21:32:52Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-dlm",
+      "depends_on_id": "jmap-chat-tui-mmm.7",
+      "type": "supersedes",
+      "created_at": "2026-04-26T22:45:02Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

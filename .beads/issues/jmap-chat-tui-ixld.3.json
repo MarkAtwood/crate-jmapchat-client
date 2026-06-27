@@ -1,0 +1,31 @@
+{
+  "id": "jmap-chat-tui-ixld.3",
+  "title": "TransportConfig vs AuthProvider naming asymmetry",
+  "description": "The two traits are named TransportConfig ('Config') and AuthProvider ('Provider'). A contributor implementing custom TLS must implement 'TransportConfig'; one injecting tokens implements 'AuthProvider'. The asymmetric suffix has no semantic basis — both are traits with a single method. 12 months from now the maintainer will not remember which to implement for which concern, and contributors will guess wrong. The naming should be parallel (both 'Provider', both 'Config', or both without suffix).",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T01:03:42Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T01:08:09Z",
+  "closed_at": "2026-04-28T01:08:09Z",
+  "close_reason": "labeled opinion by calibration agent — naming asymmetry has no engineering basis that survives review",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "opinion",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-ixld.3",
+      "depends_on_id": "jmap-chat-tui-ixld",
+      "type": "parent-child",
+      "created_at": "2026-04-27T18:03:42Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

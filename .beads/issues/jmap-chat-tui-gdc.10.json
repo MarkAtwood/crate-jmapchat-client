@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-gdc.10",
+  "title": "ChatEntry struct over tuple makes the chat-display invariant enforceable",
+  "description": "chat_display uses Vec\u003cChatEntry\u003e (with named fields id and label) rather than Vec\u003c(String, String)\u003e. This matters because chat_display is a derived cache of chats with a strict invariant: it must be rebuilt via rebuild_chat_display() every time chats is mutated. Named fields make the invariant documentable (the doc comment names the struct by field), make call sites self-documenting (entry.id vs entry.0), and make the type appear in compiler errors when the struct changes. A future contributor might suggest replacing ChatEntry with a tuple to reduce boilerplate — that should be rejected because the named fields carry semantic weight (id vs label are not interchangeable) and the invariant documentation is anchored to the type.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:33:21Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:40:27Z",
+  "closed_at": "2026-04-26T09:40:27Z",
+  "close_reason": "Good decision already implemented in current codebase",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-gdc.10",
+      "depends_on_id": "jmap-chat-tui-gdc",
+      "type": "parent-child",
+      "created_at": "2026-04-26T02:33:20Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

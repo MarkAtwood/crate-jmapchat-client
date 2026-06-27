@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-g2f",
+  "title": "Review R1: jmap-chat-egui implementation",
+  "notes": "Confidence: 80% chance of missed bug. Uncertainty driven by: (1) days_to_ymd custom calendar math — the Hinnant algorithm is correct but I have not run test vectors against it; an off-by-one in leap-year handling would silently corrupt message timestamps; (2) MarkRead path in client_task.rs never actually fires from the UI (no UI code sends AppCommand::MarkRead), so the read-position update is dead code that may rot; (3) SyncSender queue depth of 256 — if the client task floods faster than the UI drains (e.g. large chat list + SSE storm), send() blocks the async task and stalls the tokio runtime; this is a latent deadlock risk under load, not exercised by normal use. Findings g2f.2 (per-frame alloc) and g2f.3 (double-box / blanket impl break) have real engineering basis and are not bikeshedding. g2f.1 (extract panels) and g2f.4 (dep rationale comment) are opinion — marked accordingly. Running out of real complaints: no.\nMaintainer risk: MEDIUM — The implementation is structurally sound and the architecture comments in client_task.rs are helpful. Seven specific risks filed as sub-issues (g2f.3, g2f.23, g2f.25, g2f.27, g2f.29, g2f.31, g2f.32, g2f.33). The two highest-severity items are: (1) the blanket impl AuthProvider for Box\u003cdyn AuthProvider\u003e is now a permanent public API commitment in jmap-chat that will break on any future trait method addition, and (2) the SSE reconnect tight loop with no backoff is a live operational defect that will cause visible misbehavior when the server is temporarily unreachable. The credential logging surface is clean — no token values are formatted into log/error strings. The now_rfc3339() implementation is algorithmically correct but is a maintainer surprise. Overall: nothing catastrophic, but the SSE backoff gap and the blanket-impl API lock-in should be addressed before the first external contributor arrives.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:39:34Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-26T09:28:39Z",
+  "close_reason": "all steps complete",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "id": "jmap-chat-tui-79rw",
+  "title": "Idiomatic Rust API cleanup — wave C",
+  "description": "Nine idiomatic Rust API findings identified in wave C review of jmap-chat crate. Covers type-safety gaps (String vs Id), missing trait impls (Display, From, PartialEq), API ergonomics (Vec vs slice, double-option), and a correctness issue with Serialize on receive-only enums. All findings are distinct from the 26 issues filed in prior review rounds (26yh.* and 5y1i.*).",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "feature",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T22:11:09Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T22:29:35Z",
+  "closed_at": "2026-04-27T22:29:35Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-79rw",
+      "depends_on_id": "jmap-chat-tui-1vlw",
+      "type": "blocks",
+      "created_at": "2026-04-27T15:13:27Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-79rw",
+      "depends_on_id": "jmap-chat-tui-h42o",
+      "type": "blocks",
+      "created_at": "2026-04-27T15:13:21Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-79rw",
+      "depends_on_id": "jmap-chat-tui-wtqx",
+      "type": "blocks",
+      "created_at": "2026-04-27T15:13:24Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-79rw",
+      "depends_on_id": "jmap-chat-tui-9dut",
+      "type": "blocks",
+      "created_at": "2026-04-27T15:13:23Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-79rw",
+      "depends_on_id": "jmap-chat-tui-vx7y",
+      "type": "blocks",
+      "created_at": "2026-04-27T15:13:20Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-79rw",
+      "depends_on_id": "jmap-chat-tui-qnm5",
+      "type": "blocks",
+      "created_at": "2026-04-27T15:13:32Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-79rw",
+      "depends_on_id": "jmap-chat-tui-chtp",
+      "type": "blocks",
+      "created_at": "2026-04-27T15:13:30Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-79rw",
+      "depends_on_id": "jmap-chat-tui-qfoj",
+      "type": "blocks",
+      "created_at": "2026-04-27T15:13:28Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-79rw",
+      "depends_on_id": "jmap-chat-tui-88yt",
+      "type": "blocks",
+      "created_at": "2026-04-27T15:13:25Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

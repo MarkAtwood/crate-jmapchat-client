@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-g2f.2",
+  "title": "Per-frame chat list string allocation in update()",
+  "description": "main.rs:144-164 builds a Vec\u003c(String,String,bool)\u003e with fresh String allocations for every chat on every frame (60fps). At 200 chats this is ~400-600 small heap allocations per frame regardless of whether the chat list changed. The data changes only when ChatsLoaded fires. Fix: cache the rendered label strings in AppState alongside the chat Vec, and rebuild only in apply_event(ChatsLoaded). This eliminates all per-frame allocations for the chat panel.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:40:50Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T08:58:27Z",
+  "closed_at": "2026-04-26T08:58:27Z",
+  "close_reason": "Closed",
+  "labels": [
+    "efficiency",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-g2f.2",
+      "depends_on_id": "jmap-chat-tui-g2f",
+      "type": "parent-child",
+      "created_at": "2026-04-26T01:40:49Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

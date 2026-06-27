@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-yof.17",
+  "title": "read_positions map stale after bootstrap; new chats miss read-position entries",
+  "description": "In client_task.rs, read_positions is loaded once at bootstrap and never refreshed from SSE (documented lines 142-149). A Chat created after startup has no entry in read_positions. SelectChat and SendMessage call try_mark_read which silently skips on missing entries. The MarkRead handler retries once with a full reload but try_mark_read does not. Maintenance consequence: unread counts silently fail to update for newly-created chats until restart, generating user reports. handle_state_change does not handle ReadPosition state-change events; a contributor extending it must discover this gap from the staleness comment.",
+  "status": "deferred",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:38:52Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:49:44Z",
+  "defer_until": "2026-06-01T00:00:00Z",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yof.17",
+      "depends_on_id": "jmap-chat-tui-yof",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:38:52Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-5n5.1.19",
+  "title": "Fixture directory split into types/jmap/session/methods/ layers is worth preserving",
+  "description": "Fixtures are separated into types/ (single data-type objects), jmap/ (core wire envelopes), session/ (Session validation cases), and methods/ (full JmapResponse bodies per method family). A contributor might flatten everything into a single directory. The layered structure makes it immediately clear what a fixture tests: a methods/ fixture exercises the full dispatch path; a types/ fixture tests only deserialization of a leaf object. This distinction matters when diagnosing a test failure: a types/ failure is a serde issue; a methods/ failure could also be extract_response or build_request.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:25:43Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:38:34Z",
+  "closed_at": "2026-04-27T07:38:34Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-5n5.1.19",
+      "depends_on_id": "jmap-chat-tui-5n5.1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:25:43Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

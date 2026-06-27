@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-5n5.1.13",
+  "title": "GetResponse\u003cT\u003e is a single shared generic, not per-method duplicates",
+  "description": "GetResponse\u003cT\u003e in mod.rs is parameterized on the object type. A contributor might suggest replacing it with concrete structs per method to avoid generics. That would duplicate the accountId/state/list/notFound envelope five times. The generic directly encodes the RFC 8620 §5.1 invariant that every /get response has the same wire shape regardless of object type. A single struct also means a future spec field addition is a one-line change.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:23:44Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:36:35Z",
+  "closed_at": "2026-04-27T07:36:35Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-5n5.1.13",
+      "depends_on_id": "jmap-chat-tui-5n5.1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:23:44Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

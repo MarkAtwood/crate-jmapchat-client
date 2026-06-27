@@ -1,0 +1,26 @@
+{
+  "id": "jmap-chat-tui-yh4.3",
+  "title": "fetch_session: validate upload_url and download_url non-empty",
+  "description": "Why: fetch_session validates api_url and event_source_url for emptiness but not upload_url or download_url. Blob operations will fail silently on empty URLs.\\n\\nWhat: Add emptiness checks for upload_url and download_url in fetch_session(), returning ClientError::InvalidSession.\\n\\nAlgorithm:\\n1. In client.rs fetch_session(), after existing checks, add:\\n   if session.upload_url.is_empty() { return Err(ClientError::InvalidSession('upload_url is empty')) }\\n   if session.download_url.is_empty() { return Err(ClientError::InvalidSession('download_url is empty')) }\\n2. Add two unit tests (reuse existing test_session pattern, set empty upload_url/download_url)\\n3. Run cargo test",
+  "acceptance_criteria": "cargo test passes; two new tests cover empty upload_url and download_url",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T09:47:36Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T09:50:16Z",
+  "closed_at": "2026-04-27T09:50:16Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yh4.3",
+      "depends_on_id": "jmap-chat-tui-yh4",
+      "type": "parent-child",
+      "created_at": "2026-04-27T02:47:36Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

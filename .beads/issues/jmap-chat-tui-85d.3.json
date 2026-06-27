@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-85d.3",
+  "title": "space_set_destroy: no body-shape test",
+  "description": "Test 51 has no body_json matcher — it only verifies the response deserialization. The destroy array is never asserted on the wire. A regression that serialized ids as objects instead of strings, or sent them under the wrong key name, would not be caught. The test should add a body_json matcher verifying { using, methodCalls: [[Space/set, { accountId, destroy: [id] }, r1]] }.",
+  "status": "closed",
+  "priority": 0,
+  "issue_type": "bug",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T09:09:18Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T09:14:35Z",
+  "closed_at": "2026-04-27T09:14:35Z",
+  "close_reason": "Closed",
+  "labels": [
+    "correctness",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-85d.3",
+      "depends_on_id": "jmap-chat-tui-85d",
+      "type": "parent-child",
+      "created_at": "2026-04-27T02:09:18Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-6hp.21",
+  "title": "chat_query flat params vs message_query input struct — inconsistent extensibility",
+  "description": "chat_query takes four positional params while message_query takes MessageQueryInput struct. Each new filter field on chat_query is a breaking signature change. Should use ChatQueryInput for additive extensibility, consistent with message_query pattern, before the API is frozen.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:06:33Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:27:26Z",
+  "closed_at": "2026-04-27T06:27:26Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-6hp.21",
+      "depends_on_id": "jmap-chat-tui-6hp",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:06:33Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

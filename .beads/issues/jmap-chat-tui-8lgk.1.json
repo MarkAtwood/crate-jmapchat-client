@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-8lgk.1",
+  "title": "Add tracing calls distinguishing WS capability sub-cases",
+  "description": "## Why\n\nclient_task.rs currently derives ws_url silently. When it is None, there is no log entry. The two sub-cases (server has no jmap:websocket vs. has websocket but not chat extension) are operationally distinct: the second suggests a misconfigured or partially-upgraded server, and deserves a WARN rather than an INFO.\n\n## What to do\n\nIn client_task.rs, replace the current silent ws_url derivation with an explicit match that logs before deciding:\n\n```rust\nlet ws_url: Option\u003cString\u003e = match (\n    session.websocket_capability().ok().flatten(),\n    session.supports_chat_websocket(),\n) {\n    (None, _) =\u003e {\n        tracing::info!(\"server has no WebSocket capability; ephemeral events unavailable\");\n        None\n    }\n    (Some(_), false) =\u003e {\n        tracing::warn!(\n            \"server advertises jmap:websocket but not jmap:chat:websocket;              typing/presence unavailable — server may need upgrade\"\n        );\n        None\n    }\n    (Some(cap), true) =\u003e {\n        tracing::debug!(url = %cap.url, \"ephemeral events via WebSocket\");\n        Some(cap.url.clone())\n    }\n};\n```\n\ntracing is already a workspace dep (used elsewhere in egui crate); no new dep needed. Verify with grep before adding.\n\n## Acceptance criteria\n\n- cargo check and cargo test pass\n- Log message text matches the three cases above",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T22:57:18Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T22:59:30Z",
+  "close_reason": "tracing calls added; INFO/WARN/DEBUG per capability sub-case",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-8lgk.1",
+      "depends_on_id": "jmap-chat-tui-8lgk",
+      "type": "parent-child",
+      "created_at": "2026-04-27T15:57:17Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

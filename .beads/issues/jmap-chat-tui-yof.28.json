@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-yof.28",
+  "title": "MarkRead handler has deeply nested reload-and-retry logic",
+  "description": "client_task.rs: The MarkRead arm in the main command loop has four levels of nesting: Some(AppCommand::MarkRead) \u003e if-let rp_id \u003e else \u003e match load_read_positions \u003e Ok(new_map) \u003e if-let rp_id \u003e if-let Err. The reload-and-retry sub-path requires re-reading the outer branch to understand the flow. Suggested rewrite: extract the reload-and-retry path into an async fn force_mark_read(client, session, chat_id, message_id, read_positions, tx, ctx) that owns the full reload+retry logic and reports its own error events, leaving the MarkRead arm as a two-branch if-let / else call to force_mark_read — consistent with how try_mark_read handles the best-effort path.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:40:18Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:50:34Z",
+  "closed_at": "2026-04-27T06:50:34Z",
+  "close_reason": "Opinion: MarkRead nesting per SEC7; logic is correct",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "opinion",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yof.28",
+      "depends_on_id": "jmap-chat-tui-yof",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:40:17Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-qa0",
+  "title": "ChatContact/changes method + fixture test",
+  "description": "Implement ChatContact/changes in methods/contact.rs:\\n- Request: accountId, sinceState, maxChanges?, properties?\\n- Response: accountId, oldState, newState, hasMoreChanges, created[], updated[], destroyed[]\\n- Wire to JmapClient::call()\\n- Fixture test: wiremock stub returning spec-example /changes response, assert returned ChangesResponse fields match\\n\\nFixture file: tests/fixtures/chat_contact_changes.json",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:16:38Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T11:02:46Z",
+  "closed_at": "2026-04-27T11:02:46Z",
+  "close_reason": "Implementation and tests already present from prior work",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-qa0",
+      "depends_on_id": "jmap-chat-tui-9w3",
+      "type": "blocks",
+      "created_at": "2026-04-26T21:16:45Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

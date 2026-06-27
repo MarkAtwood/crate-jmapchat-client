@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-4u4.25",
+  "title": "extract_response is pub but not re-exported; its public status is unexplained",
+  "description": "extract_response is declared pub in client.rs and is called as crate::client::extract_response from methods.rs. It is visible to external crate users but is not intended as a public API surface — it is a plumbing function needed only because methods.rs is a sibling module, not a child. There is no doc comment explaining this. A contributor would not know whether to use it, extend it, or whether it is safe to use externally. Either add a doc comment explaining it is pub(crate) intentionally and why, or change visibility to pub(crate) to make the intent explicit.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:08:20Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:30:50Z",
+  "closed_at": "2026-04-26T07:30:50Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4u4.25",
+      "depends_on_id": "jmap-chat-tui-4u4",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:08:20Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

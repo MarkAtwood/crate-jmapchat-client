@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-yof.24",
+  "title": "Id newtype with non-empty invariant enforced at deserialization time is correct and must be preserved",
+  "description": "Id is a newtype over String with a custom Deserialize impl that rejects empty strings immediately at parse time. Two construction paths exist: Id::new (fallible, for user-controlled input) and Id::from_trusted (panics in debug on empty, for server-assigned IDs and test fixtures). This is correct because JMAP IDs are opaque server-assigned strings that the spec defines as non-empty; allowing an empty Id to exist would propagate a malformed state into every field that holds one (chat_id, sender_id, etc.). A future contributor might suggest replacing Id with String to reduce boilerplate, or unifying the two constructors into one that silently skips validation. The first loses the compile-time distinction between validated and unvalidated IDs; the second allows the malformed state to propagate. The same design applies to UTCDate. The from_trusted escape hatch is explicitly documented as only acceptable for server responses and test fixtures.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:39:18Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:01:02Z",
+  "closed_at": "2026-04-27T07:01:02Z",
+  "close_reason": "Decision record — no action needed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yof.24",
+      "depends_on_id": "jmap-chat-tui-yof",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:39:18Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

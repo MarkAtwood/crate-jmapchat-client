@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-axzv",
+  "title": "BearerAuth and BasicAuth: derive Clone",
+  "description": "## Why\n\nBearerAuth and BasicAuth store a pre-computed HeaderValue. HeaderValue is Clone. There is no reason these types cannot be Clone. Currently callers building pools, multi-region clients, or tests that need multiple client instances with the same auth must re-construct and re-validate the auth type for each instance rather than cloning once.\n\n## What needs to be done\n\nAdd #[derive(Clone)] (or hand-implement Clone) to BearerAuth and BasicAuth. Add a test asserting that a constructed BearerAuth or BasicAuth can be cloned and that the clone produces an identical auth header.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T01:44:38Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-28T02:15:03Z",
+  "close_reason": "Closed"
+}

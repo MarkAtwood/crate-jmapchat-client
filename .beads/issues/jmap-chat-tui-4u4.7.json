@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-4u4.7",
+  "title": "auth_header() silently returns None on encoding failure",
+  "description": "BearerAuth::auth_header() and BasicAuth::auth_header() call HeaderValue::from_str(...).ok().map(...). If the token/password contains a non-visible-ASCII byte, HeaderValue::from_str returns Err, .ok() converts it to None, and auth_header() returns None — meaning no Authorization header is sent. The request proceeds unauthenticated and the server returns 401. The user sees AuthFailed(401) with no message explaining why their token was silently dropped. The comment 'Bearer tokens are ASCII' is an assumption, not a guarantee. — Users with tokens containing non-ASCII bytes will file repeated 401 issues; the root cause is invisible from the error message.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:07:39Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:20:38Z",
+  "closed_at": "2026-04-26T07:20:38Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4u4.7",
+      "depends_on_id": "jmap-chat-tui-4u4",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:07:38Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

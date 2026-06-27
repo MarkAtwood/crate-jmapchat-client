@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-g2f.14",
+  "title": "Document 5-second error timeout rationale and fatal-error behavior",
+  "description": "app.rs tick_error_timeout() silently clears any error after 5 seconds. Two things are undocumented: (1) why 5 seconds (UX rule of thumb? measured? arbitrary?), and (2) fatal errors like auth failure are also cleared after 5 seconds, which means a user who blinks could miss the explanation for why nothing is working. A contributor won't know if this was intentional or an oversight. Add a comment in tick_error_timeout() stating whether fatal vs transient errors are distinguished, and where the 5-second value came from — or add a TODO issue reference if this is a known limitation.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:41:25Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:25:21Z",
+  "closed_at": "2026-04-26T09:25:21Z",
+  "close_reason": "Already documented: tick_error_timeout doc comment explains 5s timeout, non-fatal nature, and contrast with status changes",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-g2f.14",
+      "depends_on_id": "jmap-chat-tui-g2f",
+      "type": "parent-child",
+      "created_at": "2026-04-26T01:41:25Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

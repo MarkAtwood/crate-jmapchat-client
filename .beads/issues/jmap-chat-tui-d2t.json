@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-d2t",
+  "title": "API idiomaticity improvements",
+  "description": "A collection of Rust idiomaticity issues found during review of the jmap-chat crate public API surface. Issues range from mechanical cleanups (redundant error conversions) to API-breaking renames and new abstractions.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T15:32:51Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T15:52:56Z",
+  "close_reason": "all steps complete"
+}

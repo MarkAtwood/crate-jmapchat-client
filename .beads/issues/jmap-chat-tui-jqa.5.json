@@ -1,0 +1,25 @@
+{
+  "id": "jmap-chat-tui-jqa.5",
+  "title": "Fix inconsistent create method naming (chat_create_* vs chat_*)",
+  "description": "Create methods are named chat_create_direct, chat_create_group, chat_create_channel while other operations follow resource_verb. The create_ infix is redundant because the struct already conveys that it is a create. This is inconsistent with how space_create, space_join work (no resource_verb_noun triple).\n\nEvaluate two options:\nA) Collapse to a single chat_create(input: ChatCreateInput) where ChatCreateInput is an enum variant: ChatCreate::Direct { contact_id }, ChatCreate::Group { name, members, ... }, ChatCreate::Channel { space_id, name, ... }\nB) Keep separate methods but rename to match the resource: chat_direct(input), chat_group(input), chat_channel(input)\n\nOption A is more idiomatic (one entry point, discriminated by type) but is a bigger change. Option B is a simple rename. Either way the current naming (three different methods with create_ in the middle, mixing with the set_ prefix methods) is inconsistent and confusing for new callers.\n\nRecord the design decision (A or B) as a child issue before implementing.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T14:31:20Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T15:16:03Z",
+  "closed_at": "2026-04-27T15:16:03Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-jqa.5",
+      "depends_on_id": "jmap-chat-tui-jqa",
+      "type": "parent-child",
+      "created_at": "2026-04-27T07:31:19Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

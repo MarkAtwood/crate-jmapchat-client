@@ -1,0 +1,34 @@
+{
+  "id": "jmap-chat-tui-4yc.3",
+  "title": "AppState, AppEvent, AppCommand types",
+  "description": "Create crates/jmap-chat-egui/src/app.rs and src/event.rs defining shared state and channel message types.\n\nWhat: Define all mutable GUI state and channel message enums.\n\nAlgorithm:\n1. In event.rs, define:\n   AppEvent (task→UI):\n   - SessionReady { api_url: String, account_id: String }\n   - ChatsLoaded(Vec\u003cChat\u003e)\n   - MessagesLoaded { chat_id: String, messages: Vec\u003cMessage\u003e }\n   - StatusChanged(ConnectionStatus)\n   - Error(String)\n\n   AppCommand (UI→task):\n   - SelectChat(String)  // Chat.id\n   - SendMessage { chat_id: String, body: String }\n   - MarkRead { chat_id: String, message_id: String }\n\n   ConnectionStatus enum: Connecting, Connected, Reconnecting, Error(String), Disconnected.\n\n2. In app.rs, define AppState:\n   - chats: Vec\u003cChat\u003e\n   - selected_chat: Option\u003cString\u003e\n   - messages: Vec\u003cMessage\u003e          // messages for selected chat\n   - compose_text: String\n   - status: ConnectionStatus\n   - error: Option\u003cString\u003e           // transient, shown for a few seconds\n   - api_url: String                 // learned from session\n   - account_id: String              // learned from session\n\n3. Impl AppState::apply_event(event: AppEvent) to mutate self (no network, pure state transition).\n\nDefensive rules:\n- All enums #[non_exhaustive] if they mirror external data.\n- No unwrap in apply_event.\n- error field set to None after 5 seconds (timer tracked in AppState with Instant).\n\nTests (in tests/app_state_test.rs):\n- apply_chats_loaded: AppState::default() + ChatsLoaded(vec![chat1]) → chats == [chat1]\n- apply_status_changed: apply StatusChanged(Connected) → status == Connected\n- apply_error: apply Error('oops') → error == Some('oops')\n- apply_messages_loaded: apply MessagesLoaded{chat_id, messages} → messages populated\n- apply_select_chat_clears_messages: send SelectChat → messages cleared pending reload\nOracle: expected state derived directly from event content, not via implementation.",
+  "acceptance_criteria": "cargo test -p jmap-chat-egui app_state exits 0; all 5 AppState tests pass",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:21:08Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-26T08:28:27Z",
+  "close_reason": "app.rs + event.rs + 6 tests passing, clippy clean",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4yc.3",
+      "depends_on_id": "jmap-chat-tui-4yc.1",
+      "type": "blocks",
+      "created_at": "2026-04-26T01:22:11Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-4yc.3",
+      "depends_on_id": "jmap-chat-tui-4yc",
+      "type": "parent-child",
+      "created_at": "2026-04-26T01:21:07Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

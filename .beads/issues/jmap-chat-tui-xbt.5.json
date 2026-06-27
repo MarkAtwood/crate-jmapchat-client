@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-xbt.5",
+  "title": "CustomCaAuth.der_cert is pub, no construction-time validation",
+  "description": "CustomCaAuth { pub der_cert: Vec\u003cu8\u003e } exposes the field publicly. Validation (non-empty, parseable DER) is deferred to build_client() inside reqwest, giving a confusing error at connection time rather than at construction. Making the field pub also prevents adding a constructor with validation later without a breaking change. This sets the pattern for the missing ClientCertAuth implementation: a contributor following this example would store private key bytes as a pub field, making them accessible via Debug and violating the 'Never log credentials' rule. Maintenance consequence: credential-logging bugs in future auth implementations modeled on this pattern.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:35:23Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:39:59Z",
+  "closed_at": "2026-04-26T07:39:59Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-xbt.5",
+      "depends_on_id": "jmap-chat-tui-xbt",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:35:22Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

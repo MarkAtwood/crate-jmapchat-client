@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-4u4.39",
+  "title": "Chat struct uses Option fields for kind-specific data instead of a sum type",
+  "description": "The Chat struct has 10+ optional fields annotated with inline comments (direct only, group only, channel only). This means the type does not prevent a value of kind=direct from having a space_id, or a kind=group from having a contact_id. The compiler offers no help; validity is only in the comments. The problem shape is a sum type. Rewrite: represent the kind-specific data as enum ChatDetails { Direct { contact_id: Id }, Group { name: String, description: Option\u003cString\u003e, members: Vec\u003cChatMember\u003e }, Channel { name: String, space_id: Id, ... } } and embed it in Chat as pub details: ChatDetails. Shared fields remain on the outer struct. Serde representation uses untagged or internally-tagged enum to preserve the wire format.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:09:10Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:29:00Z",
+  "closed_at": "2026-04-26T07:29:00Z",
+  "close_reason": "Deferred: large architectural refactor; separate epic needed when Chat spec stabilizes",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4u4.39",
+      "depends_on_id": "jmap-chat-tui-4u4",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:09:09Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

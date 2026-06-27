@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-6hp.3",
+  "title": "sort comparator re-parses RFC3339 on every comparison",
+  "description": "load_messages_for_chat (client_task.rs:518-526) calls chrono::DateTime::parse_from_rfc3339 twice per comparison inside sort_by, giving O(N log N) parses for N messages. For N=100 that is ~1330 parse calls per chat-open. Fix: collect (message, parsed_datetime) pairs first, sort the pairs, then discard the parsed datetimes before sending.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:05:41Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:23:55Z",
+  "closed_at": "2026-04-27T06:23:55Z",
+  "close_reason": "Closed",
+  "labels": [
+    "efficiency",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-6hp.3",
+      "depends_on_id": "jmap-chat-tui-6hp",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:05:40Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

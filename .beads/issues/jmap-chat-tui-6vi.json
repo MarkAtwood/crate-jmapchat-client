@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-6vi",
+  "title": "Presence status display and own status set",
+  "description": "## Why\nPresence is a visible and settable part of the JMAP Chat experience.\n\n## What\n- Display contact presence dot in chat list (online=green, away=yellow, busy=red, offline=grey, absent=grey)\n- Display contact statusText and statusEmoji in contact tooltips or chat header\n- Fetch own PresenceStatus on startup\n- Allow setting own presence via a status menu (online/away/busy/offline)\n- Call PresenceStatus/set when status changes",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T03:26:55Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T04:05:31Z",
+  "closed_at": "2026-04-27T04:05:31Z",
+  "close_reason": "Superseded; replaced by issues under jmap-chat-tui-s2e (egui) and new TUI epic",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-6vi",
+      "depends_on_id": "jmap-chat-tui-vp2",
+      "type": "blocks",
+      "created_at": "2026-04-26T20:27:14Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

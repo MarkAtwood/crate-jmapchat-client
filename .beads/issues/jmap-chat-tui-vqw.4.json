@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-vqw.4",
+  "title": "ChatCapability.supported_body_types is Vec\u003cString\u003e — BodyType enum exists and is unused here",
+  "description": "ChatCapability.supported_body_types: Vec\u003cString\u003e where BodyType already exists in types.rs with Plain, Markdown, and Unknown(String) fallback for extensibility. MessageCreateInput.body_type uses BodyType correctly. The capability field should be Vec\u003cBodyType\u003e so callers can intersect supported types with their desired body_type without string comparison. Inconsistency will generate callers doing my_type.to_str() == capability.supported_body_types.iter()...",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T17:10:12Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T17:32:08Z",
+  "closed_at": "2026-04-27T17:32:08Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-vqw.4",
+      "depends_on_id": "jmap-chat-tui-vqw",
+      "type": "parent-child",
+      "created_at": "2026-04-27T10:10:12Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

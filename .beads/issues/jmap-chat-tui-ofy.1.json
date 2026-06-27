@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-ofy.1",
+  "title": "test comment says Wednesday but 2024-03-17 is Sunday",
+  "description": "utils.rs test_within_week_returns_weekday_and_time: comment says 'Wednesday, 2024-03-17' but 2024-03-17 is a Sunday. The assertion 'Sun 08:03' is correct; only the comment is wrong. Low blast radius but misleading — a reader verifying the oracle against calendar would find the comment contradicts the assertion.",
+  "status": "closed",
+  "priority": 0,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T11:26:20Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T11:28:14Z",
+  "closed_at": "2026-04-27T11:28:14Z",
+  "close_reason": "fixed",
+  "labels": [
+    "correctness",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-ofy.1",
+      "depends_on_id": "jmap-chat-tui-ofy",
+      "type": "parent-child",
+      "created_at": "2026-04-27T04:26:20Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

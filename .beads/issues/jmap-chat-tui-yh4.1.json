@@ -1,0 +1,26 @@
+{
+  "id": "jmap-chat-tui-yh4.1",
+  "title": "sha2 dep: add sha2=0.10 to workspace",
+  "description": "Why: SHA-256 computation required for blob upload verification and download integrity checking. No sha2 dep exists in workspace.\\n\\nWhat: Add sha2='0.10' to workspace Cargo.toml, add sha2.workspace=true to jmap-chat Cargo.toml.\\n\\nAlgorithm:\\n1. Add sha2='0.10' to [workspace.dependencies] in root Cargo.toml\\n2. Add sha2.workspace=true to crates/jmap-chat/Cargo.toml [dependencies]\\n3. Run cargo check to confirm",
+  "acceptance_criteria": "cargo check passes; sha2 in Cargo.lock",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T09:47:24Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T09:50:14Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yh4.1",
+      "depends_on_id": "jmap-chat-tui-yh4",
+      "type": "parent-child",
+      "created_at": "2026-04-27T02:47:24Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

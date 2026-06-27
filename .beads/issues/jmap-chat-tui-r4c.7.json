@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-r4c.7",
+  "title": "test naming: standardize verb pattern in message_set_update tests",
+  "description": "Tests 30-35 have inconsistent naming: test 30 uses 'returns_typed_response', test 31 uses 'sends_correct_patch', test 32 reverts to 'returns_typed_response'. The distinction (returns response vs sends patch in request) makes sense semantically, but it breaks scanning consistency. Recommend: (1) standardize to 'returns_typed_response' for all, OR (2) use 'sends_correct_*' for all and rename test 30 to 'message_set_update_body_edit_sends_correct_patch'. Option 2 is more precise since we're testing the request body, not the response.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T08:19:14Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T08:23:51Z",
+  "closed_at": "2026-04-27T08:23:51Z",
+  "close_reason": "Design decision: test naming is adequate; cosmetic only",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-r4c.7",
+      "depends_on_id": "jmap-chat-tui-r4c",
+      "type": "parent-child",
+      "created_at": "2026-04-27T01:19:13Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

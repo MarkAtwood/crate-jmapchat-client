@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-jqa",
+  "title": "Idiomatic Rust API redesign for jmap-chat",
+  "description": "The jmap-chat library is intended for third-party callers. Four API-shape problems make it feel like a typed JSON wrapper rather than a Rust-native client library. This epic tracks the full redesign.\n\nProblems:\n1. Option\u003cOption\u003cT\u003e\u003e for nullable fields — confusing, explains nothing\n2. client_id in every create struct — leaks JMAP wire-protocol detail to callers  \n3. Required id mixed into update structs — prevents Default::default() ergonomics\n4. Method names carry _set_ prefix — chat_set_update is verbose vs chat_update\n\nEach problem is a child epic with its own issues. All changes are breaking; do them before any public release.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T14:30:15Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T15:16:04Z",
+  "close_reason": "Closed"
+}

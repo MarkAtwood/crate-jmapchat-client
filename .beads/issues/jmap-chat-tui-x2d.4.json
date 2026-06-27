@@ -1,0 +1,41 @@
+{
+  "id": "jmap-chat-tui-x2d.4",
+  "title": "impl: space.rs file + space_get, space_changes, space_set_destroy, space_query, space_query_changes",
+  "description": "What: Create crates/jmap-chat/src/methods/space.rs and add pub mod space to mod.rs. Implement 5 standard methods.\n\nAlgorithm:\n1. Add 'pub mod space;' to methods/mod.rs (after space_invite, before private helpers)\n2. Create space.rs with use super::{ChangesResponse, GetResponse, QueryChangesResponse, QueryResponse, SetResponse, SpaceQueryInput};\n3. space_get(\u0026self, session, ids: Option\u003c\u0026[\u0026str]\u003e, properties: Option\u003c\u0026[\u0026str]\u003e) -\u003e Result\u003cGetResponse\u003ccrate::types::Space\u003e, ClientError\u003e — mirror chat_get exactly with 'Space/get'\n4. space_changes(\u0026self, session, since_state: \u0026str, max_changes: Option\u003cu64\u003e) -\u003e Result\u003cChangesResponse, ClientError\u003e — mirror chat_changes with 'Space/changes'\n5. space_set_destroy(\u0026self, session, ids: \u0026[\u0026str]) -\u003e Result\u003cSetResponse, ClientError\u003e — guard empty ids, then destroy list with 'Space/set'\n6. space_query(\u0026self, session, input: \u0026SpaceQueryInput\u003c'_\u003e) -\u003e Result\u003cQueryResponse, ClientError\u003e — build filter with filter_name (as 'name' key) and filter_is_public (as 'isPublic' key); null filter when empty; optional position/limit\n7. space_query_changes(\u0026self, session, since_query_state: \u0026str, max_changes: Option\u003cu64\u003e) -\u003e Result\u003cQueryChangesResponse, ClientError\u003e — omit maxChanges when None\n\nRun cargo fmt, clippy, test. Close bead.",
+  "acceptance_criteria": "cargo test passes; space.rs exists with 5 methods; clippy clean",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T08:56:53Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T09:02:56Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-x2d.4",
+      "depends_on_id": "jmap-chat-tui-x2d.2",
+      "type": "blocks",
+      "created_at": "2026-04-27T01:57:12Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-x2d.4",
+      "depends_on_id": "jmap-chat-tui-x2d.3",
+      "type": "blocks",
+      "created_at": "2026-04-27T01:57:13Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-x2d.4",
+      "depends_on_id": "jmap-chat-tui-x2d",
+      "type": "parent-child",
+      "created_at": "2026-04-27T01:56:52Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

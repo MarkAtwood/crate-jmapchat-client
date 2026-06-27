@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-r4c.12",
+  "title": "design: separate message_set_update and message_set_destroy methods",
+  "description": "message_set_update (153 lines) and message_set_destroy (75 lines) are distinct methods rather than a single method with operation variants. This separation is right because: (1) update is complex (9 optional fields, conditional patch building, reaction changes), destroy is simple (just IDs), (2) mixing would bloat one signature with fields that don't apply to the other, (3) Rust's type system can't express 'some fields required only for update', so separation is clearer, (4) callers have distinct mental models (edit vs remove), (5) tests (30-32) can validate each path independently. Matches the RFC 8620 §5.3 design (Message/set handles create, update, destroy all in one call, but we expose separate entry points for clarity).",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T08:19:39Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T08:24:05Z",
+  "closed_at": "2026-04-27T08:24:05Z",
+  "close_reason": "Design decision: good design, no action needed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-r4c.12",
+      "depends_on_id": "jmap-chat-tui-r4c",
+      "type": "parent-child",
+      "created_at": "2026-04-27T01:19:39Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

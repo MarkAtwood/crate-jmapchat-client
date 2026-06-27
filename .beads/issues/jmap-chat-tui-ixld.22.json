@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-ixld.22",
+  "title": "fetch_session URL: comment trailing-slash guarantee from url::Url",
+  "description": "fetch_session builds the session URL as format\\!(\"{}.well-known/jmap\", self.base_url) with no explicit slash separator. This is correct only because url::Url Display for an origin URL always ends in a trailing slash (e.g. 'https://host/'). A contributor reading the line will not know why there is no slash, and may 'fix' it to include one, producing a double slash. A one-line comment stating the trailing-slash guarantee prevents this silent regression.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T01:06:17Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T01:29:42Z",
+  "closed_at": "2026-04-28T01:29:42Z",
+  "close_reason": "Added trailing-slash guarantee comment to fetch_session in client.rs",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-ixld.22",
+      "depends_on_id": "jmap-chat-tui-ixld",
+      "type": "parent-child",
+      "created_at": "2026-04-27T18:06:16Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

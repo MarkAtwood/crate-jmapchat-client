@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-yof.29",
+  "title": "AuthProvider pre-computes header values at construction time: fail-fast is correct and must be preserved",
+  "description": "BearerAuth and BasicAuth pre-compute HeaderValue at construction time, so auth_header() is infallible and cannot fail at the first request. BearerAuth rejects empty and whitespace-only tokens; BasicAuth rejects usernames containing ':' (RFC 7617 section 2). This is correct: auth misconfiguration should fail loudly at startup, not silently on the first network call; auth_header() returns Option not Result, so making validation lazy would require every call site to handle an error that should never occur at runtime. A future contributor might suggest moving validation to auth_header() to simplify new() or allow lazy construction. That turns a startup-time configuration error into a silent per-request failure. The pre-computation also avoids a per-request allocation. Tested in bearer_auth_empty_token_rejected, bearer_auth_whitespace_only_token_rejected, basic_auth_colon_in_username_rejected.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:41:44Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:01:18Z",
+  "closed_at": "2026-04-27T07:01:18Z",
+  "close_reason": "Decision record — no action needed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yof.29",
+      "depends_on_id": "jmap-chat-tui-yof",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:41:43Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

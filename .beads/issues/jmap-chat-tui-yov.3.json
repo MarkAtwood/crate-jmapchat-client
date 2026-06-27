@@ -1,0 +1,33 @@
+{
+  "id": "jmap-chat-tui-yov.3",
+  "title": "fixtures + tests: all ChatContact methods",
+  "description": "What: 4 fixture files + 5 tests (one per method + one guard test if applicable).\n\nFixtures in crates/jmap-chat/tests/fixtures/methods/:\n- chat_contact_changes_response.json: ChangesResponse\n- chat_contact_set_response.json: SetResponse with updated map\n- chat_contact_query_response.json: QueryResponse with ids list\n- chat_contact_query_changes_response.json: QueryChangesResponse with one added item\n\nTests in methods_test.rs (after test 42):\n- test 43: chat_contact_changes_returns_typed_response\n- test 44: chat_contact_set_blocked_returns_typed_response — body_json verifies only 'blocked:true' in patch\n- test 45: chat_contact_query_filters_returns_typed_response — body_json verifies filter/sort fields\n- test 46: chat_contact_query_changes_returns_typed_response — body_json verifies sinceQueryState, no maxChanges key\n\nUpdate README.md methods/ table with 4 new rows.\nRun cargo fmt, clippy, test (expect 47+ passing). Close bead.",
+  "acceptance_criteria": "cargo test passes including tests 43-46; 4 fixture files exist; README updated; clippy clean",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T08:45:30Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T08:50:16Z",
+  "closed_at": "2026-04-27T08:50:16Z",
+  "close_reason": "4 fixtures created, tests 43-46 passing, README updated",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yov.3",
+      "depends_on_id": "jmap-chat-tui-yov",
+      "type": "parent-child",
+      "created_at": "2026-04-27T01:45:30Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-yov.3",
+      "depends_on_id": "jmap-chat-tui-yov.2",
+      "type": "blocks",
+      "created_at": "2026-04-27T01:45:35Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

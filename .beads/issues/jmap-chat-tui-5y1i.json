@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-5y1i",
+  "title": "Review: jmap-chat idiomaticity pass",
+  "notes": "Maintainer risk: MEDIUM — the 7 idiomaticity changes are individually sound, but two issues require attention before 0.1 fossilizes: (1) Invocation's all-public fields without #[non_exhaustive] lock in struct-literal construction which will break if the spec adds a 4th array element (filed as 5y1i.23); (2) the base_url path validator has a dead is_empty() branch that misrepresents the logic to future readers (filed as 5y1i.24). The existing bug 5y1i.21 (query/fragment accepted) is the highest-severity correctness finding. All other findings are readability and elegance items already captured in the child issues.\nCalibration by SEC7.\n\nConfidence: 72% chance of missed bug. Uncertainty driven by: (1) subscribe_events buffer growth and chunk-boundary edge cases were reviewed by reading the code, not by running property-based tests against arbitrary chunk sizes and encodings; (2) the SSE parser's triple-delimiter search (CRLF, LF, CR) was not verified against all RFC 8820 delimiter variants with interleaved multibyte characters; (3) extract_response is unit-tested but the error-path for a missing 'type' field in an error invocation was not traced; (4) base_url query/fragment rejection (.21) is a filed P0 bug — that specific input class was missed during initial construction validation.\n\nWould raise confidence if: property-based tests (proptest/arbitrary) over SSE chunk boundaries; explicit test for base_url with ?query and #fragment; fuzzing extract_response with malformed error invocations.\n\nOpinion labeling: reviewed all 24 findings. Zero findings meet the 'would not survive a public comment thread' bar. Issues .3, .13, .15, .16, .17, .19, .22 are architectural rationale notes (defending current correct design) not bug/improvement findings — they have strong engineering basis. Issues .1, .5, .7, .9, .12, .14 are legitimate elegance improvements. All P4 readability findings have concrete engineering grounds (missing RFC citations, missing invariant documentation, silent duplicate invariant enforcement). No opinion labels applied.\n\nRunning out of real complaints: yes. The remaining open issues are real — P0 bug (.21 query/fragment validation gap), P1 dead branch (.24), P1 Invocation field publicness (.23), P2 efficiency items (.8, .11) — but after those are fixed, the codebase has no further substantive complaints. The P3/P4 backlog is genuine polish, not manufactured filler.\nReview converged after 1 round. Final P0=0 P1=0 P2=0. SEC7 verdict: running out of real complaints.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T20:12:14Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T20:23:34Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

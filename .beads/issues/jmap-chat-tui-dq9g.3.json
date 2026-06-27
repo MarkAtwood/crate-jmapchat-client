@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-dq9g.3",
+  "title": "call_batch duplicate-ID error path has no test",
+  "description": "call_batch documents that it returns ClientError::Parse on duplicate call IDs (RFC 8620 §3.3 violation), but there is no test exercising that path. Under project testing rules all documented error paths must have tests. A server returning duplicate call IDs is not hypothetical — a misbehaving proxy could duplicate responses. The fix is: add a wiremock test that returns a batch_response.json where two invocations share the same call_id, and assert ClientError::Parse is returned.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T01:17:48Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T01:20:38Z",
+  "closed_at": "2026-04-28T01:20:38Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-dq9g.3",
+      "depends_on_id": "jmap-chat-tui-dq9g",
+      "type": "parent-child",
+      "created_at": "2026-04-27T18:17:47Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

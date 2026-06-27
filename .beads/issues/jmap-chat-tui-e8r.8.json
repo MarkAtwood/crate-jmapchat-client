@@ -1,0 +1,27 @@
+{
+  "id": "jmap-chat-tui-e8r.8",
+  "title": "set method signatures inconsistent: create always-Some vs Option",
+  "description": "custom_emoji_set and space_ban_set require a create input unconditionally, while space_invite_set takes Option\u003c\u0026SpaceInviteCreateInput\u003e. Callers wanting destroy-only on CustomEmoji or SpaceBan cannot express it. All three should take Option\u003c\u0026XxxCreateInput\u003e for a uniform, destroy-only-capable API.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:51:23Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T08:01:31Z",
+  "closed_at": "2026-04-27T08:01:31Z",
+  "close_reason": "decision: create-only methods take \u0026CreateInput (always creating); space_invite_set takes Option\u003c\u0026CreateInput\u003e because destroy-only calls are a real use case; inconsistency is intentional and follows spec semantics",
+  "labels": [
+    "elegance"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-e8r.8",
+      "depends_on_id": "jmap-chat-tui-e8r",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:51:23Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

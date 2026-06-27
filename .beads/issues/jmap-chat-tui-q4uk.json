@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-q4uk",
+  "title": "Review: refactor(jmap-chat): idiomatic API fixes wave C",
+  "notes": "Maintainer risk: LOW — Patch footgun requires misuse; enum drift is caught by tests when spec sends new known variants.\nConfidence: 92% chance no missed bugs. Uncertainty: Patch\u003cT\u003e footgun (Keep→null if skip_serializing_if omitted) not exercised by current tests since all existing Patch fields use correct attrs. Would raise confidence if: compile-time check (debug_assert) or type-level enforcement (separate type for 'Patch that must be skipped') were added.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T22:29:47Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T22:32:30Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

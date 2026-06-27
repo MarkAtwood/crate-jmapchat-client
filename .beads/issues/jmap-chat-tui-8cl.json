@@ -1,0 +1,23 @@
+{
+  "id": "jmap-chat-tui-8cl",
+  "title": "api: session-aware client type to eliminate api_url + account_id threading",
+  "description": "Every method currently takes (api_url: \u0026str, account_id: \u0026str, ...). Both are available from Session after connect. With 30+ methods, every UI adapter must extract and pass these on every call.\\n\\nDesign: add a JmapSession type returned by JmapChatClient::connect():\\n\\n  pub struct JmapSession {\\n      client: Arc\u003cJmapChatClient\u003e,\\n      api_url: String,\\n      account_id: String,\\n      pub session: Session,\\n  }\\n\\nAll methods move from JmapChatClient to JmapSession, dropping api_url and account_id params:\\n  session.chat_get(ids, properties).await?\\n\\nKeep JmapChatClient::fetch_session() as the raw escape hatch for callers that need multi-account control.\\n\\nMigration: update all existing methods, all call sites in tests, all client_task code.\\n\\nTests: confirm connect() populates api_url and account_id correctly from the session fixture.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:31:32Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T05:44:59Z",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-8cl",
+      "depends_on_id": "jmap-chat-tui-mmm.6",
+      "type": "supersedes",
+      "created_at": "2026-04-26T22:44:59Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

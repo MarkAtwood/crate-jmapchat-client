@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-yof.27",
+  "title": "EndpointType is a manual parse/display enum while Endpoint.endpoint_type stays String: correct separation of wire type from semantic type",
+  "description": "Endpoint.endpoint_type is typed as String on the wire (accepting future extension URIs without deserialization failure), while EndpointType is a separate semantic enum with from_uri/as_uri conversion methods. This separation is correct: (1) if endpoint_type were serde-driven, an unrecognized URI would fail deserialization and discard the entire Endpoint object; (2) keeping the wire type as String and providing a companion enum gives callers a clean API for matching known types while preserving unknown URIs exactly. A future contributor might suggest making endpoint_type an #[serde(rename_all)] enum (like ChatKind) to unify the pattern. That would silently lose the original URI string for unknown types — EndpointType::Other(String) round-trips the raw URI, but a serde-driven #[serde(other)] variant cannot. The EndpointType::as_uri/from_uri round-trip is tested in test_endpoint_type_as_uri_round_trips.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:39:45Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:01:12Z",
+  "closed_at": "2026-04-27T07:01:12Z",
+  "close_reason": "Decision record — no action needed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yof.27",
+      "depends_on_id": "jmap-chat-tui-yof",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:39:45Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

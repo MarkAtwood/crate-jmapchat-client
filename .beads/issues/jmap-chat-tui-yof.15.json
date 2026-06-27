@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-yof.15",
+  "title": "chat_using() OnceLock adds complexity with no benefit",
+  "description": "methods.rs: chat_using() uses OnceLock\u003cVec\u003cString\u003e\u003e to cache two static strings, but build_request() calls .to_vec() on the result every time anyway. The OnceLock saves one Vec allocation per process lifetime while adding indirection and a non-obvious two-call pattern. Suggested rewrite: remove chat_using(), add const CHAT_USING: [\u0026str; 2] = [\"urn:ietf:params:jmap:core\", \"urn:ietf:params:jmap:chat\"]; and have build_request() do CHAT_USING.iter().map(|\u0026s| s.to_string()).collect().",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:38:47Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:49:53Z",
+  "closed_at": "2026-04-27T06:49:53Z",
+  "close_reason": "Opinion: OnceLock vs const array is a style preference with identical correctness",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "opinion",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yof.15",
+      "depends_on_id": "jmap-chat-tui-yof",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:38:46Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

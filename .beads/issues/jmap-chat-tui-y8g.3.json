@@ -1,0 +1,27 @@
+{
+  "id": "jmap-chat-tui-y8g.3",
+  "title": "design: query sends filter:null when no filter predicates provided",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T08:51:15Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T08:53:26Z",
+  "closed_at": "2026-04-27T08:53:26Z",
+  "close_reason": "Good design / no action needed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-y8g.3",
+      "depends_on_id": "jmap-chat-tui-y8g",
+      "type": "parent-child",
+      "created_at": "2026-04-27T01:51:15Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

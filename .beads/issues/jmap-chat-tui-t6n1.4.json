@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-t6n1.4",
+  "title": "EndpointType not re-exported from crate root",
+  "description": "lib.rs re-exports ChatStreamDataType, PushUrgency, QuotaScope as commonly-used enum types, but EndpointType is absent. Users who match on Endpoint.endpoint_type or MessageAction.action_type (both public fields of public structs) must use the qualified path jmap_chat::types::EndpointType. Every other type needed to work with public struct fields (Id, UTCDate, BodyType, ContactPresence, etc.) is either re-exported or reachable from a re-exported module. The inconsistency will generate user questions and workaround imports. Maintenance consequence: support burden and downstream breakage when users pin to types:: path assuming stability.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:06:45Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:15:25Z",
+  "closed_at": "2026-04-27T19:15:25Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-t6n1.4",
+      "depends_on_id": "jmap-chat-tui-t6n1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T12:06:44Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

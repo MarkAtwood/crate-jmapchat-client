@@ -1,0 +1,34 @@
+{
+  "id": "jmap-chat-tui-mph.3",
+  "title": "message_query_changes method",
+  "description": "Why: Clients need to detect which messages entered/left a query result set since a last-known state (e.g. for incremental chat message list sync). This is the standard RFC 8620 §5.6 /queryChanges endpoint applied to messages.\n\nWhat: Add message_query_changes() to message.rs, returning QueryChangesResponse.\n\nAlgorithm:\n1. Open crates/jmap-chat/src/methods/message.rs\n2. Add QueryChangesResponse to the use super::{ ... } import\n3. Add this method to the impl JmapChatClient block:\n\n/// Fetch query-result changes for Message since \n/// (RFC 8620 §5.6 / Message/queryChanges).\n///\n/// Returns which message IDs were removed from or added to the query\n/// result set since the given state.  may be None.\npub async fn message_query_changes(\n    \u0026self,\n    session: \u0026crate::jmap::Session,\n    since_query_state: \u0026str,\n    max_changes: Option\u003cu64\u003e,\n) -\u003e Result\u003cQueryChangesResponse, crate::error::ClientError\u003e {\n    let (api_url, account_id) = Self::session_parts(session)?;\n    let mut args = serde_json::json!({\n        \"accountId\": account_id,\n        \"sinceQueryState\": since_query_state,\n    });\n    if let Some(mc) = max_changes {\n        args[\"maxChanges\"] = mc.into();\n    }\n    let (call_id, req) = super::build_request(\"Message/queryChanges\", args);\n    let resp = self.call(api_url, \u0026req).await?;\n    crate::client::extract_response(resp, call_id)\n}\n\n4. Run cargo check to verify compilation.\n\nPattern: This exactly matches custom_emoji_query_changes (in custom_emoji.rs), which is the established pattern for queryChanges in this codebase. max_changes follows omit-when-None pattern (not null) per RFC 8620 §5.6 which says max_changes is UnsignedInt (not nullable in queryChanges, unlike /changes).\n\nWait — actually RFC 8620 §5.6 says maxChanges is UnsignedInt (non-nullable for /queryChanges). So omit when None is correct here.",
+  "acceptance_criteria": "cargo test -p jmap-chat passes; cargo clippy -- -D warnings passes; cargo fmt --check passes; message_query_changes method compiles",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T08:09:27Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T08:13:51Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-mph.3",
+      "depends_on_id": "jmap-chat-tui-mph.1",
+      "type": "blocks",
+      "created_at": "2026-04-27T01:09:52Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-mph.3",
+      "depends_on_id": "jmap-chat-tui-mph",
+      "type": "parent-child",
+      "created_at": "2026-04-27T01:09:27Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

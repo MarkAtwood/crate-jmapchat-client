@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-g2f.24",
+  "title": "100-event-per-frame drain cap in update() prevents SSE burst from starving the render loop",
+  "description": "update() drains at most 100 AppEvents from the channel per frame before proceeding to render. If the background task is sending events faster than the UI can paint (e.g. SSE fires many StateChange notifications during a chat resync), draining to exhaustion on each frame would mean the UI never paints — it would loop processing events until the queue empties, which could take arbitrarily long. The 100-item cap guarantees the render pass runs every frame and the UI stays interactive even under load; any remaining events are processed on the next frame. A contributor might argue the cap should be removed for 'simplicity' or raised to infinity. That would be wrong: a bound on per-frame processing is required for any interactive application receiving asynchronous input. The specific value of 100 is generous (a frame at 60fps takes 16ms; processing 100 small struct copies is microseconds); raising it is fine, but removing the cap entirely is not.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:42:11Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:22:08Z",
+  "closed_at": "2026-04-26T09:22:08Z",
+  "close_reason": "Already implemented in current codebase",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-g2f.24",
+      "depends_on_id": "jmap-chat-tui-g2f",
+      "type": "parent-child",
+      "created_at": "2026-04-26T01:42:10Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

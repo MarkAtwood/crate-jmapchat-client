@@ -1,0 +1,31 @@
+{
+  "id": "jmap-chat-tui-ucdp.7",
+  "title": "connect_ws scheme guard and JmapChatClient::new scheme gap are untested",
+  "description": "Two test gaps: (1) connect_ws() guards against non-ws:// URLs (SSRF prevention) but no test passes 'http://host' to verify rejection; the guard is undocumented-except-in-code. (2) JmapChatClient::new() has no test for 'ftp://host' or 'file:///etc/passwd' — these are currently accepted (no scheme check exists), so the test gap and the bug reinforce each other. Need: test new() rejects non-http/https schemes; test connect_ws rejects non-ws/wss schemes.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T02:39:11Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T02:46:42Z",
+  "closed_at": "2026-04-28T02:46:42Z",
+  "close_reason": "Added connect_ws_rejects_non_ws_schemes test in ws/mod.rs; scheme validation in new() already covered by ucdp.2",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-ucdp.7",
+      "depends_on_id": "jmap-chat-tui-ucdp",
+      "type": "parent-child",
+      "created_at": "2026-04-27T19:39:10Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

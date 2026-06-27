@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-r4c.2",
+  "title": "MessageUpdateInput.reaction_changes lacks caller ergonomics docs",
+  "description": "MessageUpdateInput.reaction_changes: \u0026'a [ReactionChange\u003c'a\u003e] (mod.rs:193) is a slice reference with lifetime. When callers construct a Vec\u003cReactionChange\u003c'a\u003e\u003e, they must explicitly borrow it (\u0026vec[..]). The current docs (mod.rs:192-193) give one sentence; they don't explain the lifetime borrow pattern or show a typical call pattern. A future maintainer unfamiliar with this design might refactor to Option\u003cVec\u003c_\u003e\u003e or owned Vec, breaking all callers. Add doc example showing proper instantiation with a vector.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T08:18:28Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T08:23:35Z",
+  "closed_at": "2026-04-27T08:23:35Z",
+  "close_reason": "Added usage example showing \u0026changes[..] pattern to reaction_changes field doc",
+  "labels": [
+    "documentation",
+    "maintainer-burden",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-r4c.2",
+      "depends_on_id": "jmap-chat-tui-r4c",
+      "type": "parent-child",
+      "created_at": "2026-04-27T01:18:28Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-5y1i.11",
+  "title": "EndpointType::Deserialize allocates String for known variants",
+  "description": "EndpointType::Deserialize calls String::deserialize(d) unconditionally, heap-allocating a String for every Endpoint seen in a session response or Chat object. For the 7 known variants (Vtc, Payment, Blob, etc.) the String is immediately dropped after the match in from_uri(). Only the Other(s) variant actually needs ownership. A str-visitor approach (via serde's visit_str) would avoid the allocation for all known variants, keeping the alloc only for Other(s). Endpoints appear in Session.owner_endpoints and ChatContact.endpoints — low cardinality per response, but the pattern is worth fixing for consistency with how other enum deserializers in the codebase handle this.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T20:14:22Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T20:21:42Z",
+  "closed_at": "2026-04-27T20:21:42Z",
+  "close_reason": "Closed",
+  "labels": [
+    "efficiency",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-5y1i.11",
+      "depends_on_id": "jmap-chat-tui-5y1i",
+      "type": "parent-child",
+      "created_at": "2026-04-27T13:14:21Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

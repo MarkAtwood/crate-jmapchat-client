@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-4u4.27",
+  "title": "BasicAuth encodes username:password incorrectly when username contains a colon",
+  "description": "auth.rs BasicAuth::auth_header(): format\\!('{}:{}', username, password) is base64-encoded and sent as Basic credentials. RFC 7617 §2 forbids colons in user-ids, but the implementation does not validate or reject them. A caller who passes username='admin:root' and password='pass' produces base64('admin:root:pass'), which the server decodes as user='admin', password='root:pass' — silently sending the wrong credentials with no error. The code comment claims RFC 7617 compliance but the constraint is not enforced.",
+  "status": "closed",
+  "priority": 0,
+  "issue_type": "bug",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:08:24Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:20:43Z",
+  "closed_at": "2026-04-26T07:20:43Z",
+  "close_reason": "Closed",
+  "labels": [
+    "correctness",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4u4.27",
+      "depends_on_id": "jmap-chat-tui-4u4",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:08:24Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

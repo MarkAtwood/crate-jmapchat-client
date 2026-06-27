@@ -1,0 +1,16 @@
+{
+  "id": "jmap-chat-tui-gbg",
+  "title": "Wire EndpointType into Endpoint.endpoint_type and MessageAction.action_type",
+  "description": "Both fields are String but EndpointType enum already exists with from_uri/as_uri and full tests. Callers currently must call EndpointType::from_uri(\u0026ep.endpoint_type) manually; the compile-time guarantee is absent. Fix: change Endpoint.endpoint_type from String to EndpointType and MessageAction.action_type from String to EndpointType. Update serde: EndpointType needs Serialize/Deserialize impls that delegate to as_uri/from_uri (same pattern as BodyType). Update all tests that compare the field as a string literal.",
+  "notes": "Part of epic jmap-chat-tui-hqb: jmap-chat wire up enums — eliminate stringly-typed spec fields",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T18:49:28Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:05:09Z",
+  "closed_at": "2026-04-27T19:05:09Z",
+  "close_reason": "Closed"
+}

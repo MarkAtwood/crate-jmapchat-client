@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-5n5.1.21",
+  "title": "message_query always sorts sentAt descending with a code comment explaining why",
+  "description": "message_query hard-codes sort: [{property: sentAt, isAscending: false}] and the doc-comment explains: descending order means position:0,limit:N returns the N most recent messages; callers that display chronologically must reverse after fetching; without an explicit sort the spec leaves order undefined. A contributor might remove the hard-coded sort to let callers choose, or omit it because 'servers usually sort by time anyway'. Removing it means the display order is undefined by spec and will differ across servers. The comment documents the precise trade-off so the decision is not re-litigated on every review.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:26:23Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:39:06Z",
+  "closed_at": "2026-04-27T07:39:06Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-5n5.1.21",
+      "depends_on_id": "jmap-chat-tui-5n5.1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:26:23Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-3ix.4",
+  "title": "Patch\u003cT\u003e + ChatCreateInput design is correct and worth defending",
+  "description": "The Patch\u003cT\u003e three-way enum (Keep/Set/Clear) correctly models JMAP patch semantics without requiring Option\u003cOption\u003cT\u003e\u003e. The Default=Keep means callers can use ..Default::default() for unset fields. The resolve_client_id helper cleanly handles ULID auto-generation without exposing lifetime machinery. The ChatCreateInput enum matches SpaceJoinInput's established pattern. A future contributor may suggest collapsing back to Option\u003cOption\u003cT\u003e\u003e or separate struct methods — both are inferior.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T15:18:39Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T15:20:28Z",
+  "closed_at": "2026-04-27T15:20:28Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-3ix.4",
+      "depends_on_id": "jmap-chat-tui-3ix",
+      "type": "parent-child",
+      "created_at": "2026-04-27T08:18:39Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

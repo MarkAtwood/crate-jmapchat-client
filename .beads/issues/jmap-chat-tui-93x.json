@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-93x",
+  "title": "Review: feat(jmap-chat): upgrade types to current spec",
+  "notes": "Maintainer risk: MEDIUM — Two P0 correctness bugs in serde handling (unknown enum variants break deserialization; None fields serialize as null). P1 risks are minor (footgun field visibility, untested error path). No security or API-lock-in issues beyond what is already committed.\nConfidence: 15% chance of missed bug. Uncertainty driven by: did not run the server against real wire data; did not check the spec for whether null vs absent is actually defined for ChatStreamEnable optional fields. Would raise confidence if: integration test with a real JMAP Chat server, or if the spec text on ChatStreamEnable null semantics is found.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:58:39Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T05:02:47Z",
+  "close_reason": "All P0 and P1 findings resolved. Decision records preserved.",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

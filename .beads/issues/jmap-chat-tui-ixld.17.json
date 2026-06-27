@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-ixld.17",
+  "title": "Patch deserialize maps JSON null to Clear not Keep, inverse of field absence",
+  "description": "methods/mod.rs lines 235-243: Patch\u003cT\u003e's Deserialize impl maps JSON null to Patch::Clear and JSON absent (via #[serde(default)]) to Patch::Keep. This means Keep is not representable in JSON at all — only Clear and Set are wire-level states. The asymmetry matters for any code path that round-trips a patch struct through serde (e.g. persisting drafts, replaying operations). More subtly, the doc comment says 'Use Default::default() or Patch::Keep to leave the field unchanged', but a caller who receives a Patch from JSON deserialization can never get Keep from the wire — they always get Clear or Set. This implicit rule (Keep = not present in JSON = default only at construction) is not stated in the type-level docs. Suggested improvement: add a doc note to the Deserialize impl or the type doc stating explicitly that Keep cannot be deserialized from JSON and is only reachable via Default or field construction, so callers that deserialize patch structs know they will never observe Keep from inbound JSON.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T01:05:09Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T01:29:45Z",
+  "closed_at": "2026-04-28T01:29:45Z",
+  "close_reason": "Added Deserialization section to Patch\u003cT\u003e doc: Keep is not reachable from JSON",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-ixld.17",
+      "depends_on_id": "jmap-chat-tui-ixld",
+      "type": "parent-child",
+      "created_at": "2026-04-27T18:05:08Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

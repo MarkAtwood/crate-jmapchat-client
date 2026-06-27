@@ -1,0 +1,27 @@
+{
+  "id": "jmap-chat-tui-e8r.4",
+  "title": "double-Option field handling in presence_status_set is opaque",
+  "description": "misc.rs lines 105-125: the three nullable fields (status_text, status_emoji, expires_at) are \u0026input.field references to Option\u003cOption\u003cT\u003e\u003e, then inner-mapped via .map(serde_json::Value::from).unwrap_or(Null). The indirection through the outer reference is non-obvious. receipt_sharing (line 126) uses a different pattern (direct if-let on a copy of Option\u003cbool\u003e) with no comment explaining why it differs. Fix: add a one-line comment at each block explaining the Some(None)-null vs Some(Some(v))-value semantics.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:50:10Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T08:01:29Z",
+  "closed_at": "2026-04-27T08:01:29Z",
+  "close_reason": "decision: Option\u003cOption\u003cT\u003e\u003e is correct JMAP nullable-patch idiom; documented in PresenceStatusSetInput doc comment; no change needed",
+  "labels": [
+    "readability"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-e8r.4",
+      "depends_on_id": "jmap-chat-tui-e8r",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:50:09Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

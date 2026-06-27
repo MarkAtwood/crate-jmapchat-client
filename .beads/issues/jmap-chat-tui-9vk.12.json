@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-9vk.12",
+  "title": "empty chat_state causes full Chat/query on every SSE StateChange event",
+  "description": "When load_chats finds no chats (query.ids.is_empty()), it returns Ok(String::new()). chat_delta_sync returns Some(String::new()), which is written back into chat_state. chat_state remains empty. Every subsequent SSE StateChange containing Chat hits the is_empty() guard in chat_delta_sync and calls load_chats again (full Chat/query + potential Chat/get), rather than attempting delta sync. Trigger: account with 0 chats receives any SSE StateChange for Chat type. This is realistic for a newly-created account or after all chats are destroyed. The full-reload loop persists until at least one chat is created, at which point load_chats returns a non-empty state and normal delta sync resumes.",
+  "status": "closed",
+  "priority": 0,
+  "issue_type": "bug",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:01:18Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:10:40Z",
+  "closed_at": "2026-04-26T09:10:40Z",
+  "close_reason": "Closed",
+  "labels": [
+    "correctness",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-9vk.12",
+      "depends_on_id": "jmap-chat-tui-9vk",
+      "type": "parent-child",
+      "created_at": "2026-04-26T02:01:18Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

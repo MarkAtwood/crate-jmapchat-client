@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-4u4.1",
+  "title": "BearerAuth/BasicAuth credential fields are pub",
+  "description": "BearerAuth::token and BasicAuth::username/password are declared pub. Any contributor adding a Debug impl, a log line, or a test assert will trivially exfiltrate credentials. The #[must_not_log] comment on auth_header() does not protect the struct fields themselves. Future contributors will copy the pub pattern when adding new auth structs. — API surface fossilizes: changing these to pub(crate) or adding a Credentials newtype is a breaking change once any downstream depends on them.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:07:25Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:20:23Z",
+  "closed_at": "2026-04-26T07:20:23Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4u4.1",
+      "depends_on_id": "jmap-chat-tui-4u4",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:07:25Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

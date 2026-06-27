@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-gdc.12",
+  "title": "O(N) heap allocs per frame in message render loop",
+  "description": "main.rs lines 174-191: every widget call in the per-message loop passes \u0026str or \u0026String through egui 0.28 RichText::new(impl Into\u003cString\u003e), which calls .into() on \u0026str, allocating a heap String. Affected per message per frame: ui.strong(\u0026msg.sender_id), ui.label separator, ui.label(timestamp), ui.label(body), ui.small([edited]), RichText::new([deleted]). With N visible messages this is 4-6*N allocs/frame at 60 fps. Fix: pre-compute static label strings as WidgetText or LayoutJob once; pass owned data by reference.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:33:26Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:40:49Z",
+  "closed_at": "2026-04-26T09:40:49Z",
+  "close_reason": "OPINION: egui's Into\u003cWidgetText\u003e trait bound requires String allocation per label per frame by design; pre-computing RichText objects moves the clone to load time but doesn't eliminate it; not worth the complexity at chat-scale (\u003c100 messages)",
+  "labels": [
+    "efficiency",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-gdc.12",
+      "depends_on_id": "jmap-chat-tui-gdc",
+      "type": "parent-child",
+      "created_at": "2026-04-26T02:33:26Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "id": "jmap-chat-tui-yov",
+  "title": "Epic: ChatContact methods",
+  "description": "Why: Current codebase only has ChatContact/get. The spec defines changes, set (update statusText/statusEmoji/presence), query, and queryChanges. These are needed for a full contact management experience and real-time presence sync.\\n\\nWhat:\\n- ChatContact/changes\\n- ChatContact/set (update presence, statusText, statusEmoji)\\n- ChatContact/query (filter by presence, searchString)\\n- ChatContact/queryChanges\\n- Fixture tests for all four methods\\n\\nDepends on: types.rs upgrades epic (jmap-chat-tui-1aq), methods refactor epic",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:14:59Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T08:53:42Z",
+  "close_reason": "All 4 methods implemented, 46 tests passing, review converged in 1 round",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yov",
+      "depends_on_id": "jmap-chat-tui-5n5",
+      "type": "blocks",
+      "created_at": "2026-04-26T21:16:45Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

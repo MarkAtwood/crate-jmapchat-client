@@ -1,0 +1,25 @@
+{
+  "id": "jmap-chat-tui-9gp",
+  "title": "Epic: Rich Push Notifications (ChatMessagePush)",
+  "description": "Why: IMPROVEMENTS.md §1.2 defines a new companion spec (draft-atwood-jmap-chat-push-00) for rich push notifications. Extends RFC 8620 PushSubscription with a chatPush property so the server can deliver ChatMessagePush payloads — message metadata plus optional body snippet — directly to the push endpoint without a follow-up fetch. No coverage exists in the current codebase.\\n\\nWhat:\\n- PushSubscription chatPush property: per-chat filters, urgency preferences (high for mentions, normal for others)\\n- ChatMessagePush payload type: message metadata + optional body snippet\\n- ChatPushCapability struct: maxSnippetBytes, supportedUrgencyValues, maxMessagesPerPush\\n- Detect urn:ietf:params:jmap:chat:push in session capabilities\\n- Handle ChatMessagePush on the push receive path before attempting Message/changes\\n- E2EE mode: server delivers metadata-only (no body snippet); adjust notification rendering\\n- Fixture tests for payload parsing and PushSubscription/set with chatPush\\n\\nDepends on: types.rs upgrades epic (jmap-chat-tui-1aq)",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:26:32Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T09:26:20Z",
+  "close_reason": "all steps complete",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-9gp",
+      "depends_on_id": "jmap-chat-tui-1aq",
+      "type": "blocks",
+      "created_at": "2026-04-26T21:26:45Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

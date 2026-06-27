@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-xbt.9",
+  "title": "SSE buffer: 3 linear scans per chunk from offset 0",
+  "description": "client.rs subscribe_events loop: after each chunk is appended, three buf.find() calls (\\r\\n\\r\\n, \\n\\n, \\r\\r) each scan from byte 0. Should scan only the newly-appended suffix (last chunk_len + 3 bytes) to avoid rescanning already-checked bytes. Current complexity: O(3 * buf_len) per chunk. With suffix scan: O(chunk_len) per chunk. Degrades to O(n^2) in chunk count if a large frame arrives in many small network chunks (adversarial server or very slow link near the 1 MiB cap).",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:35:34Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:40:30Z",
+  "closed_at": "2026-04-26T07:40:30Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-xbt.9",
+      "depends_on_id": "jmap-chat-tui-xbt",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:35:33Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

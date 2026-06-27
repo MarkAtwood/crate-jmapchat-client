@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-6hp.2",
+  "title": "MessageCreateInput.sent_at is \u0026str not UTCDate — validation footgun",
+  "description": "MessageCreateInput.sent_at is typed as \u0026str even though UTCDate::parse() now exists. A caller can pass any string — malformed or non-UTC — and it serializes silently into the sentAt JSON field. UTCDate::new() validates non-emptiness; UTCDate::parse() validates RFC 3339 format. Using \u0026str here bypasses both. The fix is to type the field as UTCDate (or \u0026UTCDate) so that callers are guided to the typed API and format errors surface at construction rather than at server rejection. Until changed, every new caller of message_create is a potential interop bug.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:05:38Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:27:02Z",
+  "closed_at": "2026-04-27T06:27:02Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-6hp.2",
+      "depends_on_id": "jmap-chat-tui-6hp",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:05:38Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

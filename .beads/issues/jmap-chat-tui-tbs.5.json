@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-tbs.5",
+  "title": "ChatPushConfig fields use String not enum: urgency values unvalidated at type level",
+  "description": "urgency and mention_urgency are String fields. The spec enumerates exactly four valid values: very-low, low, normal, high. Users constructing ChatPushConfig with an invalid string get no compile-time or library-level rejection — the error surfaces as a server-side invalidArguments response at runtime. This will generate repeated issues from users who typo urgency values. The supported set is server-advertised via ChatPushCapability.supported_urgency_values, which makes a static enum imperfect, but at minimum a newtype or validation on construction would make the contract explicit.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T09:28:24Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T09:34:38Z",
+  "closed_at": "2026-04-27T09:34:38Z",
+  "close_reason": "design decision: urgency values are extensible per spec, String type is appropriate",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-tbs.5",
+      "depends_on_id": "jmap-chat-tui-tbs",
+      "type": "parent-child",
+      "created_at": "2026-04-27T02:28:23Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-q68",
+  "title": "Review: idiomatic Rust API improvements",
+  "notes": "Maintainer risk: LOW — The only real inconsistency is push_subscription_set naming. No correctness bugs, no security surface, no API lock-in beyond the BodyType enum (which is well-designed). Single breaking risk: BodyType replaces \u0026str in MessageCreateInput, callers must update.\nConfidence: 95% chance of no missed bug. Uncertainty driven by: push_subscription_set logic (duplicate check + two passes over cp slice) not explicitly tested for the case where cp is empty. Would raise confidence if: explicit test for empty chat_push slice and for push_subscription_set with duplicate accountId.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T15:53:05Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T15:57:55Z",
+  "close_reason": "All review findings resolved",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

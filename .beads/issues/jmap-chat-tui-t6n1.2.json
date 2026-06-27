@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-t6n1.2",
+  "title": "PushUrgency::Unknown in ChatPushConfig silently sends invalid wire value",
+  "description": "A user who deserializes a ChatPushConfig from a server response (or who branches on Unknown after reading supported_urgency_values) and then re-serializes it will send urgency=\\\"unknown\\\" to the server. The spec (draft-atwood-jmap-chat-push-00) says urgency MUST be a value in ChatPushCapability.supported_urgency_values; servers will reject or ignore the config. The doc comment on ChatPushConfig.urgency warns about the MUST constraint but does not warn that Unknown serializes as the invalid literal string \\\"unknown\\\". There is no guard (no validation in ChatPushConfig serialization, no #[serde(skip)] on Unknown). Fix: add explicit doc warning on PushUrgency::Unknown that it must not appear in outbound ChatPushConfig; consider making ChatPushConfig serialization return an error when Unknown is present.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:06:36Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:15:21Z",
+  "closed_at": "2026-04-27T19:15:21Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-t6n1.2",
+      "depends_on_id": "jmap-chat-tui-t6n1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T12:06:36Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

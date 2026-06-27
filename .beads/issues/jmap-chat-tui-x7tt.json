@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-x7tt",
+  "title": "jmap.rs: add should_panic test for duplicate call_id in builder",
+  "description": "JmapRequestBuilder::add_call panics on duplicate call_id via assert!(), but there is no #[should_panic] test documenting or verifying this behavior. Test coverage gap.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T03:13:16Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T03:16:16Z",
+  "closed_at": "2026-04-28T03:16:16Z",
+  "close_reason": "Closed"
+}

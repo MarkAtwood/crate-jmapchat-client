@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-3ix",
+  "title": "Review: idiomatic API redesign jqa.1-5",
+  "notes": "Maintainer risk: LOW — no security surface, no new wire format, no behavior change. Two missing #[non_exhaustive] annotations are a breaking-change risk on future spec additions but not a runtime bug.\nConfidence: 5% chance of missed bug. Uncertainty driven by: lifetime complexity in chat_create's let create_obj; uninitialized pattern, and the resolve_client_id lifetime tying. Would raise confidence if: runtime test against a real JMAP server exercised the new chat_create paths.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T15:17:58Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T15:20:30Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

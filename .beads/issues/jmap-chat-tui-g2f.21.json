@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-g2f.21",
+  "title": "Clarify let _ = der pattern in config.rs",
+  "description": "config.rs auth_provider() binds 'der' from ca_cert_bytes and then immediately discards it with 'let _ = der' in two places (lines 78 and 91). A contributor reading this will be confused: why bind it only to drop it? This is a compiler-appeasing pattern (to consume the Option so it doesn't fall through to the CustomCaAuth branch below), but without a comment it looks like a bug or dead code. Add a brief comment such as '// consumed here; --ca-cert is incompatible with header-based auth' to make the intent clear, or restructure the control flow so the discard is unnecessary.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:41:47Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:25:29Z",
+  "closed_at": "2026-04-26T09:25:29Z",
+  "close_reason": "Stale: let _ = der pattern does not exist in config.rs; DER bytes are named der and passed directly to CustomCaAuth::new",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-g2f.21",
+      "depends_on_id": "jmap-chat-tui-g2f",
+      "type": "parent-child",
+      "created_at": "2026-04-26T01:41:47Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

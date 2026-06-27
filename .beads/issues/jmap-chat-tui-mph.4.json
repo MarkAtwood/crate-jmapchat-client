@@ -1,0 +1,42 @@
+{
+  "id": "jmap-chat-tui-mph.4",
+  "title": "Fixtures and wiremock tests for new Message methods",
+  "description": "Why: All new message methods need fixture JSON files and wiremock tests per the project testing philosophy (independent oracle, no fabricated values).\n\nWhat: Create hand-written fixture files and corresponding tests in methods_test.rs for: message_set_update (body edit), message_set_update (reaction add), message_set_update (delete), message_set_destroy, message_query_changes, message_query (with text filter), message_query (with threadRootId filter).\n\nAlgorithm:\n\nStep 1 — Create fixture files in crates/jmap-chat/tests/fixtures/methods/:\n\nmessage_set_update_response.json (reuse for all update variants — a SetResponse with updated map):\n{\n  \"methodResponses\": [[\"Message/set\", {\n    \"accountId\": \"account1\",\n    \"oldState\": \"state-msg-001\",\n    \"newState\": \"state-msg-002\",\n    \"updated\": { \"01HV5Z6QKWJ7N3P8R2X4YTMD42\": null }\n  }, \"r1\"]],\n  \"sessionState\": \"sess-abc\"\n}\n\nmessage_set_destroy_response.json (SetResponse with destroyed list):\n{\n  \"methodResponses\": [[\"Message/set\", {\n    \"accountId\": \"account1\",\n    \"oldState\": \"state-msg-001\",\n    \"newState\": \"state-msg-002\",\n    \"destroyed\": [\"01HV5Z6QKWJ7N3P8R2X4YTMD42\"]\n  }, \"r1\"]],\n  \"sessionState\": \"sess-abc\"\n}\n\nmessage_query_changes_response.json (QueryChangesResponse):\n{\n  \"methodResponses\": [[\"Message/queryChanges\", {\n    \"accountId\": \"account1\",\n    \"oldQueryState\": \"msg-qs-000\",\n    \"newQueryState\": \"msg-qs-001\",\n    \"removed\": [],\n    \"added\": [{\"id\": \"01HV5Z6QKWJ7N3P8R2X4YTMDCC\", \"index\": 0}]\n  }, \"r1\"]],\n  \"sessionState\": \"sess-abc\"\n}\n\nStep 2 — Add tests to crates/jmap-chat/tests/methods_test.rs:\n\nTest 30: message_set_update (edit body) — body_json matcher verifies:\n- methodCalls[0][1] has 'update': { '01HV5Z6QKWJ7N3P8R2X4YTMD42': { 'body': 'Hello, edited!' } }\n- Response: new_state is 'state-msg-002', updated map contains the message ID\n\nTest 31: message_set_update (add reaction) — body_json matcher verifies:\n- patch has key 'reactions/01HVREACTIONULID01': {'emoji': '👍', 'sentAt': '\u003ctimestamp\u003e'}\n\nTest 32: message_set_destroy — body_json matcher verifies:\n- methodCalls[0][1] has 'destroy': ['01HV5Z6QKWJ7N3P8R2X4YTMD42']\n- Response: destroyed list contains the ID\n\nTest 33: message_query_changes — verifies:\n- Response: added list has one item with the expected id\n\nTest 34: message_set_destroy rejects empty ids — no mock needed, guard fires before network\n\nStep 3 — Update fixtures README.md table to include the 3 new fixtures.\n\nNote: Use MessageUpdateInput and ReactionChange from the completed beads. Import them at the top of methods_test.rs.\nNote: For the reaction body_json test, use a fixed UTCDate string and a fixed senderReactionId so the test is deterministic.",
+  "acceptance_criteria": "cargo test -p jmap-chat passes (all 34+ tests); cargo clippy -- -D warnings passes; cargo fmt --check passes; all 3 new fixture files exist; README table updated",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T08:09:47Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T08:17:23Z",
+  "closed_at": "2026-04-27T08:17:23Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-mph.4",
+      "depends_on_id": "jmap-chat-tui-mph",
+      "type": "parent-child",
+      "created_at": "2026-04-27T01:09:47Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-mph.4",
+      "depends_on_id": "jmap-chat-tui-mph.3",
+      "type": "blocks",
+      "created_at": "2026-04-27T01:09:53Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-mph.4",
+      "depends_on_id": "jmap-chat-tui-mph.2",
+      "type": "blocks",
+      "created_at": "2026-04-27T01:09:53Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

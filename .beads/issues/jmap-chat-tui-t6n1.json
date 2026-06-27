@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-t6n1",
+  "title": "Review round 1: jmap-chat enum-wiring epic",
+  "notes": "Maintainer risk: MEDIUM — one outbound-footgun (PushUrgency::Unknown silently serializes as invalid wire value in ChatPushConfig), one discoverability gap (EndpointType not re-exported), one doc consistency gap (new Unknown variants lack the established round-trip-loss disclaimer). No structural API design problems; all issues are fixable without semver breaks.\nConfidence: 85% chance of no missed bug. Uncertainty driven by: (1) whether any of the six serde(other) enums (ChatKind, DeliveryState, ChatMemberRole, ChannelPermissionTargetType, ContactPresence, OwnerPresence) are ever serialized back to the server in practice — if any code path does that, t6n1.7 is a real bug not just a polish issue; (2) whether PushUrgency::Unknown can realistically enter a ChatPushConfig via any caller path not covered by t6n1.16/t6n1.2. Would raise confidence if: QuotaScope is confirmed never outbound (it is JMAP Quota data, inbound-only from server); ChatKind/DeliveryState/etc. are confirmed never set via partial-update methods that re-serialize them. Running out of real complaints: yes — P0/P1/P2 are all solid; P3/P4 are the bottom of the barrel (naming conventions, doc comments, boilerplate), no new correctness issues remain.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:05:30Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T19:21:50Z",
+  "close_reason": "all steps complete",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

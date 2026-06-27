@@ -1,0 +1,25 @@
+{
+  "id": "jmap-chat-tui-yov.1",
+  "title": "types: ChatContactSetInput, ChatContactQueryInput",
+  "description": "What: Add ChatContactSetInput and ChatContactQueryInput to methods/mod.rs.\n\nAlgorithm:\n1. ChatContactSetInput\u003c'a\u003e after SpaceBanCreateInput / before AddMemberInput group:\n   id: \u0026'a str (which contact to update)\n   blocked: Option\u003cbool\u003e\n   display_name: Option\u003cOption\u003c\u0026'a str\u003e\u003e (Some(None)=clear, Some(Some(s))=set, None=omit)\n   No Default; doc comment explains Option\u003cOption\u003e pattern.\n2. ChatContactQueryInput\u003c'a\u003e with #[derive(Debug, Default)]:\n   filter_blocked: Option\u003cbool\u003e\n   filter_presence: Option\u003c\u0026'a str\u003e\n   position: Option\u003cu64\u003e\n   limit: Option\u003cu64\u003e\n   sort_property: Option\u003c\u0026'a str\u003e  -- 'lastSeenAt'|'login'|'lastActiveAt'\n   sort_ascending: Option\u003cbool\u003e\n\nRun cargo fmt, clippy -D warnings, cargo test. Close bead.",
+  "acceptance_criteria": "cargo test passes; ChatContactSetInput and ChatContactQueryInput in mod.rs; clippy clean",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T08:45:28Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T08:46:26Z",
+  "close_reason": "ChatContactSetInput and ChatContactQueryInput added to mod.rs",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yov.1",
+      "depends_on_id": "jmap-chat-tui-yov",
+      "type": "parent-child",
+      "created_at": "2026-04-27T01:45:28Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

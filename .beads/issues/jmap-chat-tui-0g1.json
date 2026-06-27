@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-0g1",
+  "title": "batch: structured multi-method call builder",
+  "description": "Add a batch call helper to client.rs:\\n- JmapRequestBuilder: add_call(method, args, method_id) -\u003e \u0026mut Self; build() -\u003e JmapRequest\\n- JmapChatClient::call_batch(request: JmapRequest) -\u003e Vec\u003cInvocationResponse\u003e\\n- Return all responses indexed by method_id for caller to route\\n- Test: batch two method calls in one request, assert both responses returned\\n\\nFixture file: tests/fixtures/batch_request.json",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:21:10Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T10:47:54Z",
+  "close_reason": "Implemented JmapRequestBuilder, call_batch, ResultReference, Session::supports_refplus/quotas, Quota type, quota_get(); all tests pass"
+}

@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-wju9.7",
+  "title": "impl_string_enum\\! macro now covers 6 identical enum patterns",
+  "description": "crates/jmap-chat/src/types.rs — This commit added ChatKind, ChatMemberRole, and OwnerPresence with Unknown(String) + manual serde, matching BodyType and PushUrgency exactly. EndpointType differs only in as_uri/from_uri naming (see sibling issue). The count is now 6 structurally identical patterns (5 sharing the exact same as_str/Display/Serialize/Deserialize shape). Prior issue jmap-chat-tui-t6n1.18 was closed as 'valid polish; deferred'. With 6 instances the duplication cost is ~150 lines of mechanically identical boilerplate. Recommending the impl_string_enum\\! macro move from 'deferred' to 'worth scheduling'. Suggested macro call form: impl_string_enum\\!(ChatKind; Direct =\u003e \"direct\", Group =\u003e \"group\", Channel =\u003e \"channel\"); — generates as_str(), Display, Serialize, Deserialize with Unknown(String) fallback.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:28:50Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:33:21Z",
+  "closed_at": "2026-04-27T19:33:21Z",
+  "close_reason": "Opinion; no engineering basis",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "opinion",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-wju9.7",
+      "depends_on_id": "jmap-chat-tui-wju9",
+      "type": "parent-child",
+      "created_at": "2026-04-27T12:28:49Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

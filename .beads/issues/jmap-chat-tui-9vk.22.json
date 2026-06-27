@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-9vk.22",
+  "title": "cannotCalculateChanges not handled: loops on error instead of falling back to full reload",
+  "description": "chat_delta_sync handles Err(e) from chat_changes by sending an error event and returning None. Returning None leaves chat_state unchanged. The next SSE StateChange event containing Chat will call chat_changes again with the same stale baseline. If the server returned cannotCalculateChanges (RFC 8620 §5.5: server cannot enumerate changes since that state), it will return the same error again. This loops indefinitely, emitting error toasts every time the Chat type appears in a StateChange, with no automatic recovery. Per RFC 8620 §5.5, cannotCalculateChanges MUST be treated as a signal to perform a full resync (equivalent to the has_more_changes=true path). Fix: match on ClientError::MethodError { error_type, .. } where error_type == 'cannotCalculateChanges' (or 'cannotCalculateChanges' appears in the error type), and call load_chats as a fallback.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "bug",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:03:28Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:21:26Z",
+  "closed_at": "2026-04-26T09:21:26Z",
+  "close_reason": "Fixed: detect ClientError::MethodError{cannotCalculateChanges} in chat_delta_sync and fall back to full load_chats reload",
+  "labels": [
+    "correctness",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-9vk.22",
+      "depends_on_id": "jmap-chat-tui-9vk",
+      "type": "parent-child",
+      "created_at": "2026-04-26T02:03:28Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

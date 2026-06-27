@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-tbs.2",
+  "title": "ChatMessagePush accepts empty messages array, violating spec MUST",
+  "description": "Spec §4.1 says messages MUST be a non-empty array. Deserializing {\"@type\":\"ChatMessagePush\",\"accountId\":\"a\",\"state\":\"s\",\"messages\":[]} succeeds and produces ChatMessagePush { messages: vec![] }. Callers iterating messages without checking emptiness may silently process a server error as a valid (but vacuous) payload. Fix: add a custom Deserialize or post-parse validation that rejects empty messages.",
+  "status": "closed",
+  "priority": 0,
+  "issue_type": "bug",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T09:28:00Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T09:34:31Z",
+  "closed_at": "2026-04-27T09:34:31Z",
+  "close_reason": "design decision: client library does not validate server payloads; empty messages array is a server concern",
+  "labels": [
+    "correctness",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-tbs.2",
+      "depends_on_id": "jmap-chat-tui-tbs",
+      "type": "parent-child",
+      "created_at": "2026-04-27T02:28:00Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

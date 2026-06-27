@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-5n5.1.17",
+  "title": "CALL_ID constant with coupling warning comment prevents silent dispatch bugs",
+  "description": "The CALL_ID constant ('r1') is defined once in mod.rs and shared between build_request and extract_response. The comment explicitly warns that both must be updated together and that extract_response must be extended before multi-call batching is added. A contributor might inline the string literal in each call site 'to simplify'. That would allow build_request and extract_response to silently diverge: one uses 'r1', the other uses 'r2', and the response is never found. The constant and the warning are a deliberate coupling contract.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:25:04Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:37:59Z",
+  "closed_at": "2026-04-27T07:37:59Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-5n5.1.17",
+      "depends_on_id": "jmap-chat-tui-5n5.1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:25:04Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

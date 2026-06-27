@@ -1,0 +1,16 @@
+{
+  "id": "jmap-chat-tui-o09",
+  "title": "Replace match-with-early-return with let-else in Session capability methods",
+  "description": "Three methods in jmap.rs (chat_capability, websocket_capability, chat_push_capability) use the pre-let-else idiom: match Some(x) =\u003e x, None =\u003e return Ok(None). Rust 1.65+ let-else is the current idiomatic form and is more readable. Fix: replace the 6 match arms (2 per method) with let-else at jmap.rs:379-390, 408-416, 439-448. Mechanical change, no behaviour difference.",
+  "notes": "Epic: jmap-chat-tui-4pp (jmap-chat API idiomaticity: review findings)",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T17:53:58Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T18:13:10Z",
+  "closed_at": "2026-04-27T18:13:10Z",
+  "close_reason": "Closed"
+}

@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-7p5.6",
+  "title": "ChatContactQueryInput.sort_property doc comment lists string literals, not enum variants",
+  "description": "The doc comment on ChatContactQueryInput.sort_property still reads: '/// Sort property: one of `ContactSortProperty::LastSeenAt`, `Login`, `LastActiveAt`.' The backtick-quoted `Login` and `LastActiveAt` are not full paths, inconsistent with `ContactSortProperty::LastSeenAt`. rustdoc will not resolve bare `Login` as a link. Use consistent full paths or write them as `ContactSortProperty::LastSeenAt | Login | LastActiveAt` with an intra-doc link to ContactSortProperty.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T17:34:29Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T17:39:27Z",
+  "closed_at": "2026-04-27T17:39:27Z",
+  "close_reason": "Fixed: sort_property doc comment now uses full paths ContactSortProperty::LastSeenAt | Login | LastActiveAt",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-7p5.6",
+      "depends_on_id": "jmap-chat-tui-7p5",
+      "type": "parent-child",
+      "created_at": "2026-04-27T10:34:29Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

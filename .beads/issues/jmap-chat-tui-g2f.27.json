@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-g2f.27",
+  "title": "spawn_blocking bridge holds a thread-pool thread indefinitely, undocumented",
+  "description": "client_task.rs bridges std::sync::mpsc::Receiver\u003cAppCommand\u003e to tokio via tokio::task::spawn_blocking(). The blocking task loops on rx.recv() and forwards to a tokio channel. This is correct but occupies one tokio blocking thread for the lifetime of the process. The comment says 'bridge' but does not explain the resource cost or why the simpler pattern of using tokio::sync::mpsc directly on both sides was rejected. A future contributor adding a second such bridge will create a second thread. The pattern is not obviously safe under tokio's blocking thread pool limits.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:42:26Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T08:57:53Z",
+  "closed_at": "2026-04-26T08:57:53Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-g2f.27",
+      "depends_on_id": "jmap-chat-tui-g2f",
+      "type": "parent-child",
+      "created_at": "2026-04-26T01:42:26Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

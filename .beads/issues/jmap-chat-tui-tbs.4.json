@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-tbs.4",
+  "title": "duplicate accountId keys in chat_push slice silently drop one entry",
+  "description": "In push_subscription_set, chat_push_map.insert() is called in a loop over \u0026[(\u0026str, ChatPushConfig)]. If the caller passes two entries with the same accountId (e.g., by mistake or a copy-paste error), the first entry is silently overwritten. No validation or error is returned. The resulting request will have one fewer chatPush account than the caller intended. Fix: check for duplicates before inserting and return ClientError::InvalidArgument if found.",
+  "status": "closed",
+  "priority": 0,
+  "issue_type": "bug",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T09:28:14Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T09:34:13Z",
+  "closed_at": "2026-04-27T09:34:13Z",
+  "close_reason": "fixed in implementation",
+  "labels": [
+    "correctness",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-tbs.4",
+      "depends_on_id": "jmap-chat-tui-tbs",
+      "type": "parent-child",
+      "created_at": "2026-04-27T02:28:14Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

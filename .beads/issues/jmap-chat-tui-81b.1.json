@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-81b.1",
+  "title": "subscribe_events panics on non-ASCII UTF-8 in SSE buffer: scan_from non-char-boundary",
+  "description": "In client.rs subscribe_events(), after appending a new chunk to the buffer, scan_from is set to old_len.saturating_sub(3) — a raw byte offset. If the buffer contains multibyte UTF-8 sequences (e.g. emoji U+1F600 is 4 bytes, euro sign U+20AC is 3 bytes) and old_len-3 falls inside such a sequence, then \u0026buf[scan_from..] panics with 'byte index N is not a char boundary'.\n\nTrigger: any SSE payload that contains non-ASCII characters (emoji in a StateChange data payload, Unicode in a presence statusText, CJK characters anywhere). This is virtually certain in production for an international chat application.\n\nRoot cause: scan_from was introduced as an optimization in R2 (jmap-chat-tui-xbt.9) to avoid O(n^2) rescanning. The optimization uses byte arithmetic on a String buffer without ensuring char boundary alignment.\n\nReproduction sketch:\n  let buf = \"abc\\u{20AC}x\"; // 7 bytes: a(1)+b(1)+c(1)+€(3)+x(1)\n  let old_len = buf.len(); // 7\n  let scan_from = old_len.saturating_sub(3); // 4\n  let _ = \u0026buf[scan_from..]; // PANIC: byte index 4 is not a char boundary\n\nFix options:\n  (a) Iterate backward from old_len.saturating_sub(3) until a char boundary is found:\n      let scan_from = (0..=old_len.saturating_sub(3)).rev()\n          .find(|\u0026i| buf.is_char_boundary(i)).unwrap_or(0);\n  (b) Use Bytes (Vec\u003cu8\u003e) as the buffer type and search byte-level patterns directly\n      (safe because all SSE delimiters \\r\\n, \\n\\n, \\r\\r are ASCII, which cannot\n      appear as interior bytes of a multibyte UTF-8 sequence).\n  Option (b) is preferred: it eliminates the class of problem and avoids the\n  repeated UTF-8 validation cost.",
+  "status": "closed",
+  "priority": 0,
+  "issue_type": "bug",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:51:45Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:54:22Z",
+  "closed_at": "2026-04-26T07:54:22Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-81b.1",
+      "depends_on_id": "jmap-chat-tui-81b",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:51:45Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

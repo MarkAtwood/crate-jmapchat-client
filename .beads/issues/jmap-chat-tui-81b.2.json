@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-81b.2",
+  "title": "chrono and ulid are dead production dependencies in jmap-chat",
+  "description": "jmap-chat/Cargo.toml lists chrono and ulid in [dependencies] (production), but neither crate is imported or used anywhere in crates/jmap-chat/src/. Verified by grepping all src/*.rs files: zero 'use chrono' or 'use ulid' occurrences. Both are declared at the workspace level and pulled into the crate's prod dependency graph.\n\nImpact:\n  - Both crates add compile time for every build of jmap-chat and any crate that depends on it\n  - chrono v0.4 with serde feature pulls in a non-trivial amount of code\n  - ulid v1 is smaller but still dead weight\n  - Downstream crates that compile jmap-chat acquire transitive dependencies they did not ask for\n\nFix: Remove 'chrono.workspace = true' and 'ulid.workspace = true' from crates/jmap-chat/Cargo.toml [dependencies].\nIf chrono is needed for future UTCDate parsing (RFC 3339 validation), add it back when the feature is implemented.\nIf ulid is needed for future client-side ULID generation (message_create client_id), add it back then.\nThe workspace-level declarations can remain for future crates to use.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:51:54Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:54:23Z",
+  "closed_at": "2026-04-26T07:54:23Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-81b.2",
+      "depends_on_id": "jmap-chat-tui-81b",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:51:53Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

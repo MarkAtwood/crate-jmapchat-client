@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-ixld.8",
+  "title": "Box\u003cdyn TransportConfig\u003e blanket impl with no Arc counterpart",
+  "description": "AuthProvider has blanket impls for both Arc\u003cdyn AuthProvider\u003e and Box\u003cdyn AuthProvider\u003e. TransportConfig has a blanket impl only for Box\u003cdyn TransportConfig\u003e. The asymmetry is unexplained and will surprise anyone who tries Arc\u003cdyn TransportConfig\u003e. The reason for the asymmetry is structural — JmapChatClient clones its auth field via Arc (because it must be Clone) but transport is consumed at construction and never stored, so Arc is not needed. This design fact is invisible at the impl site. Either: (a) add a comment at the Box\u003cdyn TransportConfig\u003e impl explaining that no Arc impl is needed because the transport is consumed immediately in new() and never stored; or (b) eliminate the need for the blanket entirely by accepting the transport by-value with a concrete enum (TransportKind::Default / TransportKind::CustomCa) for the two known cases, which removes the dynamic dispatch overhead and the blanket entirely. Suggested comment addition: '// No Arc impl needed — transport is consumed in new() and not stored.'",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T01:04:04Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T01:05:46Z",
+  "closed_at": "2026-04-28T01:05:46Z",
+  "close_reason": "Duplicate of ixld.5 (Box/Arc TransportConfig asymmetry already filed)",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-ixld.8",
+      "depends_on_id": "jmap-chat-tui-ixld",
+      "type": "parent-child",
+      "created_at": "2026-04-27T18:04:03Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-g2f.30",
+  "title": "BearerAuth and BasicAuth pre-compute HeaderValue at construction time, making auth_header() infallible and fast",
+  "description": "BearerAuth::new() and BasicAuth::new() validate the credentials and construct the HeaderValue immediately, storing it in the struct. auth_header() then just clones this pre-built value — no allocation, no validation, no Result return type needed. The consequences of this design are: (1) invalid credentials (empty token, control characters, colon in username) fail at process startup before any network call is attempted; (2) auth_header() returns Option\u003c(HeaderName, HeaderValue)\u003e not Result\u003c...\u003e, so every call site in the client is free of error-handling boilerplate; (3) no allocation per request; (4) credentials are not re-processed on every call, reducing the surface where they might be accidentally logged. A contributor might suggest deferring construction to auth_header() to 'keep new() simple'. That would be wrong: it would push validation errors to the first network request (silent until then), require auth_header() to return a Result (propagating error handling to every HTTP call site), and re-do the base64 encoding on every request. Pre-computing at construction is the correct tradeoff.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:42:41Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:24:38Z",
+  "closed_at": "2026-04-26T09:24:38Z",
+  "close_reason": "Already implemented: BearerAuth and BasicAuth store HeaderValue as field computed at construction",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-g2f.30",
+      "depends_on_id": "jmap-chat-tui-g2f",
+      "type": "parent-child",
+      "created_at": "2026-04-26T01:42:41Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

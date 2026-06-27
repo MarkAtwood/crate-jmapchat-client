@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-7c2.10",
+  "title": "filter_presence Unknown variant: type allows invalid filter, guard not visible at definition site",
+  "description": "ContactPresence::Unknown is a deserialization catch-all with no filter semantics, but filter_presence is typed Option\u003cContactPresence\u003e which structurally allows it. The InvalidArgument runtime guard exists in contact.rs but is invisible at the struct definition site. A contributor adding a new query method that copies this struct pattern will omit the guard and silently send invalid filter values to the server.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T18:16:33Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T18:22:10Z",
+  "closed_at": "2026-04-27T18:22:10Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-7c2.10",
+      "depends_on_id": "jmap-chat-tui-7c2",
+      "type": "parent-child",
+      "created_at": "2026-04-27T11:16:33Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

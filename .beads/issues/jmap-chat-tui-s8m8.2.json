@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-s8m8.2",
+  "title": "Borrow\u003cstr\u003e for Id/UTCDate: correct implementation satisfying Borrow contract",
+  "description": "Borrow\u003cstr\u003e requires Hash/Eq consistency: Id uses String's hash/eq and str uses the same hash/eq algorithm, so the contract is satisfied. A future contributor might suggest removing it as 'redundant with AsRef\u003cstr\u003e' — but AsRef does not enable HashMap::get(\u0026str) for HashMap\u003cId, V\u003e; Borrow is required for that use case.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T02:17:31Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T02:18:13Z",
+  "closed_at": "2026-04-28T02:18:13Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-s8m8.2",
+      "depends_on_id": "jmap-chat-tui-s8m8",
+      "type": "parent-child",
+      "created_at": "2026-04-27T19:17:30Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

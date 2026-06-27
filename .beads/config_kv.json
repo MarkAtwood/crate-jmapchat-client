@@ -1,0 +1,13 @@
+{
+  "auto_compact_enabled": "false",
+  "compact_batch_size": "50",
+  "compact_parallel_workers": "5",
+  "compact_tier1_days": "30",
+  "compact_tier1_dep_levels": "2",
+  "compact_tier2_commits": "100",
+  "compact_tier2_days": "90",
+  "compact_tier2_dep_levels": "5",
+  "compaction_enabled": "false",
+  "issue_prefix": "jmap-chat-tui",
+  "kv.memory.jmap-chat-spec-files-live-in-project-jmap": "JMAP Chat spec files live in ~/PROJECT/jmap-chat-spec/ (sibling repo). Primary spec: draft-atwood-jmap-chat-00.md. Companions: draft-atwood-jmap-chat-wss-00.md, draft-atwood-jmap-chat-push-00.md, draft-atwood-jmap-cid-00.md, draft-atwood-jmap-chat-filenode-00.md, draft-atwood-jmap-chat-federation-00.md. Reference RFCs in references/ subdir. Do NOT look in jmap-chat-ui/docs/ — that directory has been deleted."
+}

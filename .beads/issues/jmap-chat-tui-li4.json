@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-li4",
+  "title": "ChatContact/query method + fixture test",
+  "description": "Implement ChatContact/query in methods/contact.rs:\\n- Filter: ContactFilter { presence: Option\u003cContactPresence\u003e, searchString: Option\u003cString\u003e, inChatId: Option\u003cId\u003e }\\n- Sort: by displayName, presence\\n- Returns QueryResponse: accountId, queryState, canCalculateChanges, position, ids[], total?, limit?\\n- Fixture test\\n\\nFixture file: tests/fixtures/chat_contact_query.json",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:16:39Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T11:02:46Z",
+  "close_reason": "Implementation and tests already present from prior work",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-li4",
+      "depends_on_id": "jmap-chat-tui-9w3",
+      "type": "blocks",
+      "created_at": "2026-04-26T21:16:47Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

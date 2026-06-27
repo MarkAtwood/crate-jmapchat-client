@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-zo1u",
+  "title": "Id::new and UTCDate::new: return a domain error, not ClientError",
+  "description": "## Why\n\nId::new and UTCDate::new return ClientError::InvalidArgument. These are domain primitives whose only invariant is non-empty. Using the network-level ClientError couples a type-system concern to a network concern: any call site that constructs an Id outside of a network path must import ClientError to handle the error, which is conceptually wrong.\n\n## What needs to be done\n\nIntroduce a small dedicated error type (e.g. InvalidId(String) or a unit struct EmptyId) and use it as the Err variant for Id::new and UTCDate::new. Alternatively, if the only invalid case is empty string and the type is only ever constructed from server JSON (where Deserialize already validates), consider making new() panic rather than return Result. Evaluate which is cleaner given existing call sites. Update all call sites and tests.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T01:44:54Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-28T02:15:04Z",
+  "close_reason": "Closed"
+}

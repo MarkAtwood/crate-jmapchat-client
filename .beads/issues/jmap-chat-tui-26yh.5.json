@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-26yh.5",
+  "title": "Invocation named struct with hand-written serde preserves wire format guarantee",
+  "description": "The tuple alias type Invocation = (String, serde_json::Value, String) was replaced with a named struct. A contributor might suggest using serde's tuple struct derive instead. The hand-written impl is correct because: (1) it serializes to a 3-element JSON array per RFC 8620 §3.2 — the tuple struct derive would also do this, but the visitor pattern in Deserialize clearly expresses the intent; (2) the named fields (method, args, call_id) make call sites readable — a 3-element tuple's .0/.1/.2 are not self-documenting; (3) #[non_exhaustive] on the struct prevents downstream crates from exhaustively matching and future-proofs against metadata fields that specs occasionally add. Do not revert to tuple type.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T20:29:25Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T22:33:23Z",
+  "closed_at": "2026-04-27T22:33:23Z",
+  "close_reason": "Decision record: current implementation is correct; no code change needed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-26yh.5",
+      "depends_on_id": "jmap-chat-tui-26yh",
+      "type": "parent-child",
+      "created_at": "2026-04-27T13:29:24Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

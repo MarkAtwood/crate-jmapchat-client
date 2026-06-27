@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-t6n1.20",
+  "title": "ChatStreamEnable::msg_type is pub(crate) because the wire discriminator is not a public API concern",
+  "description": "The @type discriminator field (msg_type) in ChatStreamEnable, ChatStreamDisable, ChatTypingEvent, and ChatPresenceEvent is pub(crate), not pub. The value is always a compile-time constant string that must match the type name exactly on the wire. Making it pub would invite callers to read or mutate it, serving no purpose (callers know the type from Rust's type system) while creating a footgun (mutating it produces invalid wire messages). The constructor ChatStreamEnable::new() sets it correctly and is the only public construction path. A contributor might make it pub for 'symmetry with other fields' — that would expose a field with no legitimate external use and potential for wire corruption.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:08:16Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:21:18Z",
+  "closed_at": "2026-04-27T19:21:18Z",
+  "close_reason": "Decision recorded",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-t6n1.20",
+      "depends_on_id": "jmap-chat-tui-t6n1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T12:08:15Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

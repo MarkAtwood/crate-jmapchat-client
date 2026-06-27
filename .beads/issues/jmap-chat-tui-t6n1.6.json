@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-t6n1.6",
+  "title": "PushUrgency/QuotaScope Unknown variants missing loss-of-value doc disclaimer",
+  "description": "ChatMemberRole, ChatKind, DeliveryState, OwnerPresence, and ChannelPermissionTargetType all document their Unknown variant with: 'If serialized, produces the literal string \\\"unknown\\\" — not the original wire value.' The two new enums PushUrgency and QuotaScope lack this disclaimer. ChatStreamDataType::Unknown says only 'Unrecognized value — silently ignored per spec' which is ambiguous about what happens on re-serialization. A user who stores a decoded PushUrgency::Unknown and later re-serializes it will silently corrupt the wire value with no warning. Inconsistency in doc patterns also means the existing test test_unknown_catch_all_variants_serialize_as_literal_unknown does not cover the new enums. Maintenance consequence: user confusion, divergent doc style, missing test coverage.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:06:53Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:15:30Z",
+  "closed_at": "2026-04-27T19:15:30Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-t6n1.6",
+      "depends_on_id": "jmap-chat-tui-t6n1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T12:06:53Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

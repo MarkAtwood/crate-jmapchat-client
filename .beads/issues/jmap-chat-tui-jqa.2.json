@@ -1,0 +1,25 @@
+{
+  "id": "jmap-chat-tui-jqa.2",
+  "title": "Auto-generate client IDs in create operations",
+  "description": "Every create input struct requires caller to pass client_id: \u0026str. This exposes a JMAP protocol detail (the create map key) that the library should own. A third-party caller does not know what a JMAP client ID is and should not have to generate one.\n\nFix: generate a ULID internally on each create call. Expose an optional override for idempotency (retry same request with same ID):\n\n// Before: caller must generate ULID\nMessageCreateInput { client_id: 'my-ulid-001', body: 'Hello', ... }\n\n// After: generated transparently\nMessageCreateInput { body: 'Hello', ... }\n\n// After, with idempotency override:\nMessageCreateInput { body: 'Hello', client_id: None, ... } // auto\nMessageCreateInput { body: 'Hello', client_id: Some('my-id'), ... } // explicit\n\nAffected structs (9): MessageCreateInput, CustomEmojiCreateInput, SpaceInviteCreateInput, SpaceBanCreateInput, SpaceCreateInput, ChatCreateDirectInput, ChatCreateGroupInput, ChatCreateChannelInput, PushSubscriptionCreateInput.\n\nDependency: add ulid crate (or generate via uuid). The generated client_id must be surfaced to the caller via the SetResponse created map key.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T14:30:52Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T15:10:49Z",
+  "closed_at": "2026-04-27T15:10:49Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-jqa.2",
+      "depends_on_id": "jmap-chat-tui-jqa",
+      "type": "parent-child",
+      "created_at": "2026-04-27T07:30:51Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

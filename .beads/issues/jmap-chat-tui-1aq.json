@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-1aq",
+  "title": "Epic: jmap-chat types.rs upgrades to current spec",
+  "description": "## Why\ntypes.rs was written against the OLD spec. The current spec (../jmap-chat-spec/draft-atwood-jmap-chat-00.md) adds new fields, changes field semantics, and adds entirely new type families. All downstream method and client work depends on types being correct first.\n\n## What\nUpdate all data types in crates/jmap-chat/src/types.rs and crates/jmap-chat/src/jmap.rs to match the current spec exactly. MAY fields are treated as SHOULD/MUST.\n\n## Acceptance criteria\n- All new fields present with correct Rust types and serde attributes\n- All changed fields updated (presence optional, new enum variants)\n- RichBody/Span types added with full fixture tests\n- Session capability structs added\n- All tests pass against hand-written JSON fixtures from the spec\n- cargo clippy clean",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:11:26Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T04:54:29Z",
+  "close_reason": "All types.rs and jmap.rs upgrades implemented: new Contact/Chat/PresenceStatus fields, RichBody/Span, WebSocket message types, session capability structs. 91 tests passing, clippy clean."
+}

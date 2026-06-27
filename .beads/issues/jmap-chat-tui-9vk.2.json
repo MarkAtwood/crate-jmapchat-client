@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-9vk.2",
+  "title": "unify chat_delta_sync fallback-to-full-load paths",
+  "description": "chat_delta_sync has two structurally identical fallback blocks (empty-state at line 610 and has_more_changes at line 639): both call load_chats, map Ok to Some(state), and map Err to send_event+None. The only variation is the error message string. A reader must diff both blocks to confirm they are the same logic. — Extract a private async helper, e.g. async fn full_reload(client, api_url, account_id, tx, ctx, err_label: \u0026str) -\u003e Option\u003cString\u003e, and replace both blocks with a single call site each, passing the appropriate err_label.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:00:46Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:11:30Z",
+  "closed_at": "2026-04-26T09:11:30Z",
+  "close_reason": "Closed",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-9vk.2",
+      "depends_on_id": "jmap-chat-tui-9vk",
+      "type": "parent-child",
+      "created_at": "2026-04-26T02:00:45Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

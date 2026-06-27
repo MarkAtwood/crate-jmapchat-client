@@ -1,0 +1,25 @@
+{
+  "id": "jmap-chat-tui-9w3",
+  "title": "methods: write wiremock fixture tests for all existing methods",
+  "description": "For every currently-implemented method in methods.rs, write a wiremock integration test:\\n- Start wiremock server, register stub that returns spec-example JSON fixture\\n- Call the method under test\\n- Assert the returned Rust struct matches expected values\\n\\nFixture files: crates/jmap-chat/tests/fixtures/\u003cmethod-name\u003e.json\\nEach fixture is hand-written JSON derived directly from spec examples (never generated from the code under test).\\n\\nMethods to cover: chat_get, chat_query, chat_changes, message_get, message_query, message_changes, message_create, chat_contact_get, read_position_get, read_position_set, presence_status_get",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:16:17Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T07:17:33Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-9w3",
+      "depends_on_id": "jmap-chat-tui-uku",
+      "type": "blocks",
+      "created_at": "2026-04-26T21:16:25Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

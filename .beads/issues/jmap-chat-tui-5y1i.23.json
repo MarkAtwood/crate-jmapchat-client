@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-5y1i.23",
+  "title": "Invocation: public fields without #[non_exhaustive] fossilizes 3-field layout",
+  "description": "Invocation (jmap.rs) is pub with all fields pub and no #[non_exhaustive]. Test code already struct-initializes it directly (client.rs:577, 719, 823 etc). Once 0.1 ships, callers will depend on struct-literal construction. If the spec adds a 4th field to the [method,args,callId] tuple, adding it to Invocation is a breaking change for all call sites using struct literals. Adding #[non_exhaustive] now forces callers to use Invocation::new() — preventing struct literals — at the cost of requiring a small change to internal test helpers. Alternatively, document that Invocation::new() is the stable construction path and struct initialization is internal-only. Either way, the decision must be made before 0.1 is published.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T20:15:48Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T20:21:37Z",
+  "closed_at": "2026-04-27T20:21:37Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-5y1i.23",
+      "depends_on_id": "jmap-chat-tui-5y1i",
+      "type": "parent-child",
+      "created_at": "2026-04-27T13:15:48Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

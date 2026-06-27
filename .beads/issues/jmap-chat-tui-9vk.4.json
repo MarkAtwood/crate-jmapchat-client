@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-9vk.4",
+  "title": "strip_control_chars silently strips tab characters from messages",
+  "description": "strip_control_chars preserves only \\n among C0 controls; \\t (0x09, HTAB) is stripped because is_control() returns true for it. The doc comment says 'preserving newlines' but does not mention tabs. A user who pastes tab-indented code into a message or receives a message with tab-separated columns will see the tabs silently deleted with no indication. A future contributor adding a \\r whitelist may not realize \\t is also stripped. — Maintenance consequence: silent data loss in message display; contributor adding \\r support may not audit the full whitelist.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:00:49Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:10:49Z",
+  "closed_at": "2026-04-26T09:10:49Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-9vk.4",
+      "depends_on_id": "jmap-chat-tui-9vk",
+      "type": "parent-child",
+      "created_at": "2026-04-26T02:00:48Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

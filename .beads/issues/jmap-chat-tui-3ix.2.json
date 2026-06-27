@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-3ix.2",
+  "title": "SpaceJoinInput missing #[non_exhaustive]",
+  "description": "SpaceJoinInput mirrors spec-defined join methods (InviteCode / SpaceId). Same coding-rule violation as ChatCreateInput — a future spec join method causes a breaking change without #[non_exhaustive].",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T15:18:28Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T15:20:23Z",
+  "closed_at": "2026-04-27T15:20:23Z",
+  "close_reason": "Closed",
+  "labels": [
+    "correctness",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-3ix.2",
+      "depends_on_id": "jmap-chat-tui-3ix",
+      "type": "parent-child",
+      "created_at": "2026-04-27T08:18:28Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-g2f.16",
+  "title": "mpsc channels instead of Arc\u003cMutex\u003cAppState\u003e\u003e eliminate shared mutable state between UI and network threads",
+  "description": "AppState is owned exclusively by the egui paint thread; the background client task communicates only via typed AppEvent values over mpsc channels. This eliminates shared mutable state, removes any risk of holding a lock across an async await point, prevents paint-thread blocking on mutex acquisition, and makes data flow auditable by reading channel message types alone. A contributor might suggest replacing this with Arc\u003cMutex\u003cAppState\u003e\u003e so the background task can write state directly. That would be wrong: the Mutex would need to be acquired on every state write from async context, the UI thread would contend with it on every frame, and the invariant that state transitions happen only in apply_event would be lost. The channel boundary is the architectural invariant that cleanly separates the two threads.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:41:31Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:21:59Z",
+  "closed_at": "2026-04-26T09:21:59Z",
+  "close_reason": "Already implemented in current codebase",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-g2f.16",
+      "depends_on_id": "jmap-chat-tui-g2f",
+      "type": "parent-child",
+      "created_at": "2026-04-26T01:41:31Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

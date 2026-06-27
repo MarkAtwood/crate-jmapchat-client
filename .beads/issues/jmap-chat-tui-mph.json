@@ -1,0 +1,25 @@
+{
+  "id": "jmap-chat-tui-mph",
+  "title": "Epic: Message methods (edit, delete, reactions, queryChanges)",
+  "description": "Why: Current codebase has Message/get, Message/query, Message/changes, and Message/set (create only). Missing: edit message body, soft/hard delete, add/remove emoji reactions, update readAt, text search filter, threadRootId filter, Message/queryChanges, and rateLimited slow-mode error.\\n\\nWhat:\\n- Message/set update: edit body (author-only, within edit window)\\n- Message/set destroy: delete message\\n- Message/set reactions: add/remove emoji reactions (per reaction-set semantics)\\n- Message/set readAt: mark read timestamp\\n- Message/query: text filter, threadRootId filter\\n- Message/queryChanges\\n- rateLimited SetError handling with countdown timer\\n- Fixture tests for all new operations\\n\\nDepends on: types.rs upgrades epic (jmap-chat-tui-1aq), methods refactor epic",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:15:12Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T08:24:47Z",
+  "close_reason": "All 6 methods implemented, 35 tests passing, r4c review converged",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-mph",
+      "depends_on_id": "jmap-chat-tui-5n5",
+      "type": "blocks",
+      "created_at": "2026-04-26T21:17:29Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

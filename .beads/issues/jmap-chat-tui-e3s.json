@@ -1,0 +1,16 @@
+{
+  "id": "jmap-chat-tui-e3s",
+  "title": "Add ChatStreamDataType enum, replace Vec\u003cString\u003e",
+  "description": "ChatStreamEnable.data_types is Vec\u003cString\u003e in types.rs. The spec defines a closed set: 'typing' and 'presence'. An enum ChatStreamDataType { Typing, Presence, Unknown(String) } with the Unknown catch-all would make invalid data types unrepresentable while remaining forward-compatible.",
+  "notes": "Part of epic jmap-chat-tui-hqb: jmap-chat wire up enums — eliminate stringly-typed spec fields",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T18:51:19Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:05:10Z",
+  "closed_at": "2026-04-27T19:05:10Z",
+  "close_reason": "Closed"
+}

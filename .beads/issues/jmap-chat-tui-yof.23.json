@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-yof.23",
+  "title": "chat_capability and chat_push_capability duplicate two-step lookup pattern",
+  "description": "jmap.rs Session: chat_capability() and chat_push_capability() share an identical two-step match pattern — first look up the account by id, then look up the capability key within account_capabilities, then serde_json::from_value(...).map(Some).map_err(...). The only differences are the capability URI string and the return type T. Adding a third account-level capability will require copying the pattern again. Suggested rewrite: add a private helper fn account_capability\u003cT: DeserializeOwned\u003e(\u0026self, account_id: \u0026str, cap_key: \u0026str, label: \u0026str) -\u003e Result\u003cOption\u003cT\u003e, ClientError\u003e that encodes the lookup once, then each public method becomes a one-liner calling that helper with the appropriate key and label string.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:39:10Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:50:21Z",
+  "closed_at": "2026-04-27T06:50:21Z",
+  "close_reason": "Opinion: capability lookup helper per SEC7",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "opinion",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yof.23",
+      "depends_on_id": "jmap-chat-tui-yof",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:39:09Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

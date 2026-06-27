@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-mm9",
+  "title": "Config module: CLI args and Config struct",
+  "description": "## Why\nThe client needs to know the server URL and auth method before it can connect.\n\n## What\n- clap-based CLI: --url, --bearer-token, --basic-user, --basic-pass, --ca-cert, --client-cert, --client-key\n- Config struct holding parsed values\n- Build an AuthProvider from Config (NoneAuth / BearerAuth / BasicAuth / CustomCaAuth / ClientCertAuth)\n- Unit tests for arg parsing",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T03:26:13Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T04:05:29Z",
+  "close_reason": "Superseded; replaced by issues under jmap-chat-tui-s2e (egui) and new TUI epic",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-mm9",
+      "depends_on_id": "jmap-chat-tui-ddk",
+      "type": "blocks",
+      "created_at": "2026-04-26T20:27:04Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

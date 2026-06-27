@@ -1,0 +1,31 @@
+{
+  "id": "jmap-chat-tui-kgw.1",
+  "title": "Unknown variant on Serialize enums round-trips as literal string 'unknown'",
+  "description": "Trigger: a struct containing ChatKind, DeliveryState, OwnerPresence, etc. is serialized after receiving an unknown value from the server. The Unknown catch-all variant serializes as the variant name lowercased ('unknown') via #[serde(rename_all = 'lowercase')], producing a value indistinguishable from a hypothetical spec-defined 'unknown' kind. The original wire value is permanently lost. In practice these types are deserialization-only, but the public Serialize impl makes this reachable. Mitigation: doc comment on each Unknown variant noting that serializing it produces the literal string 'unknown', not the original wire value.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T05:04:44Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T05:06:16Z",
+  "closed_at": "2026-04-27T05:06:16Z",
+  "close_reason": "Added doc notes to all Unknown variants documenting serialization-as-literal-unknown behavior. Added test_unknown_catch_all_variants_serialize_as_literal_unknown documenting the serde limitation.",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-kgw.1",
+      "depends_on_id": "jmap-chat-tui-kgw",
+      "type": "parent-child",
+      "created_at": "2026-04-26T22:04:43Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

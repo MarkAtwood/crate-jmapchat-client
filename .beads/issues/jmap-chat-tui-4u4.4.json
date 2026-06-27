@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-4u4.4",
+  "title": "Duplicate Id/UTCDate type aliases in types:: and jmap::",
+  "description": "types::Id and jmap::Id are both pub type Id = String, and same for UTCDate. The two modules are both pub, so callers see two non-interchangeable names for the same type. Code in methods.rs uses crate::types::Chat but returns GetResponse\u003cT\u003e whose fields are plain String, not typed. A contributor adding a helper that takes a types::Id will be confused about which Id to use, and any future newtype wrapping of one but not the other will silently break cross-module use. — Fossilizes wrong: whichever alias gets used first in downstream code becomes the canonical one.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:07:32Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:24:50Z",
+  "closed_at": "2026-04-26T07:24:50Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4u4.4",
+      "depends_on_id": "jmap-chat-tui-4u4",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:07:31Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

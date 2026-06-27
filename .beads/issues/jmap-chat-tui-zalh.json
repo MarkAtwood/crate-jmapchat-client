@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-zalh",
+  "title": "base_url stored as String with no construction-time validation",
+  "description": "Why: JmapChatClient::new accepts base_url: \u0026str and stores it as String. The doc says 'must be server origin without trailing slash or path component' but this is not enforced. A caller passing https://host/path/ gets silent wrong behavior on fetch_session. What: Either parse as url::Url at new() time (returns Err on malformed input), or at minimum validate the contract (no path, no trailing slash) and return ClientError::InvalidArgument.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "bug",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:53:00Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T20:01:07Z",
+  "closed_at": "2026-04-27T20:01:07Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-zalh",
+      "depends_on_id": "jmap-chat-tui-sb7x",
+      "type": "parent-child",
+      "created_at": "2026-04-27T12:54:40Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

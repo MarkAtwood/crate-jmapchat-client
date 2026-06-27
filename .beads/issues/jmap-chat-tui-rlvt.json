@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-rlvt",
+  "title": "fix: Patch::Keep silently serializes as null in release builds",
+  "description": "## Problem\\nPatch::Keep's Serialize impl has a debug_assert\\!(false) that fires in debug but is silently ignored in release, where Patch::Keep serializes as null — indistinguishable from Patch::Clear on the wire. This will clear server-side nullable fields on any struct where the skip_serializing_if annotation is accidentally omitted.\\n\\n## Solution\\nReplace the silent fallback with a hard serde error: Err(serde::ser::Error::custom(...)) so misconfigured fields fail loudly in all build profiles. Alternatively, remove the Serialize impl and require callers to use map_entry() exclusively.\\n\\n## Acceptance\\n- Patch::Keep serialization returns an error in release builds (not null)\\n- Existing usages with skip_serializing_if are unaffected\\n- Tests verify the error path",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T00:32:41Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-28T00:52:37Z",
+  "close_reason": "Closed"
+}

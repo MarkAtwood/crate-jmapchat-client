@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-5n5.1.8",
+  "title": "Independent oracle discipline: fixtures hand-written from spec, not generated from code under test",
+  "description": "Every fixture file and every test doc-comment names the spec section it derives from (e.g. 'RFC 8620 §5.1'). The README.md explains why: serializing then deserializing with the same code proves only internal consistency, not spec conformance. A contributor may suggest generating fixtures from the types to save time — that would destroy the test suite's ability to catch systematic spec misreadings. The only valid oracle is a document written from spec text before the Rust code exists.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:21:38Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:36:14Z",
+  "closed_at": "2026-04-27T07:36:14Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-5n5.1.8",
+      "depends_on_id": "jmap-chat-tui-5n5.1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:21:38Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

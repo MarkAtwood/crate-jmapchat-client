@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-30o.18",
+  "title": "30o: download_blob drops {type} template variable",
+  "description": "Location: crates/jmap-chat/src/blob.rs lines 136-143. RFC 8620 §6.2 specifies the download URL template contains {accountId}, {blobId}, {name}, and {type}. download_blob substitutes only the first three; {type} is never substituted. The expand_url_template test in blob.rs line 231 even covers {type} substitution (the image/png case), but the actual download_blob API has no type parameter. Why burden: a maintainer adding content-type negotiation will expect to pass {type} as they do {name}, but there is no parameter slot. The connection between the test that covers {type} expansion and the download_blob function that omits it will confuse anyone debugging download URL construction. Suggested fix: add an optional accept_type parameter to download_blob (or document explicitly that {type} substitution is intentionally omitted and the template variable will remain literal).",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T10:02:28Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T10:06:29Z",
+  "closed_at": "2026-04-27T10:06:29Z",
+  "close_reason": "fixed: added accept_type: Option\u003c\u0026str\u003e parameter to download_blob",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-30o.18",
+      "depends_on_id": "jmap-chat-tui-30o",
+      "type": "parent-child",
+      "created_at": "2026-04-27T03:02:28Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

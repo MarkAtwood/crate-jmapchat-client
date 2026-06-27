@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-t6n1.13",
+  "title": "EndpointType not re-exported from lib.rs",
+  "description": "lib.rs re-exports ChatStreamDataType, PushUrgency, and QuotaScope at the crate root (line 32), but EndpointType is absent despite appearing in two public struct fields: Endpoint::endpoint_type and MessageAction::action_type. Any caller that pattern-matches on those fields must write types::EndpointType or import it explicitly — it is not reachable from the crate root. ChatStreamDataType is re-exported even though it only appears inside ChatStreamEnable (a less commonly matched type), making the omission of EndpointType inconsistent. Fix: add EndpointType to the re-export line in lib.rs.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:07:32Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:18:10Z",
+  "closed_at": "2026-04-27T19:18:10Z",
+  "close_reason": "Fixed by round 1 PushUrgency/EndpointType fixes",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-t6n1.13",
+      "depends_on_id": "jmap-chat-tui-t6n1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T12:07:32Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-yof.14",
+  "title": "SSE scan_from '3 bytes back' needs explanation",
+  "description": "client.rs subscribe_events: the comment says 'Advance scan_from to 3 bytes before the new data so we catch delimiters that span the old/new boundary', but does not explain WHY 3. The longest delimiter is \\\\r\\\\n\\\\r\\\\n (4 bytes), so a new reader must work out independently that only the last 3 bytes of the old buffer can form an incomplete prefix. A GitHub contributor will wonder whether 3 is off-by-one (should it be 4?). Fix: add a sentence explaining that the longest possible partial prefix straddling the boundary is 3 bytes (e.g. '\\\\r\\\\n\\\\r' from '\\\\r\\\\n\\\\r\\\\n'), so looking back 3 is sufficient and correct.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:38:42Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:55:04Z",
+  "closed_at": "2026-04-27T06:55:04Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yof.14",
+      "depends_on_id": "jmap-chat-tui-yof",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:38:42Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

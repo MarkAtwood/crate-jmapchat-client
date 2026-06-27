@@ -1,0 +1,41 @@
+{
+  "id": "jmap-chat-tui-1s0.4",
+  "title": "fixtures + tests: all Chat methods",
+  "description": "What: Write fixture files (by hand from spec) and wiremock tests for all 5 new Chat methods.\n\nFixture files to create (in crates/jmap-chat/tests/fixtures/methods/):\n1. chat_set_create_direct_response.json — SetResponse with created map: {\"client-direct-001\": {\"id\": \"01HV5Z6QKWJ7N3P8R2X4YTMDAA\", \"kind\": \"direct\", ...}}\n2. chat_set_create_group_response.json — SetResponse with created map: {\"client-group-001\": {\"id\": \"01HV5Z6QKWJ7N3P8R2X4YTMDBB\", \"kind\": \"group\", ...}}\n3. chat_set_update_response.json — SetResponse with updated map: {\"01HV5Z6QKWJ7N3P8R2X4YTMDAA\": null}\n4. chat_typing_response.json — {methodResponses: [[\"Chat/typing\", {\"accountId\": \"account1\"}, \"r1\"]], sessionState: \"sess-abc\"}\n5. chat_query_changes_response.json — QueryChangesResponse: {accountId, oldQueryState, newQueryState, removed: [], added: [{id: \"...\", index: 0}]}\n\nAll fixtures wrapped in standard JMAP envelope: {\"methodResponses\": [[method, args, \"r1\"]], \"sessionState\": \"sess-abc\"}\n\nTests to add to crates/jmap-chat/tests/methods_test.rs (append after test 35):\n- test 36: chat_create_direct_returns_typed_response — body_json matcher verifying {create: {\"client-direct-001\": {kind:\"direct\", contactId:\"...\"}}}, asserts created key\n- test 37: chat_create_group_returns_typed_response — body_json matcher verifying {create: {\"client-group-001\": {kind:\"group\", name:\"...\", memberIds:[...]}}}, asserts created key; optional fields absent when None\n- test 38: chat_set_update_returns_typed_response — body_json matcher verifying {update: {chatId: {muted: true}}}, asserts updated map\n- test 39: chat_typing_sends_correct_args — body_json matcher verifying {accountId, chatId, typing: true}, asserts account_id in response\n- test 40: chat_typing_rejects_empty_chat_id — guard test (no mock server), expects ClientError::InvalidArgument\n- test 41: chat_query_changes_returns_typed_response — body_json matcher verifying {sinceQueryState, no maxChanges key}, asserts old/new query state, removed, added\n\nOracle for fixture values: spec wire shapes + hand-constructed values (IDs are valid ULID-format strings). No code under test used as oracle.\n\nUpdate crates/jmap-chat/tests/fixtures/README.md methods/ table with all 5 new fixtures.\n\nDefensive programming rules:\n- body_json matchers verify absence of optional fields when not provided\n- Guard test uses dummy URL \"http://127.0.0.1:1\", no MockServer\n- All expected values derived from fixture file content, not from implementation\n\nAcceptance: cargo test passes with tests 36-41 all green; all 5 fixture files exist; clippy and fmt clean",
+  "acceptance_criteria": "cargo test passes including tests 36-41; 5 new fixture files exist in fixtures/methods/; README updated; clippy and fmt clean",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T08:29:10Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T08:38:22Z",
+  "closed_at": "2026-04-27T08:38:22Z",
+  "close_reason": "5 fixture files created, tests 36-41 passing, README updated",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-1s0.4",
+      "depends_on_id": "jmap-chat-tui-1s0.2",
+      "type": "blocks",
+      "created_at": "2026-04-27T01:29:14Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-1s0.4",
+      "depends_on_id": "jmap-chat-tui-1s0",
+      "type": "parent-child",
+      "created_at": "2026-04-27T01:29:09Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-1s0.4",
+      "depends_on_id": "jmap-chat-tui-1s0.3",
+      "type": "blocks",
+      "created_at": "2026-04-27T01:29:14Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

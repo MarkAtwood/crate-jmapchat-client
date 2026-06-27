@@ -1,0 +1,25 @@
+{
+  "id": "jmap-chat-tui-x2d.3",
+  "title": "types: SpaceUpdateInput + 4 sub-types",
+  "description": "What: Add SpaceUpdateInput and its sub-types to mod.rs. Scope: metadata + member management only (not role/channel/category management — those are out of scope for this epic).\n\nAlgorithm:\n1. SpaceAddMemberInput\u003c'a\u003e: id: \u0026'a str, role_ids: Option\u003c\u0026'a [\u0026'a str]\u003e\n2. SpaceUpdateMemberInput\u003c'a\u003e: id: \u0026'a str, role_ids: Option\u003c\u0026'a [\u0026'a str]\u003e, nick: Option\u003cOption\u003c\u0026'a str\u003e\u003e\n3. SpaceAddChannelInput\u003c'a\u003e: name: \u0026'a str, category_id: Option\u003c\u0026'a str\u003e, position: Option\u003cu64\u003e, topic: Option\u003c\u0026'a str\u003e\n4. SpaceRemoveChannelInput: just \u0026str (not a struct — list of channel ids), use \u0026[\u0026str] directly\n5. SpaceUpdateInput\u003c'a\u003e (no Default, id required):\n   id: \u0026'a str\n   name: Option\u003c\u0026'a str\u003e\n   description: Option\u003cOption\u003c\u0026'a str\u003e\u003e  (Some(None)=clear)\n   icon_blob_id: Option\u003cOption\u003c\u0026'a str\u003e\u003e  (Some(None)=clear)\n   is_public: Option\u003cbool\u003e\n   is_publicly_previewable: Option\u003cbool\u003e\n   add_members: \u0026'a [SpaceAddMemberInput\u003c'a\u003e]\n   remove_members: \u0026'a [\u0026'a str]\n   update_members: \u0026'a [SpaceUpdateMemberInput\u003c'a\u003e]\n   add_channels: \u0026'a [SpaceAddChannelInput\u003c'a\u003e]\n   remove_channels: \u0026'a [\u0026'a str]\n\nNote: omit role/category management from SpaceUpdateInput entirely (out of scope).\n\nRun cargo fmt, clippy -D warnings, test. Close bead.",
+  "acceptance_criteria": "cargo test passes; SpaceUpdateInput + SpaceAddMemberInput + SpaceUpdateMemberInput + SpaceAddChannelInput in mod.rs; clippy clean",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T08:56:24Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T08:58:53Z",
+  "close_reason": "SpaceAddMemberInput, SpaceUpdateMemberInput, SpaceAddChannelInput, SpaceUpdateInput added to mod.rs",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-x2d.3",
+      "depends_on_id": "jmap-chat-tui-x2d",
+      "type": "parent-child",
+      "created_at": "2026-04-27T01:56:24Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

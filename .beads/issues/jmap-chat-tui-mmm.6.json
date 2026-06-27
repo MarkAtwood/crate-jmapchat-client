@@ -1,0 +1,42 @@
+{
+  "id": "jmap-chat-tui-mmm.6",
+  "title": "methods: replace (api_url, account_id) params with \u0026Session",
+  "description": "What: Remove api_url: \u0026str and account_id: \u0026str from all 10 typed method wrappers in methods.rs; replace with session: \u0026Session. Update all call sites in client_task.rs and methods_test.rs.\n\nAlgorithm:\n\nPART 1 — methods.rs changes:\nFor each of the 10 methods (chat_get, chat_query, chat_changes, message_get, message_query, message_changes, message_create, chat_contact_get, read_position_get, read_position_set, presence_status_get):\n1. Remove api_url: \u0026str and account_id: \u0026str parameters.\n2. Add session: \u0026crate::jmap::Session as first parameter (after \u0026self).\n3. In the method body, replace api_url with \u0026session.api_url, and replace account_id with the result of:\n   let account_id = session.chat_account_id().ok_or_else(|| crate::error::ClientError::InvalidSession(\"no chat account_id for urn:ietf:params:jmap:chat\"))?;\n4. Remove any #[allow(clippy::too_many_arguments)] suppressions that were only needed because of the two extra params (check each method's arg count without the 2 removed params).\n\nPART 2 — methods_test.rs changes:\nFor every call like client.chat_get(\u0026api_url, \"account1\", ...) in tests:\n1. Create a minimal Session fixture (use serde_json::from_str with a hand-written JSON string for the session):\n   let session: Session = serde_json::from_str(r#\"{\"capabilities\":{},\"accounts\":{},\"primaryAccounts\":{\"urn:ietf:params:jmap:chat\":\"account1\"},\"username\":\"test\",\"apiUrl\":\"http://...\",\"downloadUrl\":\"\",\"uploadUrl\":\"\",\"eventSourceUrl\":\"\",\"state\":\"\"}\"}#).unwrap();\n   Use the mock server url for apiUrl (e.g., the wiremock base_url).\n2. Pass \u0026session instead of the two separate string args.\n\nPART 3 — client_task.rs changes:\nFor every call to a jmap-chat typed method (chat_query, chat_get, message_query, message_get, message_create, read_position_set, read_position_get, chat_changes, etc.):\n1. Remove the api_url and account_id arguments.\n2. Pass \u0026session instead.\n3. Remove the local api_url: String and account_id: String variables extracted from the session (lines ~97-119 of client_task.rs) since they are no longer needed.\n4. Helper functions that previously took api_url: \u0026str, account_id: \u0026str should be updated to take session: \u0026Session instead.\n5. The #[allow(clippy::too_many_arguments)] on try_mark_read (if it still triggers after this change) should be evaluated — remove if no longer needed.\n\nDefensive rules:\n- Session::chat_account_id() returns Option\u003c\u0026str\u003e; use ok_or_else to propagate as ClientError::InvalidSession.\n- Do not store session inside JmapChatClient — methods take it by reference on each call.\n- Do not change the low-level client.call() method (it keeps api_url: \u0026str — that's fine, it's the transport layer).\n- After removing api_url/account_id locals from client_task.rs, double check the session is still accessible in all the places it's referenced.\n\nTests:\n- All existing tests pass (they just pass \u0026session instead of two strings).\n- cargo test -p jmap-chat and cargo test -p jmap-chat-egui both pass.",
+  "acceptance_criteria": "cargo test --workspace passes. cargo clippy --workspace -- -D warnings passes. No remaining api_url or account_id positional string parameters on any typed method wrapper in methods.rs.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T05:43:43Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T05:59:56Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-mmm.6",
+      "depends_on_id": "jmap-chat-tui-mmm.4",
+      "type": "blocks",
+      "created_at": "2026-04-26T22:44:11Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-mmm.6",
+      "depends_on_id": "jmap-chat-tui-mmm.2",
+      "type": "blocks",
+      "created_at": "2026-04-26T22:44:12Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-mmm.6",
+      "depends_on_id": "jmap-chat-tui-mmm",
+      "type": "parent-child",
+      "created_at": "2026-04-26T22:43:43Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

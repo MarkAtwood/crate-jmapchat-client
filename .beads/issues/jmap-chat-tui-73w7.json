@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-73w7",
+  "title": "auth_failed_if name reads as predicate, not action",
+  "description": "Why: JmapChatClient::auth_failed_if(status) is named like a boolean predicate ('auth failed if X') but is actually a Result-returning action that returns Ok(()) on success. Callers skimming the code must read the body to understand the polarity. What: Rename to check_auth_status or require_non_auth_error. pub(crate) so no public API break.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:53:14Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T20:01:01Z",
+  "closed_at": "2026-04-27T20:01:01Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-73w7",
+      "depends_on_id": "jmap-chat-tui-sb7x",
+      "type": "parent-child",
+      "created_at": "2026-04-27T12:54:43Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

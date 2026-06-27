@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-vqw",
+  "title": "Review: Rust bigot API idiomaticity pass",
+  "notes": "Maintainer risk: MEDIUM — the Id inconsistency in response types is the main concern; it will generate subtle bugs and confusion as the TUI crate grows. The stringly-typed sort/filter params are a lower-frequency footgun but will be hit.\nConfidence: 95% no missed bug. These are API shape issues, not logic bugs. The only miss risk: a response type field that should be Id but gets an empty string from a buggy server — currently silently propagates, not caught at parse time.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T17:09:30Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T17:32:14Z",
+  "close_reason": "all steps complete",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

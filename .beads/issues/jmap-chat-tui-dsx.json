@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-dsx",
+  "title": "client_task: SSE StateChange loop",
+  "description": "## Why\nReal-time updates require processing SSE events from the server.\n\n## What\n- Open EventSource stream via JmapChatClient::subscribe_events()\n- On StateChange for Message: call Message/changes then Message/get for new ids, send NewMessage / updated events\n- On StateChange for Chat: call Chat/changes + Chat/get, send ChatUpdated\n- On StateChange for ChatContact: refresh contacts\n- On cannotCalculateChanges: fall back to full /get\n- Exponential backoff on disconnect (1s, 2s, 4s … cap 60s), then reconnect\n- Forward typing and presence SSE events as AppEvent",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T03:26:35Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T04:05:30Z",
+  "closed_at": "2026-04-27T04:05:30Z",
+  "close_reason": "Superseded; replaced by issues under jmap-chat-tui-s2e (egui) and new TUI epic",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-dsx",
+      "depends_on_id": "jmap-chat-tui-nyc",
+      "type": "blocks",
+      "created_at": "2026-04-26T20:27:08Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

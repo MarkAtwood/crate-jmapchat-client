@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-6hp.19",
+  "title": "GetResponse\u003cT\u003e and SetResponse\u003cT=Value\u003e generic response types with default type param are correct",
+  "description": "GetResponse\u003cT\u003e and SetResponse\u003cT = serde_json::Value\u003e are generic over the object type rather than having per-method concrete response types. A future contributor might add per-method aliases (type ChatGetResponse = GetResponse\u003cChat\u003e) or flatten these into concrete types. The generic approach is correct because RFC 8620 §5.1/§5.3 define the response envelope shape uniformly across all object types — the only variation is the element type. The default type parameter on SetResponse is load-bearing: message_create and read_position_set use SetResponse without a type argument, which avoids requiring callers to name a created-object type they do not need. Removing the default would force callers to write SetResponse\u003cserde_json::Value\u003e everywhere for update-only operations, which is noise. The #[serde(bound)] attribute on SetResponse is required because Rust's default derived bound is too conservative for generic structs with Option fields.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:06:22Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:33:59Z",
+  "closed_at": "2026-04-27T06:33:59Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-6hp.19",
+      "depends_on_id": "jmap-chat-tui-6hp",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:06:21Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

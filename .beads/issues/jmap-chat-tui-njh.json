@@ -1,0 +1,32 @@
+{
+  "id": "jmap-chat-tui-njh",
+  "title": "UI: message view panel",
+  "description": "## Why\nThe user needs to read the messages in the selected chat.\n\n## What\n- Display messages in receivedAt order, oldest at top\n- Each row: sender display name (fall back to login, then id), timestamp (coarsened to hour granularity), body text\n- Show [edited] tag when editedAt is set\n- Show [deleted] when deletedAt is set (body will be empty)\n- Show [encrypted] when bodyType is not text/plain or text/markdown\n- Auto-scroll to bottom on new message; preserve scroll position on history load\n- PgUp/PgDn and scroll wheel to navigate history",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T03:26:37Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T04:05:30Z",
+  "close_reason": "Superseded; replaced by issues under jmap-chat-tui-s2e (egui) and new TUI epic",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-njh",
+      "depends_on_id": "jmap-chat-tui-saj",
+      "type": "blocks",
+      "created_at": "2026-04-26T20:27:10Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-njh",
+      "depends_on_id": "jmap-chat-tui-nyc",
+      "type": "blocks",
+      "created_at": "2026-04-26T20:27:12Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-9vk.6",
+  "title": "replace empty-string chat_state sentinel with Option\u003cString\u003e",
+  "description": "chat_state: \u0026mut String uses an empty string as a sentinel meaning 'no baseline state known'. This requires comments at every site (load_chats line 416 returns String::new() for the empty-chat case; run line 116 assigns String::new() on load failure; chat_delta_sync line 610 tests is_empty()). The sentinel is invisible to the type system and could silently collide if a server ever returned an empty state token. — Change the type to Option\u003cString\u003e throughout: load_chats returns Ok(None) when there are no chats to baseline, run holds mut chat_state: Option\u003cString\u003e, chat_delta_sync takes chat_state: Option\u003c\u0026str\u003e and matches None | Some(_) explicitly. The None branch and has_more_changes branch then visibly converge on the same full-reload path.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:00:54Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:11:17Z",
+  "closed_at": "2026-04-26T09:11:17Z",
+  "close_reason": "Closed",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-9vk.6",
+      "depends_on_id": "jmap-chat-tui-9vk",
+      "type": "parent-child",
+      "created_at": "2026-04-26T02:00:53Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

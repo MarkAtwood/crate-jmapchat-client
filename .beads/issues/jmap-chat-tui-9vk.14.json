@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-9vk.14",
+  "title": "try_send over send in send_event: prevents blocking async executor on full channel",
+  "description": "send_event uses std::sync::mpsc::SyncSender::try_send (non-blocking) rather than send (blocking). If the UI thread falls behind and the 256-slot channel fills, a blocking send would stall the tokio task driving all JMAP I/O — effectively freezing network operations. try_send drops the event instead, which is safe because the events dropped under backpressure (transient status updates, non-critical errors) can be re-derived from the next event or are genuinely transient. A future contributor might change this to send 'to avoid dropping events', not realising they would be blocking an async executor thread and potentially deadlocking or starving the runtime.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:01:25Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:24:07Z",
+  "closed_at": "2026-04-26T09:24:07Z",
+  "close_reason": "Already addressed: send_event uses unbounded channel; send() is always non-blocking and cannot block the async executor",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-9vk.14",
+      "depends_on_id": "jmap-chat-tui-9vk",
+      "type": "parent-child",
+      "created_at": "2026-04-26T02:01:25Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

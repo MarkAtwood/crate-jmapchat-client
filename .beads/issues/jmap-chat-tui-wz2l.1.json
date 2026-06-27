@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-wz2l.1",
+  "title": "PushUrgency known variants lack serialization tests",
+  "description": "PushUrgency::VeryLow/Low/Normal/High have no test asserting their as_str() wire strings. The only coverage is the Unknown(String) round-trip test. A maintainer editing as_str() has no CI safety net for the known RFC 8030 wire strings. Consequence: silent regression where ChatPushConfig urgency serializes wrong values to the push endpoint.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:17:34Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:19:29Z",
+  "closed_at": "2026-04-27T19:19:29Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-wz2l.1",
+      "depends_on_id": "jmap-chat-tui-wz2l",
+      "type": "parent-child",
+      "created_at": "2026-04-27T12:17:33Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

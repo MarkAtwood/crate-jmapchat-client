@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-cu3j",
+  "title": "Clear supports_ephemeral when WS upgrade fails permanently",
+  "description": "## Why this issue exists\n\nAfter the 8lgk epic, `supports_ephemeral` is set from `ws_url.is_some()` at session bootstrap. If the server correctly advertises both `urn:ietf:params:jmap:websocket` and `urn:ietf:params:jmap:chat:websocket` but the WebSocket upgrade subsequently fails on every retry (proxy strips Upgrade headers, port blocked, TLS mismatch), the flag remains `true` indefinitely. The UI renders the typing indicator area and presence badges, but they are permanently empty — the original silent-degradation problem reappears in a narrower failure mode.\n\n## What needs to be done\n\n1. Add `WsNotification::PermanentFailure` variant to the WS notification enum in `client_task.rs`. The WS subtask should send this after exhausting retries (e.g. N consecutive failures without a successful frame received), rather than continuing to loop with backoff forever.\n\n2. In the main select! loop, when `WsNotification::PermanentFailure` is received, send `AppEvent::EphemeralUnavailable` to the UI.\n\n3. Add `AppEvent::EphemeralUnavailable` to `event.rs`. The `apply_event` handler in `app.rs` sets `self.supports_ephemeral = false`.\n\n4. Add a tracing::warn! at the permanent-failure point: `\"WebSocket upgrade failed after N retries; disabling ephemeral events\"`.\n\n## Acceptance criteria\n\n- After N consecutive WS upgrade failures, `AppState.supports_ephemeral` becomes `false`\n- UI stops rendering typing/presence elements after the flag clears\n- SSE transport is unaffected throughout\n- No panic paths; reconnect loop exits cleanly on permanent failure\n- `cargo test` and `cargo clippy` pass\n\n## Design notes\n\nN (retry limit before declaring permanent failure) needs a decision. Options:\n- Fixed count (e.g. 5 consecutive failures): simple, predictable\n- Time-based (e.g. no success within 60s of first attempt): handles transient network blips better\n\nRecommend fixed count = 5 to start; can be made configurable later if needed.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T23:09:05Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T23:11:57Z",
+  "close_reason": "all steps complete"
+}

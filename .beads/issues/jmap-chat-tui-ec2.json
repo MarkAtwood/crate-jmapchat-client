@@ -1,0 +1,14 @@
+{
+  "id": "jmap-chat-tui-ec2",
+  "title": "types: DeliveryReceipt deviceDeliveredAt, PresenceStatus receiptSharing",
+  "description": "## What\nSpec changes (IMPROVEMENTS.md §4, §5):\n- DeliveryReceipt: add device_delivered_at: Option\u003cUTCDate\u003e (optional; absent if recipient platform cannot confirm device delivery)\n- PresenceStatus: add receipt_sharing: bool (default true); add to PresenceStatus/set\n\n## Tests\nFixture tests/fixtures/types/delivery_receipt_with_device.json\nFixture tests/fixtures/types/presence_status_receipt_sharing.json\nAssert: deviceDeliveredAt round-trips as Option\u003cUTCDate\u003e\nAssert: receiptSharing defaults to true when absent",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:12:08Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T11:16:53Z",
+  "close_reason": "implemented and tests passing"
+}

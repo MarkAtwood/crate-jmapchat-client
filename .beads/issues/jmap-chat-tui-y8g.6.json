@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-y8g.6",
+  "title": "ChatContact/changes sends maxChanges:null but queryChanges omits key — inconsistent None handling across method pair",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T08:51:56Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T08:52:39Z",
+  "closed_at": "2026-04-27T08:52:39Z",
+  "close_reason": "Design decision: codebase-wide pattern — all /changes methods serialize maxChanges via json! (None→null per RFC 8620 §5.2); all /queryChanges methods conditionally omit (Pattern B). Both are spec-valid. Consistent, not a bug.",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-y8g.6",
+      "depends_on_id": "jmap-chat-tui-y8g",
+      "type": "parent-child",
+      "created_at": "2026-04-27T01:51:55Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

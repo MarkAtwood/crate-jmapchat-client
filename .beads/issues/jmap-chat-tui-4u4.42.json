@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-4u4.42",
+  "title": "CHAT_USING constant allocates Vec\u003cString\u003e on every request",
+  "description": "In methods.rs, build_request does: CHAT_USING.iter().map(|s| s.to_string()).collect() to populate JmapRequest::using. This happens on every single JMAP method call. The constant exists to avoid writing the URIs twice, but the realization into Vec\u003cString\u003e is deferred into the hot path. The real problem is that JmapRequest::using is Vec\u003cString\u003e when the call-time value is always a statically-known slice. Rewrite: change JmapRequest::using to Vec\u003cString\u003e but construct it once in a lazy_static or simply inline the two well-known strings as vec![...to_string()] at construction time and document that build_request is only ever called with the standard set. Alternatively, keep the constant and use CHAT_USING.iter().map(|\u0026s| s.to_string()) without the intermediate \u0026str hop. The allocation itself is minor; the real elegance issue is that the pattern implies reuse across different using sets but the code only ever uses one set.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:09:28Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:27:30Z",
+  "closed_at": "2026-04-26T07:27:30Z",
+  "close_reason": "Labeled OPINION by SEC7: allocation is noise vs HTTP round-trip cost",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "opinion",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4u4.42",
+      "depends_on_id": "jmap-chat-tui-4u4",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:09:28Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

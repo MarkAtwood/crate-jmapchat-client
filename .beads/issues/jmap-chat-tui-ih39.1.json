@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-ih39.1",
+  "title": "supports_ephemeral stays true if connect_ws fails after capability check",
+  "description": "supports_ephemeral is set from ws_url.is_some() at SessionReady time. If the server advertises both capabilities but the WebSocket upgrade subsequently fails (and keeps failing through all retries), AppState.supports_ephemeral stays true while typing indicators never arrive. The UI would show typing indicator UI with nothing in it — the original silent-degradation problem, but only in the upgrade-failure case. Fix is a WsNotification::PermanentFailure variant that flips the flag. Explicitly out of scope for this epic; filed for follow-up.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T23:03:28Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T23:09:09Z",
+  "closed_at": "2026-04-27T23:09:09Z",
+  "close_reason": "Superseded by epic jmap-chat-tui-cu3j",
+  "labels": [
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-ih39.1",
+      "depends_on_id": "jmap-chat-tui-ih39",
+      "type": "parent-child",
+      "created_at": "2026-04-27T16:03:28Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

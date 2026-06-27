@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-q68.4",
+  "title": "push_subscription_set error message has hardcoded method name",
+  "description": "The InvalidArgument error on duplicate accountId says 'push_subscription_set: duplicate accountId' with the old method name. After the rename to push_subscription_create this message will be stale. Fix at the same time as the rename (jmap-chat-tui-q68.1).",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T15:55:34Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T15:57:46Z",
+  "closed_at": "2026-04-27T15:57:46Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-q68.4",
+      "depends_on_id": "jmap-chat-tui-q68",
+      "type": "parent-child",
+      "created_at": "2026-04-27T08:55:34Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

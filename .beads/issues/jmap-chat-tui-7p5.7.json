@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-7p5.7",
+  "title": "SetResponse HashMap keys are String not Id — needs a comment explaining why",
+  "description": "After this commit, every account_id, ids, created (Vec), destroyed (Vec) field in GetResponse/QueryResponse/ChangesResponse/SetResponse was upgraded from String to Id. However, the HashMap keys in SetResponse remain String:\n\n  pub created: Option\u003cHashMap\u003cString, T\u003e\u003e,\n  pub updated: Option\u003cHashMap\u003cString, T\u003e\u003e,\n  pub not_created: Option\u003cHashMap\u003cString, SetError\u003e\u003e,\n  pub not_updated: Option\u003cHashMap\u003cString, SetError\u003e\u003e,\n  pub not_destroyed: Option\u003cHashMap\u003cString, SetError\u003e\u003e,\n\nThis is correct per RFC 8620 §5.3: the keys in the created/updated/not_*/destroyed maps are the caller-supplied *creation keys* (arbitrary strings chosen by the client), not server-assigned Ids. But a reader who just finished reading the fields above — all now typed Id — will wonder why these are still String.\n\nAdd a brief doc comment on the created and not_created fields explaining that the map key is the caller-supplied creation key, not a server Id. E.g.:\n\n  /// Keys are caller-supplied creation keys (not server Ids); see RFC 8620 §5.3.\n  pub created: Option\u003cHashMap\u003cString, T\u003e\u003e,\n\nFile: crates/jmap-chat/src/methods/mod.rs lines 81-86.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T17:34:38Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T17:39:30Z",
+  "closed_at": "2026-04-27T17:39:30Z",
+  "close_reason": "Fixed: added 'Keys are caller-supplied creation keys (not server Ids); see RFC 8620 §5.3.' to created and not_created fields",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-7p5.7",
+      "depends_on_id": "jmap-chat-tui-7p5",
+      "type": "parent-child",
+      "created_at": "2026-04-27T10:34:38Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

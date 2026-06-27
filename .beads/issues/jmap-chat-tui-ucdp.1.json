@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-ucdp.1",
+  "title": "expand_url_template silently leaves unreplaced {type} in download URL",
+  "description": "When download_blob is called with accept_type=None but the server's download URL template contains {type}, expand_url_template does a no-op replace and the literal string '{type}' stays in the URL. The request fires with a malformed URL; the server returns a 4xx with no indication the cause is a missing template variable. No post-expansion check detects unreplaced {...} tokens.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T02:38:27Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T02:42:23Z",
+  "closed_at": "2026-04-28T02:42:23Z",
+  "close_reason": "Fixed in source; compile verified",
+  "labels": [
+    "correctness",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-ucdp.1",
+      "depends_on_id": "jmap-chat-tui-ucdp",
+      "type": "parent-child",
+      "created_at": "2026-04-27T19:38:27Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

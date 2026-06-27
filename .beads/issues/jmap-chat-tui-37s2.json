@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-37s2",
+  "title": "fix: rename Id::from_trusted / UTCDate::from_trusted to from_raw",
+  "description": "## Problem\\nfrom_trusted is non-standard naming. The Rust ecosystem convention for bypassing validation is new_unchecked or from_raw. 'Trusted' implies a security property rather than a caller assertion that the invariant holds.\\n\\n## Solution\\nRename from_trusted to from_raw (or new_unchecked) on both Id and UTCDate. Update all call sites.\\n\\n## Acceptance\\n- from_trusted renamed consistently across both types and all call sites\\n- No other behavior changes",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T00:32:58Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-28T01:02:09Z",
+  "close_reason": "Closed"
+}

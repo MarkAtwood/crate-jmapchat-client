@@ -1,0 +1,33 @@
+{
+  "id": "jmap-chat-tui-1s0.3",
+  "title": "impl: chat_typing, chat_query_changes",
+  "description": "What: Implement chat_typing and chat_query_changes methods on JmapChatClient in methods/chat.rs.\n\nAlgorithm:\n1. chat_typing(\u0026self, session, chat_id: \u0026str, typing: bool) -\u003e Result\u003csuper::TypingResponse, ClientError\u003e:\n   a. Guard: if chat_id.is_empty() { return Err(ClientError::InvalidArgument(\"chat_typing: chat_id must not be empty\".into())) }\n   b. let (api_url, account_id) = Self::session_parts(session)?;\n   c. let args = json!({accountId: account_id, chatId: chat_id, typing: typing})\n   d. let (call_id, req) = super::build_request(\"Chat/typing\", args)\n   e. let resp = self.call(api_url, \u0026req).await?\n   f. crate::client::extract_response(resp, call_id)\n2. chat_query_changes(\u0026self, session, since_query_state: \u0026str, max_changes: Option\u003cu64\u003e) -\u003e Result\u003csuper::QueryChangesResponse, ClientError\u003e:\n   a. let (api_url, account_id) = Self::session_parts(session)?;\n   b. let mut args = json!({accountId: account_id, sinceQueryState: since_query_state})\n   c. if let Some(mc) = max_changes { args[\"maxChanges\"] = mc.into(); }  // omit when None (Pattern B)\n   d. let (call_id, req) = super::build_request(\"Chat/queryChanges\", args)\n   e. call + extract_response\n\nNote: chat_query_changes mirrors message_query_changes exactly (message.rs:233-250). TypingResponse is imported from super::.\n\nDefensive programming rules:\n- empty chat_id guard fires before session_parts (no network call)\n- max_changes: omit when None (not null) — same as message_query_changes\n- No unwrap(), no key material\n\nAcceptance: cargo test passes; chat_typing and chat_query_changes exist on JmapChatClient; clippy and fmt clean",
+  "acceptance_criteria": "cargo test passes; chat_typing and chat_query_changes exist on JmapChatClient; clippy and fmt clean",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T08:28:52Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T08:34:12Z",
+  "close_reason": "chat_typing (with empty-id guard) and chat_query_changes implemented in chat.rs",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-1s0.3",
+      "depends_on_id": "jmap-chat-tui-1s0",
+      "type": "parent-child",
+      "created_at": "2026-04-27T01:28:51Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-1s0.3",
+      "depends_on_id": "jmap-chat-tui-1s0.1",
+      "type": "blocks",
+      "created_at": "2026-04-27T01:29:13Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

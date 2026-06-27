@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-k8t.12",
+  "title": "PresenceStatusSetInput::default() silently sends id=empty string",
+  "description": "PresenceStatusSetInput derives Default, so Default::default() yields id=empty string. This compiles and produces a JMAP request with update key empty string, which is semantically invalid. A caller who builds the struct incrementally (let mut input = PresenceStatusSetInput::default(); input.presence = Some(...); client.presence_status_set(\u0026session, \u0026input).await) forgets to fill in id and gets a silent server error or incorrect update. The id field should not participate in Default — either remove the derive and implement manually omitting id, or change id type to Option\u003c\u0026str\u003e and validate at call time.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:51:48Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:59:33Z",
+  "closed_at": "2026-04-27T07:59:33Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-k8t.12",
+      "depends_on_id": "jmap-chat-tui-k8t",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:51:47Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

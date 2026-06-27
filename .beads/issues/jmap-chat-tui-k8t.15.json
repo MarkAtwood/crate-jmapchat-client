@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-k8t.15",
+  "title": "client_id in create-input structs is unvalidated and undocumented",
+  "description": "CustomEmojiCreateInput, SpaceInviteCreateInput, SpaceBanCreateInput, and MessageCreateInput all have client_id: \u0026str used as the JMAP create-map key. An empty string, whitespace-only string, or string containing JSON-special characters produces a malformed or ambiguous create map. No doc comment warns callers that this must be a ULID or otherwise unique non-empty string. No validation is performed at call time. The server will reject or misroute the response; the error will surface only as a SetError in not_created with no indication the client_id was the cause. Add a doc comment specifying ULID format and that empty strings are invalid.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:52:14Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:59:57Z",
+  "closed_at": "2026-04-27T07:59:57Z",
+  "close_reason": "client_id is already documented in all create-input structs as a caller-supplied ULID; RFC 8620 does not require client-side ULID validation",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-k8t.15",
+      "depends_on_id": "jmap-chat-tui-k8t",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:52:14Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "jmap-chat-tui-qnm5",
+  "title": "ChatStreamEnable::new takes Option\u003cVec\u003cId\u003e\u003e instead of Option\u003c\u0026[Id]\u003e",
+  "description": "ChatStreamEnable::new(data_types: Vec\u003cChatStreamDataType\u003e, chat_ids: Option\u003cVec\u003cId\u003e\u003e, contact_ids: Option\u003cVec\u003cId\u003e\u003e) takes owned Vecs for the optional filter lists. All other input constructors in this crate that take collections use borrowed slices (e.g. ChatPatch.add_members: Option\u003c\u0026[AddMemberInput]\u003e, ChatCreateInput::Group.member_ids: \u0026[\u0026str]). The ChatStreamEnable constructor forces callers to allocate owned Vecs even when they have a slice or a literal. Fix: change the constructor signature to new(data_types: Vec\u003cChatStreamDataType\u003e, chat_ids: Option\u003c\u0026[Id]\u003e, contact_ids: Option\u003c\u0026[Id]\u003e) and store as Option\u003cVec\u003cId\u003e\u003e internally by calling .map(|s| s.to_vec()). Alternatively keep Vec for the struct fields and change only the constructor.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T21:59:22Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T22:29:01Z",
+  "close_reason": "Closed"
+}

@@ -1,0 +1,33 @@
+{
+  "id": "jmap-chat-tui-1s0.2",
+  "title": "impl: chat_create_direct, chat_create_group, chat_set_update",
+  "description": "What: Implement chat_create_direct, chat_create_group, and chat_set_update methods on JmapChatClient in methods/chat.rs.\n\nAlgorithm:\n1. Add import: use super::{ChangesResponse, ChatCreateDirectInput, ChatCreateGroupInput, ChatUpdateInput, AddMemberInput, UpdateMemberRoleInput, GetResponse, QueryResponse, QueryChangesResponse, SetResponse};\n2. chat_create_direct(\u0026self, session, input: \u0026ChatCreateDirectInput\u003c'_\u003e) -\u003e Result\u003cSetResponse, ClientError\u003e:\n   a. let (api_url, account_id) = Self::session_parts(session)?;\n   b. Build create_obj: {kind: 'direct', contactId: input.contact_id}\n   c. let args = json!({accountId, create: {input.client_id: create_obj}})\n   d. build_request(\"Chat/set\", args), call, extract_response\n3. chat_create_group(\u0026self, session, input: \u0026ChatCreateGroupInput\u003c'_\u003e) -\u003e Result\u003cSetResponse, ClientError\u003e:\n   a. session_parts\n   b. Build create_obj: {kind: 'group', name: input.name, memberIds: input.member_ids}\n   c. Conditionally insert: description, avatarBlobId, messageExpirySeconds (None = omit)\n   d. let args = json!({accountId, create: {input.client_id: create_obj}})\n   e. build_request, call, extract_response\n4. chat_set_update(\u0026self, session, input: \u0026ChatUpdateInput\u003c'_\u003e) -\u003e Result\u003cSetResponse, ClientError\u003e:\n   a. session_parts\n   b. let mut patch = serde_json::Map::new()\n   c. Conditionally insert each field:\n      - muted: Option\u003cbool\u003e → insert if Some\n      - mute_until: Option\u003cOption\u003c\u0026UTCDate\u003e\u003e → if Some(inner): insert inner.map(|d| d.as_str().into()).unwrap_or(Null)\n      - receive_typing_indicators: Option\u003cbool\u003e\n      - pinned_message_ids: Option\u003c\u0026[\u0026str]\u003e → if Some(ids): insert as JSON array\n      - message_expiry_seconds: Option\u003cu64\u003e\n      - receipt_sharing: Option\u003cbool\u003e\n      - name: Option\u003c\u0026str\u003e\n      - description: Option\u003cOption\u003c\u0026str\u003e\u003e → same nullable pattern as mute_until\n      - avatar_blob_id: Option\u003cOption\u003c\u0026str\u003e\u003e\n   d. For add_members (non-empty): build array of {id, role} objects (role: omit if None), insert under 'addMembers'\n   e. For remove_members (non-empty): insert ids array under 'removeMembers'\n   f. For update_member_roles (non-empty): build array of {id, role}, insert under 'updateMemberRoles'\n   g. let args = json!({accountId, update: {input.id: Value::Object(patch)}})\n   h. build_request(\"Chat/set\", args), call, extract_response\n\nDefensive programming rules:\n- No guard for empty create inputs — each method has a single purpose\n- Nullable optional fields (mute_until, description, avatar_blob_id) use the Option\u003cOption\u003c...\u003e\u003e → Null pattern from misc.rs presence_status_set\n- For roles in add_members: use serde_json::to_value(role).map_err(ClientError::Serialize)? when Some, omit field when None\n- No unwrap(), no key material\n\nAcceptance: cargo test passes, cargo clippy clean, cargo fmt clean",
+  "acceptance_criteria": "cargo test passes; chat_create_direct, chat_create_group, chat_set_update exist on JmapChatClient; clippy and fmt clean",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T08:28:35Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T08:34:49Z",
+  "close_reason": "chat_create_direct, chat_create_group, chat_set_update implemented in chat.rs",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-1s0.2",
+      "depends_on_id": "jmap-chat-tui-1s0",
+      "type": "parent-child",
+      "created_at": "2026-04-27T01:28:35Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-1s0.2",
+      "depends_on_id": "jmap-chat-tui-1s0.1",
+      "type": "blocks",
+      "created_at": "2026-04-27T01:29:13Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

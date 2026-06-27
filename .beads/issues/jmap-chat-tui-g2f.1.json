@@ -1,0 +1,31 @@
+{
+  "id": "jmap-chat-tui-g2f.1",
+  "title": "extract chat list render out of update()",
+  "description": "update() is 150+ lines covering event drain, key input, status bar, compose bar, chat list panel, and message panel — six concerns in one method. The chat list block (lines 136-174 of main.rs) is self-contained: it reads self.state.chats, computes display labels, and calls selectable_label. Suggested rewrite: extract a fn show_chat_list(state: \u0026mut AppState, tx: \u0026SyncSender\u003cAppCommand\u003e, ui: \u0026mut egui::Ui) and call it from inside the SidePanel closure. Same pattern applies to show_message_panel and show_compose_bar. This reduces update() to ~30 lines of orchestration and makes each panel independently readable.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:40:43Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:28:36Z",
+  "closed_at": "2026-04-26T09:28:36Z",
+  "close_reason": "Closed",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "opinion",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-g2f.1",
+      "depends_on_id": "jmap-chat-tui-g2f",
+      "type": "parent-child",
+      "created_at": "2026-04-26T01:40:43Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

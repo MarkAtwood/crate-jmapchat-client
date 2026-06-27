@@ -1,0 +1,42 @@
+{
+  "id": "jmap-chat-tui-4yc.6",
+  "title": "Wire main.rs: clap, auth, tokio, eframe",
+  "description": "Rewrite main.rs to assemble all components into a working application.\n\nWhat: Entry point that parses config, builds auth, spawns client_task, runs eframe.\n\nAlgorithm:\n1. fn main() -\u003e eframe::Result\u003c()\u003e\n2. Parse config: let config = Config::parse();\n3. Build auth: let auth = config.auth_provider().expect('auth config');  (display error and exit on Err)\n4. Build client: let client = JmapChatClient::new(auth, \u0026config.server_url).unwrap_or_else(|e| { eprintln!('client: {e}'); std::process::exit(1); });\n5. Create channels: std::sync::mpsc::channel::\u003cAppEvent\u003e() for task→UI, std::sync::mpsc::channel::\u003cAppCommand\u003e() for UI→task.\n6. Run eframe::run_native:\n   Box::new(|cc| {\n     let ctx = cc.egui_ctx.clone();\n     // Spawn tokio runtime + client task on background thread:\n     let (task_tx, ui_rx) = mpsc::channel::\u003cAppEvent\u003e();\n     let (ui_tx, task_rx) = mpsc::channel::\u003cAppCommand\u003e();\n     std::thread::spawn(move || {\n       tokio::runtime::Runtime::new().unwrap().block_on(\n         client_task::run(client, task_tx, task_rx, ctx)\n       );\n     });\n     Ok(Box::new(App::new(AppState::default(), ui_tx, ui_rx)))\n   })\n\nDefensive rules:\n- Never unwrap() on client construction — print error and exit with code 1.\n- Never unwrap() on thread spawn — print error and exit.\n- Do not log bearer token in any startup message.\n\nTests: (integration: not easily unit-testable; covered by manual run and client_task tests)",
+  "acceptance_criteria": "cargo build -p jmap-chat-egui exits 0; binary runs and shows window (manual verification)",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:21:56Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-26T08:35:06Z",
+  "close_reason": "main.rs wired; binary builds; 81 tests passing",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4yc.6",
+      "depends_on_id": "jmap-chat-tui-4yc.4",
+      "type": "blocks",
+      "created_at": "2026-04-26T01:22:14Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-4yc.6",
+      "depends_on_id": "jmap-chat-tui-4yc.5",
+      "type": "blocks",
+      "created_at": "2026-04-26T01:22:15Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-4yc.6",
+      "depends_on_id": "jmap-chat-tui-4yc",
+      "type": "parent-child",
+      "created_at": "2026-04-26T01:21:55Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

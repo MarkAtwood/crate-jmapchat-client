@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-4u4.19",
+  "title": "SseFrameTooLarge error omits the size limit",
+  "description": "The error message for SseFrameTooLarge is \"SSE frame too large\" with no indication of what the limit is. The actual limit is 1 MiB (1024*1024 bytes), documented only in the subscribe_events doc comment and the inline guard comment in client.rs. A user who sees this error at 2am cannot tell what server behavior caused it or whether to file a bug. The error message should include the limit: \"SSE frame too large (limit: 1 MiB)\" so the error is actionable without reading source.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:08:05Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:30:45Z",
+  "closed_at": "2026-04-26T07:30:45Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4u4.19",
+      "depends_on_id": "jmap-chat-tui-4u4",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:08:05Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

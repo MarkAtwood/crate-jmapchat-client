@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-4u4.12",
+  "title": "parse_sse_block id return silently discarded in stream loop",
+  "description": "In client.rs subscribe_events, the event id returned by parse_sse_block is discarded with _id. The doc comment on subscribe_events says callers should track last_event_id for reconnect (RFC 8620 §7.3), but there is no comment at the discard site explaining whether this is a known omission or a bug. A contributor seeing _id would not know whether to fix it or leave it. The discard site needs a comment: // id tracking deferred — caller must implement reconnect with last_event_id.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:07:53Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:09:23Z",
+  "closed_at": "2026-04-26T07:09:23Z",
+  "close_reason": "duplicate of jmap-chat-tui-4u4.6",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4u4.12",
+      "depends_on_id": "jmap-chat-tui-4u4",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:07:53Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

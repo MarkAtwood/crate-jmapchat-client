@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-7va",
+  "title": "Split PresenceStatusSetInput, ChatContactSetInput, SpaceUpdateInput",
+  "description": "Same pattern as I3A/I3B for three more update structs:\n\nPresenceStatusSetInput { id, ... } -\u003e presence_status_set(\u0026session, id, \u0026PresenceStatusPatch { ..Default::default() })\nChatContactSetInput { id, ... } -\u003e chat_contact_set(\u0026session, id, \u0026ChatContactPatch { ..Default::default() })\nSpaceUpdateInput { id, ... } -\u003e space_update(\u0026session, id, \u0026SpacePatch { ..Default::default() })",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T14:32:10Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T15:10:43Z",
+  "close_reason": "Closed"
+}

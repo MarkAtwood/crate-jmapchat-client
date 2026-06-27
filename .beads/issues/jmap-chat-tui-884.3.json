@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-884.3",
+  "title": "quota_get returns GetResponse\u003cQuota\u003e not Vec\u003cQuota\u003e: correct and forward-compatible",
+  "description": "Returns full GetResponse\u003cQuota\u003e including state token. A contributor might suggest simplifying to Vec\u003cQuota\u003e to avoid 'boilerplate'. Reject: the state token is required for future Quota/changes delta sync support; dropping it now would be a breaking API change when Quota/changes is added. All other */get methods return GetResponse\u003cT\u003e; the previous Vec\u003cQuota\u003e was the anomaly.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T16:59:19Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T17:00:53Z",
+  "closed_at": "2026-04-27T17:00:53Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-884.3",
+      "depends_on_id": "jmap-chat-tui-884",
+      "type": "parent-child",
+      "created_at": "2026-04-27T09:59:18Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

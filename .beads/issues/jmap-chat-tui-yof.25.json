@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-yof.25",
+  "title": "EndpointType uri mapping duplicated across as_uri and from_uri",
+  "description": "types.rs: EndpointType::as_uri() and EndpointType::from_uri() are two parallel match blocks over the same 7-variant set. Adding a new variant requires editing both methods in sync; the relationship between string and variant is stated twice. Suggested rewrite: define a const table const ENDPOINT_URIS: \u0026[(EndpointType, \u0026str)] = \u0026[(EndpointType::Vtc, \"urn:jmap:chat:cap:vtc\"), ...]; then implement as_uri() and from_uri() as linear scans over that table. The table is the single source of truth; both methods become mechanical traversals.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:39:23Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:50:28Z",
+  "closed_at": "2026-04-27T06:50:28Z",
+  "close_reason": "Opinion: parallel match vs const table per SEC7; idiomatic Rust uses parallel match",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "opinion",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yof.25",
+      "depends_on_id": "jmap-chat-tui-yof",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:39:23Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-k8t.3",
+  "title": "build_request clones Vec\u003cString\u003e on every call",
+  "description": "build_request() calls chat_using().to_vec() on every JMAP method invocation, heap-allocating a Vec\u003cString\u003e with two owned String values each time. The OnceLock caches initialisation but not the clone. JmapRequest.using is Vec\u003cString\u003e, so the clone is mandatory under the current type. All 27 build_request call sites across chat, message, contact, misc, custom_emoji, space_ban, and space_invite modules are affected. Fix: change JmapRequest.using to Cow\u003c'static, [\u0026'static str]\u003e or Arc\u003c[String]\u003e, or add a separate internal request path that borrows the static slice directly. Impact: O(1) per call but two heap allocations per JMAP round-trip; measurable in tight polling loops (SSE reconnect + changes + get = 6+ gratuitous allocs per cycle).",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:50:00Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T08:00:00Z",
+  "closed_at": "2026-04-27T08:00:00Z",
+  "close_reason": "decision: build_request clones two short string literals per call; the allocation cost is negligible and adding indirection (Arc, OnceLock\u003cVec\u003e) would complicate the code more than it saves",
+  "labels": [
+    "efficiency",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-k8t.3",
+      "depends_on_id": "jmap-chat-tui-k8t",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:50:00Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

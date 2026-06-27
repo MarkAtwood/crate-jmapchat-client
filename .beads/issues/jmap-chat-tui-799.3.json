@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-799.3",
+  "title": "doc: read_positions staleness invariant not documented for new-chat SSE path",
+  "description": "When a new Chat arrives via SSE Chat/changes (handle_state_change -\u003e chat_delta_sync), read_positions is NOT refreshed. The SelectChat auto-mark-read path (client_task.rs:248) silently skips marking when read_positions.get(\u0026chat_id) returns None — newly created chats won't be auto-marked read on open until the next load_read_positions call (restart or MarkRead fallback). Nowhere in the code is the invariant stated: 'read_positions must be refreshed when new chats arrive via delta sync'. A contributor adding a chat-creation flow would not know to call load_read_positions.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:44:47Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:49:13Z",
+  "closed_at": "2026-04-26T09:49:13Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-799.3",
+      "depends_on_id": "jmap-chat-tui-799",
+      "type": "parent-child",
+      "created_at": "2026-04-26T02:44:47Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

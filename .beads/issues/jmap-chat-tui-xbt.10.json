@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-xbt.10",
+  "title": "Id::from_trusted doc does not warn against user input",
+  "description": "Id::from_trusted() doc says 'source is trusted (e.g. server-assigned IDs)' but does not explicitly say 'do not pass user-controlled strings.' A contributor adding a feature that accepts user input could call from_trusted() on it without recognizing the hazard. Suggested addition: 'Do not pass strings from user input or untrusted external sources; use Id::new() instead.' The name alone is insufficient.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:35:36Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:39:43Z",
+  "closed_at": "2026-04-26T07:39:43Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-xbt.10",
+      "depends_on_id": "jmap-chat-tui-xbt",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:35:36Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

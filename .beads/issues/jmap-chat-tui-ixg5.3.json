@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-ixg5.3",
+  "title": "Id::new and UTCDate::new empty-rejection not tested; Borrow\u003cstr\u003e not tested",
+  "description": "jmap.rs: (1) Id::new('') returning Err(EmptyError) has no test — core invariant of the type. Same for UTCDate::new(''). (2) Borrow\u003cstr\u003e impl from impl_string_newtype! macro has no test verifying HashMap\u003cId,V\u003e::get('literal') works. Both are load-bearing API contracts with zero test coverage.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T02:54:13Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T02:56:50Z",
+  "closed_at": "2026-04-28T02:56:50Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-ixg5.3",
+      "depends_on_id": "jmap-chat-tui-ixg5",
+      "type": "parent-child",
+      "created_at": "2026-04-27T19:54:12Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

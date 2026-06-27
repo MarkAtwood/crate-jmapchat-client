@@ -1,0 +1,34 @@
+{
+  "id": "jmap-chat-tui-mmm.5",
+  "title": "UTCDate: add parse() returning DateTime\u003cUtc\u003e",
+  "description": "What: Add a parse() method to UTCDate that returns a parsed DateTime\u003cUtc\u003e, and add a convenience as_datetime() method.\n\nAlgorithm:\n1. In crates/jmap-chat/src/jmap.rs, add to the UTCDate impl block:\n   /// Parse the stored string as RFC 3339 and return a DateTime\u003cUtc\u003e.\n   pub fn parse(\u0026self) -\u003e Result\u003cchrono::DateTime\u003cchrono::Utc\u003e, crate::error::ClientError\u003e {\n       chrono::DateTime::parse_from_rfc3339(\u0026self.0)\n           .map(|dt| dt.to_utc())\n           .map_err(|e| crate::error::ClientError::Parse(e.to_string()))\n   }\n2. Add chrono imports at the top of jmap.rs: use chrono::{DateTime, Utc}; (or use fully qualified paths in the method if preferred).\n3. Confirm ClientError::Parse exists (it does: Parse(String) variant).\n4. Add a unit test in the jmap.rs #[cfg(test)] block:\n   Test name: utc_date_parse_valid\n   Input: UTCDate::from_trusted(\"2024-01-02T12:00:00Z\")\n   Expected: parse() returns Ok with year=2024, month=1, day=2\n   Oracle: hand-computed expected values from the literal string, not from the code under test.\n   Test name: utc_date_parse_invalid\n   Input: UTCDate::from_trusted(\"not-a-date\")\n   Expected: parse() returns Err(ClientError::Parse(_))\n5. Run: cargo test -p jmap-chat\n\nDefensive rules:\n- Do not change UTCDate's internal representation (keep it as String newtype).\n- Do not change serde behavior of UTCDate.\n- Do not add parse() to the constructor — it is a separate method on existing instances.\n- to_utc() converts FixedOffset to Utc correctly.\n\nTests:\n- parse(\"2024-01-02T12:00:00Z\") → DateTime\u003cUtc\u003e with expected year/month/day values.\n- parse(\"not-a-date\") → Err(ClientError::Parse(...))",
+  "acceptance_criteria": "cargo test -p jmap-chat passes including new utc_date_parse_valid and utc_date_parse_invalid tests. cargo clippy -p jmap-chat -- -D warnings passes.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T05:43:42Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T05:59:53Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-mmm.5",
+      "depends_on_id": "jmap-chat-tui-mmm",
+      "type": "parent-child",
+      "created_at": "2026-04-26T22:43:42Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-mmm.5",
+      "depends_on_id": "jmap-chat-tui-mmm.1",
+      "type": "blocks",
+      "created_at": "2026-04-26T22:44:10Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

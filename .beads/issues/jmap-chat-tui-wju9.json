@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-wju9",
+  "title": "Review round 1: serde Unknown outbound fix",
+  "notes": "Confidence: 90% no missed bug. Running out of real complaints: yes. P0/P1/P2 filed this round: 0. The two P4 issues (enum-level doc gap, missing deserialize-then-serialize round-trip for Unknown) are real but cosmetic/coverage concerns, not correctness bugs. The manual serde pattern is sound. The split serialize/deserialize test structure has correct oracle discipline. Labeled issues .5 and .7 as opinion.\nMaintainer risk: LOW — The three converted enums (ChatKind, ChatMemberRole, OwnerPresence) are correct: wire strings match spec, Unknown(String) round-trips cleanly, outbound serialization call sites (chat_query, chat_update, presence_status_update) are all correct. No P0 bugs found. Two P1 items filed: (1) missing Unknown round-trip tests for the three new enums — the PushUrgency test pattern was not replicated; (2) ChatStreamDataType is an outbound enum left on the old unit-Unknown pattern inconsistently.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:26:49Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T19:33:51Z",
+  "close_reason": "all steps complete",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

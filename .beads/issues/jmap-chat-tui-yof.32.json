@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-yof.32",
+  "title": "SetResponse\u003cT = serde_json::Value\u003e default type parameter allows untyped usage without syntax noise",
+  "description": "SetResponse uses a default type parameter T = serde_json::Value so that callers that do not need typed created/updated objects can write SetResponse without a type argument (as done in message_create and read_position_set). The explicit #[serde(bound(deserialize = \"T: serde::de::DeserializeOwned\"))] attribute is required because serde's derive macro does not automatically generate the correct bound when a default type parameter is present. A future contributor might suggest removing the default and requiring explicit serde_json::Value at all call sites, or removing the serde bound annotation. The first creates pointless verbosity at every call site that does not inspect created objects; the second would cause a compile error because serde's derived impl would require T: Deserialize\u003c'de\u003e which cannot be satisfied by the default. The serde(bound) annotation is load-bearing and must stay.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:42:23Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:01:41Z",
+  "closed_at": "2026-04-27T07:01:41Z",
+  "close_reason": "Decision record — no action needed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yof.32",
+      "depends_on_id": "jmap-chat-tui-yof",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:42:22Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

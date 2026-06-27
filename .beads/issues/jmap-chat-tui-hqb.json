@@ -1,0 +1,16 @@
+{
+  "id": "jmap-chat-tui-hqb",
+  "title": "jmap-chat: wire up enums — eliminate stringly-typed spec fields",
+  "description": "Nine public API fields use String/Vec\u003cString\u003e where the spec defines a finite set of values and an enum already exists or is trivially addable. Groups: (1) wire existing enums into structs that ignore them, (2) add three small enums for spec-defined finite sets. All changes are API-breaking (minor version bump needed); plan to ship as one coordinated release.",
+  "notes": "Child issues: jmap-chat-tui-gbg (EndpointType), jmap-chat-tui-4hq (ChatKind), jmap-chat-tui-4br (ContactPresence/SSE), jmap-chat-tui-e3s (ChatStreamDataType), jmap-chat-tui-4ad (PushUrgency), jmap-chat-tui-6v1c (QuotaScope)\nReview converged after 3 round(s). Final review: jmap-chat-tui-dfw6.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T18:49:21Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:22:03Z",
+  "closed_at": "2026-04-27T19:22:03Z",
+  "close_reason": "Closed"
+}

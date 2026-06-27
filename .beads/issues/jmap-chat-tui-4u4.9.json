@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-4u4.9",
+  "title": "SSE stream continues yielding items after SseFrameTooLarge error, contradicting doc",
+  "description": "client.rs subscribe_events(): the doc says the stream 'terminates' after yielding ClientError::SseFrameTooLarge. The implementation returns Some((Err(SseFrameTooLarge), (stream, buf))) from the unfold closure, which does not terminate the stream — unfold will be polled again on the next next() call. A caller who continues polling after receiving SseFrameTooLarge will get more items (possibly more errors or events from the remaining buffer), not stream termination. The documented contract is broken.",
+  "status": "closed",
+  "priority": 0,
+  "issue_type": "bug",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:07:45Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:22:18Z",
+  "closed_at": "2026-04-26T07:22:18Z",
+  "close_reason": "Closed",
+  "labels": [
+    "correctness",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4u4.9",
+      "depends_on_id": "jmap-chat-tui-4u4",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:07:45Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

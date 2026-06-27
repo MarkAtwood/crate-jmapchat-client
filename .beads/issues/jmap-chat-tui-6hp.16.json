@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-6hp.16",
+  "title": "AuthProvider blanket impl warning doesn't list which methods need mirroring",
+  "description": "The maintenance comment above the Box\u003cdyn AuthProvider\u003e and Arc\u003cdyn AuthProvider\u003e blanket impls (auth.rs lines 174, 196) says 'every method added must be mirrored here' but doesn't enumerate which methods currently exist (build_client, auth_header). A contributor adding a third method sees the warning but has no checklist — they must manually compare the trait definition with both impls. Fix: add a comment like '// Current methods: build_client, auth_header' to make a missing mirror visible at a glance.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:06:15Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:32:29Z",
+  "closed_at": "2026-04-27T06:32:29Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-6hp.16",
+      "depends_on_id": "jmap-chat-tui-6hp",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:06:14Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-dq9g",
+  "title": "Review round 2: jmap-chat API idiomatics cleanup",
+  "notes": "Round 2 confidence: 5% chance of missed bug. Checked: all 5 files in scope (auth.rs, client.rs, error.rs, jmap.rs, methods/mod.rs) plus sse.rs for SSE-related correctness. Verified all 6 round-1 P1 fixes are correct and complete. No new P0/P1 found. Found 2 new P2s: call_batch duplicate-ID error path has no test (dq9g.3), push_subscription_create duplicate accountId path has no test (dq9g.4). Checked: SSE error continuation with Some(state) is not a correctness bug (stream terminates on next poll). Checked: Patch\u003cT\u003e three-way deserialize is correct (absent-\u003eKeep via Default, null-\u003eClear, value-\u003eSet). Checked: scan_from overlap logic and char-boundary fix are correct. Checked: call_batch after-move analysis — inv.call_id is not moved into map value, only clone is, so error message is safe. Running out of real complaints.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T01:13:57Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-28T01:23:24Z",
+  "close_reason": "all steps complete",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

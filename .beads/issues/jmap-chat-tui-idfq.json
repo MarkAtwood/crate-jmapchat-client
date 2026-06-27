@@ -1,0 +1,73 @@
+{
+  "id": "jmap-chat-tui-idfq",
+  "title": "epic: jmap-chat crate API idiomatics cleanup",
+  "description": "## Purpose\\nAddress the idiomatic Rust issues surfaced in the post-phase-2 API review. These are not correctness bugs in the protocol implementation — they are API design and type-system issues that would catch a Rust bigot's eye in a code review.\\n\\n## Scope\\nAll findings are in the jmap-chat library crate. None require protocol spec changes.\\n\\n## Issues (priority order)\\n- jmap-chat-tui-rlvt (P1 bug): Patch::Keep silently serializes as null in release builds\\n- jmap-chat-tui-dzg8 (P2): split AuthProvider transport from credential injection\\n- jmap-chat-tui-s4q2 (P2): store base_url as url::Url instead of String\\n- jmap-chat-tui-y9se (P3): remove Deref\u003cTarget=str\u003e from Id and UTCDate newtypes\\n- jmap-chat-tui-37s2 (P4): rename from_trusted to from_raw\\n- jmap-chat-tui-764r (P4): From\u003cOption\u003cT\u003e\u003e for Patch\u003cT\u003e None→Keep semantics\\n- jmap-chat-tui-mrr9 (P4): call_batch type erasure — reconsider API\\n\\n## Design notes\\nThe P1 bug (Patch::Keep) should be fixed first as it is a latent correctness issue in release builds. The P2 refactors (AuthProvider split, base_url type) are independent and can proceed in parallel. P3/P4 items are style and ergonomics improvements that carry no urgency.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "feature",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T00:33:18Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T01:23:37Z",
+  "closed_at": "2026-04-28T01:23:37Z",
+  "close_reason": "All 7 child issues implemented and two review rounds passed (P0=P1=P2=0). Tests: 259 passing, 0 failing.",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-idfq",
+      "depends_on_id": "jmap-chat-tui-mrr9",
+      "type": "blocks",
+      "created_at": "2026-04-27T17:41:03Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-idfq",
+      "depends_on_id": "jmap-chat-tui-37s2",
+      "type": "blocks",
+      "created_at": "2026-04-27T17:41:00Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-idfq",
+      "depends_on_id": "jmap-chat-tui-dzg8",
+      "type": "blocks",
+      "created_at": "2026-04-27T17:40:55Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-idfq",
+      "depends_on_id": "jmap-chat-tui-rlvt",
+      "type": "blocks",
+      "created_at": "2026-04-27T17:40:53Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-idfq",
+      "depends_on_id": "jmap-chat-tui-s4q2",
+      "type": "blocks",
+      "created_at": "2026-04-27T17:40:57Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-idfq",
+      "depends_on_id": "jmap-chat-tui-764r",
+      "type": "blocks",
+      "created_at": "2026-04-27T17:41:01Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-idfq",
+      "depends_on_id": "jmap-chat-tui-y9se",
+      "type": "blocks",
+      "created_at": "2026-04-27T17:40:58Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

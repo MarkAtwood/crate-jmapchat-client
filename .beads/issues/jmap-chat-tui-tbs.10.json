@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-tbs.10",
+  "title": "skip_serializing_if on Deserialize-only ChatMessageEntry is misleading",
+  "description": "ChatMessageEntry derives only Deserialize (no Serialize), but its optional fields carry #[serde(skip_serializing_if = \"Option::is_none\")]. These attributes are ignored at compile time and have no effect, but a contributor reading the struct will assume it is serializable. A future contributor adding Serialize derive will get the skip_serializing_if behavior they'd expect, which may or may not be correct. Fix: remove the skip_serializing_if attributes from ChatMessageEntry fields (and ChatMessagePush if it has the same pattern), since they are meaningless on a Deserialize-only type.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T09:29:17Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T09:34:19Z",
+  "closed_at": "2026-04-27T09:34:19Z",
+  "close_reason": "fixed in implementation",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-tbs.10",
+      "depends_on_id": "jmap-chat-tui-tbs",
+      "type": "parent-child",
+      "created_at": "2026-04-27T02:29:16Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

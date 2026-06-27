@@ -1,0 +1,16 @@
+{
+  "id": "jmap-chat-tui-4pp",
+  "title": "jmap-chat API idiomaticity: review findings",
+  "description": "Collect and resolve the Rust idiomaticity issues surfaced in the cold-eyes API review. Each child issue is an independent fix; the epic closes when all are done.",
+  "notes": "Child issues: jmap-chat-tui-0s4 (Message.body_type), jmap-chat-tui-1r9 (filter_presence type), jmap-chat-tui-o09 (let-else), jmap-chat-tui-q4b (crate root re-exports)",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T17:53:38Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T18:29:10Z",
+  "closed_at": "2026-04-27T18:29:10Z",
+  "close_reason": "Closed"
+}

@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-gdc.16",
+  "title": "#[non_exhaustive] on AppEvent and AppCommand is justified by protocol extensibility",
+  "description": "Both AppEvent and AppCommand carry #[non_exhaustive]. These enums mirror protocol-defined sets: AppEvent variants correspond to JMAP server events (session ready, chat changes, message updates, SSE state changes), and AppCommand variants correspond to user-initiated JMAP operations (select chat, send message, mark read). The JMAP Chat spec is not frozen; future revisions will add new event types (e.g. typing indicators, presence, read receipts as first-class events) and new command types. Without #[non_exhaustive], adding a variant is a breaking change for any crate that matches on these enums. With it, downstream match arms that lack a wildcard arm produce a compile error, forcing explicit handling rather than silent fallthrough. A future contributor might remove #[non_exhaustive] arguing that these are internal types — they are currently internal, but the attribute costs nothing and the spec extensibility rationale holds regardless of visibility.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:34:36Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:40:40Z",
+  "closed_at": "2026-04-26T09:40:40Z",
+  "close_reason": "Good decision already implemented in current codebase",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-gdc.16",
+      "depends_on_id": "jmap-chat-tui-gdc",
+      "type": "parent-child",
+      "created_at": "2026-04-26T02:34:36Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-6hp.5",
+  "title": "UTCDate stores as transparent string and parses lazily via parse() — correct tradeoff",
+  "description": "UTCDate wraps a String and exposes parse() -\u003e Result\u003cchrono::DateTime\u003cUtc\u003e, ClientError\u003e rather than storing a parsed DateTime. A future contributor might suggest parsing eagerly during deserialization to catch malformed dates at the boundary. The lazy approach is correct for two reasons: (1) JMAP date strings round-trip exactly — the wire value is preserved verbatim for re-serialization, which eager parsing would break by reformatting; (2) most code paths that receive a UTCDate (display, comparison by string) do not need a parsed DateTime, so eager parsing would pay chrono overhead on every deserialization. The serde(transparent) attribute enforces that UTCDate serializes identically to a plain string, which is the RFC 8620 §1.4 requirement. Do not change this to eager parsing.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:05:46Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:33:46Z",
+  "closed_at": "2026-04-27T06:33:46Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-6hp.5",
+      "depends_on_id": "jmap-chat-tui-6hp",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:05:46Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

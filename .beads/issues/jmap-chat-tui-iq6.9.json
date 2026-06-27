@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-iq6.9",
+  "title": "EventSender type alias comment does not explain channel choice",
+  "description": "In client_task.rs line 30: 'type EventSender = tokio::sync::mpsc::UnboundedSender\u003cAppEvent\u003e;' with the comment '// Alias to keep function signatures readable.' The comment explains why the alias exists but not why UnboundedSender was chosen over a bounded channel. A future contributor adding a new function that takes EventSender needs to know the channel is unbounded (send() never blocks, never fails due to capacity) to understand the backpressure characteristics. The send_event() helper's doc comment does explain the unbounded choice, but the type alias itself gives no hint. Adding a brief note at the alias (e.g. 'unbounded: send() is always non-blocking; see send_event() for rationale') would make the alias self-contained.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:14:31Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:26:00Z",
+  "closed_at": "2026-04-26T09:26:00Z",
+  "close_reason": "Fixed: EventSender type alias now has a comment explaining the unbounded channel choice and rationale",
+  "labels": [
+    "my-oss",
+    "opinion",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-iq6.9",
+      "depends_on_id": "jmap-chat-tui-iq6",
+      "type": "parent-child",
+      "created_at": "2026-04-26T02:14:30Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

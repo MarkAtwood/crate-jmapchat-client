@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-30o.15",
+  "title": "30o: BlobUploadResponse missing #[non_exhaustive]",
+  "description": "crates/jmap-chat/src/blob.rs: BlobUploadResponse is a server-defined response shape (RFC 8620 §6.1) and is missing #[non_exhaustive], while BlobLookupEntry and BlobLookupResponse in methods/blob.rs both carry it. Inconsistency: future spec additions to the upload response shape (e.g., a new integrity field) would silently be dropped on deserialization without the attribute flagging the pattern difference at review time.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T10:02:17Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T10:06:36Z",
+  "closed_at": "2026-04-27T10:06:36Z",
+  "close_reason": "fixed: added #[non_exhaustive] to BlobUploadResponse",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-30o.15",
+      "depends_on_id": "jmap-chat-tui-30o",
+      "type": "parent-child",
+      "created_at": "2026-04-27T03:02:16Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

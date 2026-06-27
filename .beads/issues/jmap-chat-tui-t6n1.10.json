@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-t6n1.10",
+  "title": "QuotaScope::Unknown missing serde round-trip caveat",
+  "description": "QuotaScope::Unknown uses #[serde(other)] but its doc comment says only 'Unrecognized scope value.' with no warning that serializing it emits the literal string \"unknown\" rather than the original wire value. This is inconsistent with every other #[serde(other)] Unknown variant in types.rs. Fix: add the standard caveat: 'If serialized, produces the literal string \"unknown\" — not the original wire value.'",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:07:16Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:18:07Z",
+  "closed_at": "2026-04-27T19:18:07Z",
+  "close_reason": "Fixed by round 1 PushUrgency/EndpointType fixes",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-t6n1.10",
+      "depends_on_id": "jmap-chat-tui-t6n1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T12:07:15Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

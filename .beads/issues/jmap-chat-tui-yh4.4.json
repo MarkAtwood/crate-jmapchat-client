@@ -1,0 +1,34 @@
+{
+  "id": "jmap-chat-tui-yh4.4",
+  "title": "blob.rs: BlobUploadResponse type + URL template helper",
+  "description": "Why: upload_blob and download_blob need (1) a typed response struct for RFC 8620 §6.1 upload responses and (2) a URL template expander for {accountId}/{blobId}/{name} substitution per RFC 6570 Level 1.\\n\\nWhat: Create new crates/jmap-chat/src/blob.rs with:\\n- BlobUploadResponse { account_id, blob_id, type_, size, sha256: Option\u003cString\u003e }\\n- fn expand_url_template(template: \u0026str, vars: \u0026[(\u0026str, \u0026str)]) -\u003e String — percent-encodes each value using unreserved charset (ALPHA/DIGIT/-._~), replaces {varname}\\n- Add 'pub mod blob;' to src/lib.rs\\n- Add fixture tests/fixtures/blob/upload_response.json (hand-written from RFC 8620 §6.1 example)\\n\\nAlgorithm:\\n1. Create tests/fixtures/blob/ directory and upload_response.json fixture\\n2. Create src/blob.rs with BlobUploadResponse (Deserialize, Debug, Clone)\\n3. Add expand_url_template fn (no new deps: percent-encode manually with char::is_ascii_alphanumeric + '-'/'.'/'_'/'~')\\n4. Add unit tests for template expansion: {accountId} basic, {name} with spaces/slashes, {blobId} with special chars\\n5. Add pub mod blob; to lib.rs\\n6. Run cargo test",
+  "acceptance_criteria": "cargo test passes; expand_url_template tests cover space/slash/non-ascii encoding; BlobUploadResponse deserializes fixture",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T09:47:47Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T09:53:15Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yh4.4",
+      "depends_on_id": "jmap-chat-tui-yh4.1",
+      "type": "blocks",
+      "created_at": "2026-04-27T02:48:30Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-yh4.4",
+      "depends_on_id": "jmap-chat-tui-yh4",
+      "type": "parent-child",
+      "created_at": "2026-04-27T02:47:47Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

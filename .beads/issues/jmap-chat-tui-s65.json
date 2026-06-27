@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-s65",
+  "title": "Review: feat(jmap-chat): batch requests, RefPlus, and Quota/get",
+  "notes": "Confidence: 92% chance no missed bugs. Uncertainty driven by: no live server to test quota_get; RFC 8621 Quota spec read from fixture not primary source; ResultReference path semantics (JSON Pointer RFC 6901) not exercised end-to-end. Would raise confidence if: integration test with actual JMAP server; path edge cases (array indices, nested fields) tested.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T10:49:42Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T10:51:37Z",
+  "close_reason": "Fixed: to_value() uses json! macro, call_batch() detects duplicate call_ids, new() docstring updated",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

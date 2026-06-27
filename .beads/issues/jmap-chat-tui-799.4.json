@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-799.4",
+  "title": "doc: AppState pub fields — cache-consistency invariant only stated for chat_display, not chats",
+  "description": "AppState has all fields pub. The doc comment on chat_display (app.rs:29-35) warns 'Never mutate this field directly from outside apply_event'. But the parent invariant — that chats must ALSO only be mutated via apply_event to keep chat_display consistent — is not stated on chats itself. A contributor adding a refresh button and pushing to self.state.chats directly would corrupt the display cache without any compile-time guard. The invariant should be mirrored on the chats field doc.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:44:53Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:49:15Z",
+  "closed_at": "2026-04-26T09:49:15Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-799.4",
+      "depends_on_id": "jmap-chat-tui-799",
+      "type": "parent-child",
+      "created_at": "2026-04-26T02:44:53Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

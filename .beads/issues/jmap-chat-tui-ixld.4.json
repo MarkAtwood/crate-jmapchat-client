@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-ixld.4",
+  "title": "TransportConfig/AuthProvider split: TLS config and credential injection are separate traits",
+  "description": "Previously CustomCaAuth combined TLS trust-root installation with the AuthProvider interface, making --ca-cert mutually exclusive with --bearer-token and --basic-auth. The split into TransportConfig (build_client) and AuthProvider (auth_header) allows any transport to be paired with any credential scheme. A contributor might suggest collapsing them back into one trait to reduce the public API surface — this must be resisted: the whole point is that the two concerns are orthogonal. Kith (and any private-CA server that also uses Bearer or Basic auth) requires both simultaneously.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T01:03:48Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T01:25:49Z",
+  "closed_at": "2026-04-28T01:25:49Z",
+  "close_reason": "Decision recorded during idfq epic implementation; design intentionally retained as-is.",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-ixld.4",
+      "depends_on_id": "jmap-chat-tui-ixld",
+      "type": "parent-child",
+      "created_at": "2026-04-27T18:03:48Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-g2f.22",
+  "title": "SyncSender (bounded, capacity 256) from background task to UI provides backpressure and bounds memory use",
+  "description": "The task-to-UI event channel uses std::sync::mpsc::sync_channel with capacity 256, yielding a SyncSender. When the UI is slow (window hidden, machine loaded), the background task blocks on send rather than accumulating an unbounded event queue. An unbounded channel allows the background task to fill RAM with events if the UI stalls — a real concern when SSE fires rapid state-change notifications or during a full resync. A contributor might suggest switching to mpsc::channel (unbounded) to avoid the rare case where the background task blocks. That would be wrong: the bounded channel is the mechanism that prevents unbounded event accumulation; 256 items is already generous for normal operation, and brief backpressure on an overloaded UI is preferable to OOM. The command-to-task direction is also bounded (256) for symmetry: a user rapidly clicking chats should not enqueue unbounded SelectChat commands.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:42:00Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:24:48Z",
+  "closed_at": "2026-04-26T09:24:48Z",
+  "close_reason": "Stale: AppEvent channel was switched to tokio unbounded_channel; send() never blocks",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-g2f.22",
+      "depends_on_id": "jmap-chat-tui-g2f",
+      "type": "parent-child",
+      "created_at": "2026-04-26T01:41:59Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

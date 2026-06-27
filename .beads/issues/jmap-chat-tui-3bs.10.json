@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-3bs.10",
+  "title": "SEC0: no correctness bugs found",
+  "status": "closed",
+  "priority": 0,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T08:40:35Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T08:41:48Z",
+  "closed_at": "2026-04-27T08:41:48Z",
+  "close_reason": "Design decision: good design, no action needed",
+  "labels": [
+    "correctness",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-3bs.10",
+      "depends_on_id": "jmap-chat-tui-3bs",
+      "type": "parent-child",
+      "created_at": "2026-04-27T01:40:35Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

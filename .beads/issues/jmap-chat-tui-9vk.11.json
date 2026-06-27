@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-9vk.11",
+  "title": "MarkRead silently fails when chat has no read position after re-fetch",
+  "description": "In client_task.rs MarkRead handling, if read_positions has no entry for chat_id, the code re-fetches all read positions and retries. In the retry branch (lines 317-327), if read_positions.get(\u0026chat_id) still returns None (e.g. the server has no ReadPosition object for this chat), the let _ = ... send is silently discarded — no error is sent to the UI, no log entry, no indication the MarkRead was dropped. The first branch (line 292) correctly errors, but the second branch swallows the failure. — Maintenance consequence: unread badge counts will not update and the user will not know why; silent failure makes this very hard to debug in production.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:01:14Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:11:06Z",
+  "closed_at": "2026-04-26T09:11:06Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-9vk.11",
+      "depends_on_id": "jmap-chat-tui-9vk",
+      "type": "parent-child",
+      "created_at": "2026-04-26T02:01:13Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

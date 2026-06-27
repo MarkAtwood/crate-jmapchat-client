@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-ixld.14",
+  "title": "from_raw doc: state the caller invariant, not just what's bypassed",
+  "description": "Id::from_raw and UTCDate::from_raw doc comments say 'bypassing the non-empty validation' and 'Only use for server-assigned identifiers and test fixtures.' This explains *what* is skipped but not *why* that skip is safe. A contributor unfamiliar with the pattern may use from_raw for any string they 'already have,' including ones that are not server-guaranteed. The doc should state the positive invariant the caller must uphold: the caller asserts the string is non-empty because it came from a trusted source (server JSON or a hardcoded test vector). Without that, the warning reads as a usage hint rather than a safety contract.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T01:04:49Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T01:29:43Z",
+  "closed_at": "2026-04-28T01:29:43Z",
+  "close_reason": "Updated from_raw docs on Id and UTCDate to state caller invariant (not just what's bypassed)",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-ixld.14",
+      "depends_on_id": "jmap-chat-tui-ixld",
+      "type": "parent-child",
+      "created_at": "2026-04-27T18:04:48Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

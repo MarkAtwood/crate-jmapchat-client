@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-6hp.11",
+  "title": "SenderIdOrSelf doc doesn't explain why the type exists or why empty is rejected",
+  "description": "The SenderIdOrSelf doc comment (types.rs lines 536-548) says what the wire values are, but doesn't explain: (1) why a custom type rather than String — the serde special-casing of 'self' is the whole reason; (2) why empty strings are rejected (not a spec rule, a defensive guard); (3) that the custom serde impl is what makes this work. A contributor adding a new field of this type, or changing the serde behavior, needs all three pieces to understand the invariant.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:05:57Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:32:09Z",
+  "closed_at": "2026-04-27T06:32:09Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-6hp.11",
+      "depends_on_id": "jmap-chat-tui-6hp",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:05:57Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

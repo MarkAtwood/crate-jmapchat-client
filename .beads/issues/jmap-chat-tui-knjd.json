@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-knjd",
+  "title": "space_update: validate add_channels name for empty string",
+  "description": "In space.rs, the add_channels closure maps SpaceAddChannelInput values to JSON without validating that c.name is non-empty. An empty channel name would reach the server and produce a server-side error rather than a clear client-side InvalidArgument. All other string ID parameters in the codebase have empty-string guards at the API boundary. The fix is to check c.name.is_empty() in the closure and return Err(ClientError::InvalidArgument) if so, converting the .map().collect() to .map().collect::\u003cResult\u003cVec\u003c_\u003e,_\u003e\u003e()?.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T03:27:12Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T03:28:12Z",
+  "closed_at": "2026-04-28T03:28:12Z",
+  "close_reason": "Closed"
+}

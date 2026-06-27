@@ -1,0 +1,26 @@
+{
+  "id": "jmap-chat-tui-mph.1",
+  "title": "MessageQueryInput: add text and threadRootId filters",
+  "description": "Why: MessageQueryInput is missing two JMAP Chat spec-defined filters — text (full-text search over body) and threadRootId (thread-scoped results). Without them callers cannot request text search or thread-scoped views.\n\nWhat: Add two optional fields to MessageQueryInput\u003c'a\u003e: text: Option\u003c\u0026'a str\u003e and thread_root_id: Option\u003c\u0026'a str\u003e. Update message_query() to conditionally insert \"text\" and \"threadRootId\" into the filter JSON object when Some (pattern: if let Some(t) = input.text { filter.insert(\"text\".into(), t.into()); }). Add a test asserting that text and threadRootId appear in the body_json matcher.\n\nAlgorithm:\n1. Open crates/jmap-chat/src/methods/mod.rs\n2. Locate MessageQueryInput\u003c'a\u003e struct (search for 'pub struct MessageQueryInput')\n3. Add two new fields after has_attachment:\n   - pub text: Option\u003c\u0026'a str\u003e,\n   - pub thread_root_id: Option\u003c\u0026'a str\u003e,\n4. Open crates/jmap-chat/src/methods/message.rs\n5. Locate the filter-building block (search for 'filter.insert')\n6. Add after the has_attachment block:\n   if let Some(t) = input.text { filter.insert(\"text\".into(), t.into()); }\n   if let Some(tid) = input.thread_root_id { filter.insert(\"threadRootId\".into(), tid.into()); }\n7. Run cargo test -p jmap-chat to verify no regressions\n8. Run cargo clippy and cargo fmt\n\nDefensive rules: text and threadRootId are optional (not required); do not add them to the filter object if None (must not send null — servers may reject unknown null fields per RFC 8620). No validation of the string content (server enforces unsupportedFilter if not supported). No unwrap(). No credentials.\n\nTests: Add one new test (or extend test 11) that sends message_query with text=\"hello\" and verifies body_json matcher shows 'text': 'hello' in the filter. This is a wiremock body matcher test.",
+  "acceptance_criteria": "cargo test -p jmap-chat passes (all 29+ tests); cargo clippy -- -D warnings passes; cargo fmt --check passes; new test verifying text filter in body_json",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T08:08:48Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T08:10:54Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-mph.1",
+      "depends_on_id": "jmap-chat-tui-mph",
+      "type": "parent-child",
+      "created_at": "2026-04-27T01:08:47Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

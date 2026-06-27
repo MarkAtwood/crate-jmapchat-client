@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-n76",
+  "title": "Remove client_id from all create input structs",
+  "description": "For each create struct (9 total): MessageCreateInput, CustomEmojiCreateInput, SpaceInviteCreateInput, SpaceBanCreateInput, SpaceCreateInput, ChatCreateDirectInput, ChatCreateGroupInput, ChatCreateChannelInput, PushSubscriptionCreateInput:\n- Remove pub client_id: \u0026'a str\n- Add optional override: pub client_id: Option\u003c\u0026'a str\u003e\n- In method implementation: let id = input.client_id.unwrap_or_else(|| generate_ulid());\n- Thread the generated id through to SetResponse so caller can look up their object in created map.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T14:31:56Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T15:10:42Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-n76",
+      "depends_on_id": "jmap-chat-tui-aaz",
+      "type": "blocks",
+      "created_at": "2026-04-27T07:32:59Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-5y1i.16",
+  "title": "subscribe_events return type is bounded + Send so callers can drive the stream across threads",
+  "description": "subscribe_events returns impl futures::Stream\u003c...\u003e + Send. Without Send, the stream cannot be driven in a tokio::spawn or moved across a thread boundary in a multi-threaded async runtime. The TUI's client_task spawns a background task that owns this stream; without Send the spawn would fail to compile. A contributor might propose removing the bound as 'unnecessary constraint'. It is not unnecessary: it is a contract guarantee that the concrete unfold stream (which holds a reqwest byte stream and a String buffer, both Send) can cross thread boundaries.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T20:14:45Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T22:33:27Z",
+  "closed_at": "2026-04-27T22:33:27Z",
+  "close_reason": "Decision record: current implementation is correct; no code change needed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-5y1i.16",
+      "depends_on_id": "jmap-chat-tui-5y1i",
+      "type": "parent-child",
+      "created_at": "2026-04-27T13:14:44Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

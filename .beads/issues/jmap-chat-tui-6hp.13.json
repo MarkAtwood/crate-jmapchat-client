@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-6hp.13",
+  "title": "chat_using().to_vec() clones static strings on every API request",
+  "description": "build_request (methods.rs:447) calls chat_using().to_vec() which clones two heap Strings on every API call. The OnceLock memoizes the Vec but .to_vec() still copies. Fix: change JmapRequest.using to accept Cow\u003c'static, [String]\u003e or \u0026'static [String], or pass the static slice without cloning. Impact: two String heap allocations per method call — minor but needless.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:06:07Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:33:29Z",
+  "closed_at": "2026-04-27T06:33:29Z",
+  "close_reason": "Two string clones per request: immaterial for an HTTP client. Labeled opinion.",
+  "labels": [
+    "efficiency",
+    "my-oss",
+    "opinion",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-6hp.13",
+      "depends_on_id": "jmap-chat-tui-6hp",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:06:06Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

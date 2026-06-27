@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-r4c.5",
+  "title": "doc: clarify JSON Pointer format in ReactionChange doc comment",
+  "description": "The ReactionChange enum doc (line 161-165 in methods/mod.rs) mentions the patch key format 'reactions/\u003csenderReactionId\u003e' (JSON Pointer) but doesn't explain RFC 6901 or character escaping implications. Add a note: 'The senderReactionId is appended directly after the slash; if the ID contains / or ~, they must be escaped per RFC 6901 (/ -\u003e ~1, ~ -\u003e ~0).' This clarifies that the caller is responsible for escaping, or that typical ULID/UUID IDs need no escaping.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T08:19:03Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T08:23:46Z",
+  "closed_at": "2026-04-27T08:23:46Z",
+  "close_reason": "Design decision: JSON Pointer format already documented in ReactionChange doc comment",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-r4c.5",
+      "depends_on_id": "jmap-chat-tui-r4c",
+      "type": "parent-child",
+      "created_at": "2026-04-27T01:19:02Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-92x2",
+  "title": "space/chat remove_members and remove_channels: validate individual IDs for empty string",
+  "description": "In space.rs and chat.rs, the remove_members (and remove_channels for space) array operations iterate over \u0026str IDs without validating each for empty string. The add/update operations in the same methods DO validate. For consistency, add empty-string guards to the remove operations too.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T03:35:12Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T03:38:08Z",
+  "closed_at": "2026-04-28T03:38:08Z",
+  "close_reason": "Closed"
+}

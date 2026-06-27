@@ -1,0 +1,16 @@
+{
+  "id": "jmap-chat-tui-4br",
+  "title": "Wire ContactPresence into SseEvent::Presence",
+  "description": "SseEvent::Presence { presence: String } in sse.rs should use ContactPresence instead of String. ContactPresence already exists as a type but is not used here, leaving the SSE event stringly-typed at the boundary where type safety matters most.",
+  "notes": "Part of epic jmap-chat-tui-hqb: jmap-chat wire up enums — eliminate stringly-typed spec fields",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T18:51:15Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:05:10Z",
+  "closed_at": "2026-04-27T19:05:10Z",
+  "close_reason": "Closed"
+}

@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-xbt.4",
+  "title": "BearerAuth::new accepts empty/whitespace-only token",
+  "description": "BearerAuth::new(\"\") and BearerAuth::new(\"  \") both succeed because HeaderValue::from_str(\"Bearer \") and HeaderValue::from_str(\"Bearer   \") are valid HTTP header bytes. The resulting Authorization header contains no token (or only whitespace). Every server will reject this credential, but the constructor returns Ok, so callers who pass an empty env var or unset config value silently get a broken auth header instead of an early Err. Fix: add an is_empty() / all-whitespace check before the HeaderValue call and return ClientError::Parse.",
+  "status": "closed",
+  "priority": 0,
+  "issue_type": "bug",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:35:21Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:39:50Z",
+  "closed_at": "2026-04-26T07:39:50Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-xbt.4",
+      "depends_on_id": "jmap-chat-tui-xbt",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:35:20Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

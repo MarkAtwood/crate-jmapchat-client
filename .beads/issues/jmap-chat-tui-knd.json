@@ -1,0 +1,14 @@
+{
+  "id": "jmap-chat-tui-knd",
+  "title": "types: RichBody and Span types for application/jmap-chat-rich",
+  "description": "## What\nAdd module types::rich (or inline in types.rs) for application/jmap-chat-rich body format.\nSpec: draft-atwood-jmap-chat-00 §Rich Body Format.\n\nImportant encoding note (IMPROVEMENTS.md §13): when bodyType is 'application/jmap-chat-rich', body is a JSON-encoded STRING containing the RichBody object — not an embedded JSON object. Client must serde_json::from_str::\u003cRichBody\u003e(\u0026message.body).\n\nTypes:\n- RichBody { spans: Vec\u003cSpan\u003e }\n- Span { span_type: SpanType, text: String, lang: Option\u003cString\u003e /* codeblock */, uri: Option\u003cString\u003e /* link */, user_id: Option\u003cString\u003e /* mention */ }\n- SpanType enum: Text, Bold, Italic, BoldItalic, Code, Codeblock, Blockquote, Mention, Link (non_exhaustive)\n- fn parse_rich_body(body_str: \u0026str) -\u003e Result\u003cRichBody, serde_json::Error\u003e\n- fn render_plain(rich: \u0026RichBody) -\u003e String (concatenate all span.text fields)\n\n## Tests\nFixture tests/fixtures/types/rich_body.json: the example from spec §Rich Body Format\nAssert: parse_rich_body(json_string) produces correct RichBody\nAssert: render_plain on spec example produces 'Hello @alice, see this code: foo(). Full example:fn main() {}'\nAssert: unknown span type in JSON does NOT cause parse error (use tagged enum with fallback)",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:12:08Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T11:04:32Z",
+  "close_reason": "Implementation and tests already present from prior work"
+}

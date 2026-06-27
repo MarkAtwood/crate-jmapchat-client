@@ -1,0 +1,25 @@
+{
+  "id": "jmap-chat-tui-jqa.1",
+  "title": "Replace Option\u003cOption\u003cT\u003e\u003e with Patch\u003cT\u003e enum",
+  "description": "Option\u003cOption\u003cT\u003e\u003e appears in 10 fields across 4 update structs. A caller writing Some(None) to clear a field looks like a bug. Replace with a Patch\u003cT\u003e enum:\n\npub enum Patch\u003cT\u003e { Keep, Set(T), Clear }\n\n- Keep: field absent from JSON patch (no change)\n- Set(v): field present with value\n- Clear: field present as null (clears nullable spec field)\n\nDerive Default as Patch::Keep. Affected structs:\n- ChatUpdateInput: mute_until, description, avatar_blob_id\n- PresenceStatusSetInput: status_text, status_emoji, expires_at\n- ChatContactSetInput: display_name, nick\n- SpaceUpdateInput: description, icon_blob_id\n\nThe Patch type must also implement From\u003cT\u003e for ergonomic Set usage and should live in types or a new patch module.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T14:30:33Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T15:10:48Z",
+  "closed_at": "2026-04-27T15:10:48Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-jqa.1",
+      "depends_on_id": "jmap-chat-tui-jqa",
+      "type": "parent-child",
+      "created_at": "2026-04-27T07:30:32Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-eyh8",
+  "title": "Id and UTCDate: add Borrow\u003cstr\u003e for HashMap lookup by \u0026str",
+  "description": "## Why\n\nId and UTCDate derive Hash+Eq and are used as HashMap keys throughout the codebase. The impl_string_newtype! macro generates five PartialEq impls but not Borrow\u003cstr\u003e. Without it, looking up a HashMap\u003cId, Chat\u003e by a \u0026str slice requires constructing a full Id (map.get(\u0026Id::from_raw(\"x\"))) instead of the natural map.get(\"x\"). Borrow\u003cstr\u003e is precisely the trait Rust provides for this case.\n\n## What needs to be done\n\nAdd impl Borrow\u003cstr\u003e for Id and impl Borrow\u003cstr\u003e for UTCDate inside impl_string_newtype!, returning \u0026self.0. The Borrow contract (Hash+Eq consistent with \u0026str) is already satisfied. Add a test: construct a HashMap\u003cId,_\u003e, insert with an Id, look up by \u0026str.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T01:44:21Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-28T02:15:01Z",
+  "close_reason": "Closed"
+}

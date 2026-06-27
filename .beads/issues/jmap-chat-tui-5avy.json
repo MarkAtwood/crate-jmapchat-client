@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-5avy",
+  "title": "EndpointType Deserialize duplicates from_uri match",
+  "description": "Why: The Deserialize impl (types.rs ~line 195) repeats the same match arms as from_uri line-for-line. This is a DRY violation and a maintenance hazard — one match gets updated and the other silently diverges. What: Deserialize impl should call Ok(Self::from_uri(\u0026raw)) instead of repeating the match.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "bug",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:52:55Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:58:04Z",
+  "closed_at": "2026-04-27T19:58:04Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-5avy",
+      "depends_on_id": "jmap-chat-tui-sb7x",
+      "type": "parent-child",
+      "created_at": "2026-04-27T12:54:40Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

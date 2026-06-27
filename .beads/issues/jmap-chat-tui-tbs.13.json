@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-tbs.13",
+  "title": "push_subscription_set omits accountId from request — RFC 8620 §7.2 conformance",
+  "description": "The method correctly reads api_url directly from session.api_url without calling session_parts() (which would try to extract accountId and would fail for PushSubscription objects that are not account-scoped). This is the right structural choice. A future contributor might try to refactor it to use session_parts() 'for consistency' — that would break RFC 8620 §7.2 compliance by injecting an accountId.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T09:29:53Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T09:34:57Z",
+  "closed_at": "2026-04-27T09:34:57Z",
+  "close_reason": "decision record: confirmed correct behavior",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-tbs.13",
+      "depends_on_id": "jmap-chat-tui-tbs",
+      "type": "parent-child",
+      "created_at": "2026-04-27T02:29:53Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

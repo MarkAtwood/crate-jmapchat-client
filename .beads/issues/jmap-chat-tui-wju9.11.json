@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-wju9.11",
+  "title": "ChatStreamDataType::Unknown is outbound but remains a unit variant — cannot preserve original wire string",
+  "description": "ChatStreamDataType is used in ChatStreamEnable which the client constructs and sends over WebSocket. It kept the old #[serde(other)] unit Unknown pattern while ChatKind/ChatMemberRole/OwnerPresence were converted to Unknown(String). If a future spec adds a stream data type and a server echoes a ChatStreamEnable back, deserializing and re-sending would lose the original wire string (serializes as literal 'unknown'). Consistent fix: convert to Unknown(String) with the same manual serde pattern as the other three.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:29:13Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:32:50Z",
+  "closed_at": "2026-04-27T19:32:50Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-wju9.11",
+      "depends_on_id": "jmap-chat-tui-wju9",
+      "type": "parent-child",
+      "created_at": "2026-04-27T12:29:13Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-85d.4",
+  "title": "space_set_update missing spec patch keys with no forward path",
+  "description": "The spec defines 9 update patch keys for Space/set: name/description/iconBlobId, addRoles, removeRoles, updateRoles, addMembers, removeMembers, updateMembers, addChannels, removeChannels, updateChannels, addCategories, removeCategories, updateCategories. This commit covers only 7 of them (name/description/iconBlobId, addMembers, removeMembers, updateMembers, addChannels, removeChannels). Missing: addRoles, removeRoles, updateRoles, updateChannels, addCategories, removeCategories, updateCategories. The docstring says 'Role and category management are out of scope for this epic' but there is no filed issue, no bd reference, and no note on where callers should go when they need role management. A user who reads only the public API will assume the library cannot manage roles at all — which generates support burden. Either file a follow-up issue and reference it in the doc comment, or add a panic/InvalidArgument guard with a message directing the caller to the known gap.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T09:09:28Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T09:14:37Z",
+  "closed_at": "2026-04-27T09:14:37Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-85d.4",
+      "depends_on_id": "jmap-chat-tui-85d",
+      "type": "parent-child",
+      "created_at": "2026-04-27T02:09:28Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

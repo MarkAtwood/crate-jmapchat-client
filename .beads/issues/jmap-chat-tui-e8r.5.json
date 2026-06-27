@@ -1,0 +1,27 @@
+{
+  "id": "jmap-chat-tui-e8r.5",
+  "title": "maxChanges: inconsistent omit-vs-null across /changes methods",
+  "description": "chat_changes, space_invite_changes, read_position_changes, and presence_status_changes pass maxChanges directly in json!({}) so None serializes as JSON null. custom_emoji_query_changes (custom_emoji.rs:110-112) instead conditionally inserts the key only when Some, so None means the key is absent. Both are legal per RFC 8620 §5.2 but the inconsistency makes the module harder to audit. Standardise on the json!({}) style — fewer lines, self-documenting.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:50:25Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T08:01:07Z",
+  "closed_at": "2026-04-27T08:01:07Z",
+  "close_reason": "false positive: RFC 8620 §5.2 defines maxChanges as UnsignedInt|null; null is valid and means no limit; sending null is correct",
+  "labels": [
+    "elegance"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-e8r.5",
+      "depends_on_id": "jmap-chat-tui-e8r",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:50:25Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

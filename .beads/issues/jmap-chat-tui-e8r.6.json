@@ -1,0 +1,27 @@
+{
+  "id": "jmap-chat-tui-e8r.6",
+  "title": "CustomEmojiQueryInput.filter_space_id: owned String vs \u0026str inconsistency",
+  "description": "mod.rs line 182: CustomEmojiQueryInput.filter_space_id is Option\u003cString\u003e (owned) while every analogous filter-ID field in the module uses \u0026str (e.g. MessageQueryInput.chat_id: Option\u003c\u0026str\u003e). Callers must allocate a String to pass a filter that is normally a string literal or a borrowed slice. Fix: add a lifetime to CustomEmojiQueryInput and make the field Option\u003c\u0026'a str\u003e, consistent with the rest of the module.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:50:32Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T08:01:10Z",
+  "closed_at": "2026-04-27T08:01:10Z",
+  "close_reason": "fixed in k8t review: CustomEmojiQueryInput now uses Option\u003c\u0026str\u003e with lifetime",
+  "labels": [
+    "elegance"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-e8r.6",
+      "depends_on_id": "jmap-chat-tui-e8r",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:50:32Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

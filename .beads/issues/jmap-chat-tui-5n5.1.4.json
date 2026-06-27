@@ -1,0 +1,31 @@
+{
+  "id": "jmap-chat-tui-5n5.1.4",
+  "title": "message_query hard-coded sort order not surfaced in type signature",
+  "description": "message_query always sends sort:[{property:sentAt, isAscending:false}] in the wire request, but MessageQueryInput has no sort field. Callers cannot opt into ascending order, and the return type QueryResponse does not record applied sort. When Phase 4 adds pagination or a UI needs chronological order, adding a sort parameter will be a breaking API change. Callers that already depend on the implicit descending order have no way to express that dependency, so the breakage will be silent.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:20:53Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:31:40Z",
+  "closed_at": "2026-04-27T07:31:40Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-5n5.1.4",
+      "depends_on_id": "jmap-chat-tui-5n5.1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:20:53Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

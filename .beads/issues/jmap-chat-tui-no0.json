@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-no0",
+  "title": "UI: compose bar and message send",
+  "description": "## Why\nThe user needs to be able to send messages.\n\n## What\n- Single-line text input at the bottom of the message panel\n- Enter to send via Message/set create (chatId, body, bodyType text/plain, sentAt now)\n- Clear input on successful send\n- Show send error inline (do not panic)\n- Disable send when no chat selected or body is empty",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T03:26:38Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T04:05:31Z",
+  "close_reason": "Superseded; replaced by issues under jmap-chat-tui-s2e (egui) and new TUI epic",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-no0",
+      "depends_on_id": "jmap-chat-tui-saj",
+      "type": "blocks",
+      "created_at": "2026-04-26T20:27:10Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

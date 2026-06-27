@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-s8m8.1",
+  "title": "AuthProvider::auth_header doc missing contract on String validity",
+  "description": "auth_header() returns Option\u003c(String, String)\u003e but nowhere documents that the name must be a valid HTTP header name (no spaces, lowercase, ASCII) and the value must be valid visible-ASCII. ws/mod.rs calls .parse::\u003cHeaderName\u003e().expect(...) which panics on invalid names. A custom AuthProvider returning a name like 'X-My Header' (with space) would cause a panic at WebSocket connection time with a misleading expect message. The fix is to add explicit constraints to the auth_header() doc comment: 'The header name must be a valid HTTP header name (lowercase ASCII, no spaces). The header value must contain only visible ASCII characters (0x21-0x7E plus HTAB).'",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T02:17:12Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T02:18:12Z",
+  "closed_at": "2026-04-28T02:18:12Z",
+  "close_reason": "Doc constraint added to auth_header() trait method",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-s8m8.1",
+      "depends_on_id": "jmap-chat-tui-s8m8",
+      "type": "parent-child",
+      "created_at": "2026-04-27T19:17:12Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

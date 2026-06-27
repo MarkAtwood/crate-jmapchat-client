@@ -1,0 +1,50 @@
+{
+  "id": "jmap-chat-tui-yh4.5",
+  "title": "upload_blob: implement + test",
+  "description": "Why: Client needs to upload blobs to JMAP servers per RFC 8620 §6.1. The upload must verify SHA-256 if the server returns one (JMAP-CID capability).\\n\\nWhat: Implement JmapChatClient::upload_blob in src/blob.rs:\\n  pub async fn upload_blob(\u0026self, upload_url_template: \u0026str, account_id: \u0026str, data: \u0026[u8], content_type: \u0026str) -\u003e Result\u003cBlobUploadResponse, ClientError\u003e\\n\\nAlgorithm:\\n1. Validate content_type via reqwest::header::HeaderValue::from_str, return InvalidHeaderValue on failure\\n2. Expand {accountId} in upload_url_template using expand_url_template\\n3. Build POST request: self.http.post(url).header(CONTENT_TYPE, content_type).body(data.to_vec())\\n4. Inject auth header from self.auth.auth_header() (pattern from fetch_session)\\n5. Send, call auth_failed_if(resp.status()), call error_for_status()\\n6. Deserialize response body as BlobUploadResponse\\n7. If sha256 is Some: validate it is exactly 64 lowercase hex chars (return Parse error if not); compute Sha256::digest(data), hex-encode, compare — return BlobIntegrityMismatch if mismatch\\n8. Test: wiremock POST /upload/account1/ returning upload_response.json fixture; assert blob_id and sha256 parsed correctly\\n9. Test: sha256 mismatch returns BlobIntegrityMismatch\\n\\nNote: self.http and self.auth fields need pub(crate) visibility — change them in client.rs as part of this bead.\\n\\nDefensive rules: no unwrap(); validate all inputs at entry point; do not log auth header or content bytes.",
+  "acceptance_criteria": "cargo test passes; happy-path test and sha256-mismatch test both pass",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T09:48:01Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T09:58:56Z",
+  "closed_at": "2026-04-27T09:58:56Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yh4.5",
+      "depends_on_id": "jmap-chat-tui-yh4.4",
+      "type": "blocks",
+      "created_at": "2026-04-27T02:48:32Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-yh4.5",
+      "depends_on_id": "jmap-chat-tui-yh4",
+      "type": "parent-child",
+      "created_at": "2026-04-27T02:48:01Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-yh4.5",
+      "depends_on_id": "jmap-chat-tui-yh4.1",
+      "type": "blocks",
+      "created_at": "2026-04-27T02:48:31Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-yh4.5",
+      "depends_on_id": "jmap-chat-tui-yh4.2",
+      "type": "blocks",
+      "created_at": "2026-04-27T02:48:31Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

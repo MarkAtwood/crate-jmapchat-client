@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-2qf",
+  "title": "batch: RefPlus result reference chaining",
+  "description": "Implement JMAP RefPlus result reference chaining (urn:ietf:params:jmap:refplus):\\n- Detect refplus capability in session\\n- Allow ResultReference values inside /set create/update bodies and /query filter conditions\\n- Primary use case: Message/set create → Message/query in one round-trip (send-and-scroll)\\n- Define ResultReference type; serialize as {#resultOf, name, path} in request JSON\\n- Test: fixture showing Message/set create with result ref in subsequent Message/query\\n\\nFixture file: tests/fixtures/batch_refplus.json",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:21:11Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T10:47:55Z",
+  "closed_at": "2026-04-27T10:47:55Z",
+  "close_reason": "Implemented JmapRequestBuilder, call_batch, ResultReference, Session::supports_refplus/quotas, Quota type, quota_get(); all tests pass",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-2qf",
+      "depends_on_id": "jmap-chat-tui-0g1",
+      "type": "blocks",
+      "created_at": "2026-04-26T21:21:17Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-s8m8",
+  "title": "Review: refactor(jmap-chat): idiomatic Rust API improvements",
+  "notes": "Maintainer risk: LOW — one doc gap that matters (auth_header contract), no logic errors. j1w7 ws roundtrip is the only code smell but is correct and tested.\nConfidence: 5% chance of missed bug. Uncertainty driven by: not having tested a custom AuthProvider impl through the ws path, and not having verified tungstenite's http crate version matches reqwest's. Would raise confidence if: CI runs a test with a custom AuthProvider through connect_ws.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T02:15:25Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-28T02:18:16Z",
+  "close_reason": "Review complete: 0 P0, 1 P1 fixed, 0 P2, decisions recorded",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

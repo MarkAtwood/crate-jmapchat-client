@@ -1,0 +1,33 @@
+{
+  "id": "jmap-chat-tui-1ex.2",
+  "title": "Step 2: JMAP core wire types",
+  "description": "Implement jmap:: module: JmapRequest, JmapResponse, Invocation, Id, UTCDate with serde derives. Round-trip serde tests against hand-written JSON fixtures derived directly from RFC 8620 spec examples. Fixtures committed to crates/jmap-chat/tests/fixtures/.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T06:35:55Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-26T06:41:10Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-1ex.2",
+      "depends_on_id": "jmap-chat-tui-1ex",
+      "type": "parent-child",
+      "created_at": "2026-04-25T23:35:55Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-1ex.2",
+      "depends_on_id": "jmap-chat-tui-1ex.1",
+      "type": "blocks",
+      "created_at": "2026-04-25T23:36:20Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

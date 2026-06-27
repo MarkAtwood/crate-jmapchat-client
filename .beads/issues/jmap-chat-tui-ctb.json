@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-ctb",
+  "title": "Define Patch\u003cT\u003e enum in methods module",
+  "description": "Add to methods/mod.rs (or a new methods/patch.rs):\n\npub enum Patch\u003cT\u003e { Keep, Set(T), Clear }\nimpl\u003cT\u003e Default for Patch\u003cT\u003e { fn default() -\u003e Self { Patch::Keep } }\nimpl\u003cT\u003e From\u003cT\u003e for Patch\u003cT\u003e { fn from(v: T) -\u003e Self { Patch::Set(v) } }\n\nSerde: must NOT derive Serialize/Deserialize on Patch itself — the to-JSON logic lives in the method implementation which conditionally inserts/omits the key. Add a helper method Patch::into_json(key, map) that inserts only when not Keep.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T14:31:39Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T15:10:39Z",
+  "close_reason": "Closed"
+}

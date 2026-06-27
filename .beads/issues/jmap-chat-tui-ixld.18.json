@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-ixld.18",
+  "title": "base_url doc vs behavior: trailing slash accepted despite doc",
+  "description": "new() doc says base_url must have no trailing slash. url::Url::parse normalizes both forms to path '/'. The guard accepts trailing slashes silently. A contributor adding path construction code may assume no trailing slash and produce double-slash URLs.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T01:05:15Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T01:11:26Z",
+  "closed_at": "2026-04-28T01:11:26Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-ixld.18",
+      "depends_on_id": "jmap-chat-tui-ixld",
+      "type": "parent-child",
+      "created_at": "2026-04-27T18:05:15Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

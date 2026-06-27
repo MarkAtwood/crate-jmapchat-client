@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-mai",
+  "title": "AppEvent enum and client_task skeleton",
+  "description": "## Why\nThe background network task and the UI communicate via an mpsc channel of AppEvent values. Both sides need this type defined before either can be implemented.\n\n## What\n- AppEvent enum covering: SessionFetched, ChatsLoaded, MessagesLoaded, NewMessage, ChatUpdated, ContactsLoaded, ConnectionError, TypingEvent, PresenceEvent\n- client_task async fn signature: takes Config + AuthProvider + Sender\u003cAppEvent\u003e\n- Stub implementation that connects, fetches session, sends SessionFetched, then loops on SSE\n- cargo check passes",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T03:26:14Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T04:05:29Z",
+  "close_reason": "Superseded; replaced by issues under jmap-chat-tui-s2e (egui) and new TUI epic",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-mai",
+      "depends_on_id": "jmap-chat-tui-ddk",
+      "type": "blocks",
+      "created_at": "2026-04-26T20:27:05Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

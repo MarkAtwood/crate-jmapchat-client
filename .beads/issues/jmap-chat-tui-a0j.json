@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-a0j",
+  "title": "Split MessageUpdateInput: id -\u003e param, rename to MessagePatch, derive Default",
+  "description": "Current: message_set_update(\u0026session, \u0026MessageUpdateInput { id, body, reaction_changes: \u0026[], ... })\nAfter: message_update(\u0026session, id, \u0026MessagePatch { body: Some('edit'), ..Default::default() })\n\nAlso: reaction_changes field type changes to Vec\u003cReactionChange\u003e or Option\u003c\u0026[ReactionChange]\u003e so Default::default() gives 'no reactions'. Currently callers must write reaction_changes: \u0026[] even when not using it.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T14:32:09Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T15:10:43Z",
+  "close_reason": "Closed"
+}

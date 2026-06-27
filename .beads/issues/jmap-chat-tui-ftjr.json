@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-ftjr",
+  "title": "Validate optional blob/space ID params in create methods",
+  "description": "Three optional ID fields sent to the wire lack empty-string guards: (1) custom_emoji_create space_id (2) space_create icon_blob_id (3) chat_create Group avatar_blob_id. All are identifier fields — when Some(\"\") they would send an invalid empty string to the server. Also strengthen two AppState tests (apply_chats_loaded, apply_chats_delta_adds_new_chat) that assert equality against a deserialized object instead of checking specific spec-derived field values.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T04:00:27Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T04:02:10Z",
+  "closed_at": "2026-04-28T04:02:10Z",
+  "close_reason": "Closed"
+}

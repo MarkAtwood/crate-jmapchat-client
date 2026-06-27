@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-ih39.2",
+  "title": "3-arm match on (websocket_capability, supports_chat_websocket): INFO/WARN/DEBUG distinction correct and worth defending",
+  "description": "The match clearly documents three server configurations: no WS at all (INFO — expected for non-WebSocket servers), partial capability (WARN — suggests misconfiguration), full support (DEBUG — normal path). A contributor might collapse WARN to INFO thinking it is cleaner. Do not: the WARN is intentional because partial capability indicates a server that understands the WebSocket extension but hasn't enabled the chat part — operationally actionable.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T23:03:30Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T23:03:43Z",
+  "closed_at": "2026-04-27T23:03:43Z",
+  "close_reason": "Decision record — no code change needed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-ih39.2",
+      "depends_on_id": "jmap-chat-tui-ih39",
+      "type": "parent-child",
+      "created_at": "2026-04-27T16:03:30Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

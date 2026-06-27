@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-85d.6",
+  "title": "role_ids serialization duplicated in space_set_update",
+  "description": "The pattern of serializing an optional \u0026[\u0026str] slice to a JSON Array appears twice in space_set_update: once for SpaceAddMemberInput.role_ids and once for SpaceUpdateMemberInput.role_ids. This is ~6 lines of identical code duplicated. A private helper fn role_ids_to_json(ids: \u0026[\u0026str]) -\u003e serde_json::Value would eliminate the duplication and make it easier to spot if the logic ever needs to change (e.g. if role IDs get a typed wrapper). Suggested rewrite: fn role_ids_to_json(ids: \u0026[\u0026str]) -\u003e serde_json::Value { Value::Array(ids.iter().map(|id| Value::String((*id).to_owned())).collect()) }",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T09:09:52Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T09:14:43Z",
+  "closed_at": "2026-04-27T09:14:43Z",
+  "close_reason": "role_ids helper not worth adding for 2 occurrences; no material complexity reduction",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-85d.6",
+      "depends_on_id": "jmap-chat-tui-85d",
+      "type": "parent-child",
+      "created_at": "2026-04-27T02:09:52Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

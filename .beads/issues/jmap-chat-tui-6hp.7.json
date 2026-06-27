@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-6hp.7",
+  "title": "InvalidSession error message doesn't name the missing capability URI",
+  "description": "In methods.rs every method builds the error with ClientError::InvalidSession(\"no chat account_id\"). A contributor seeing this error at runtime has no idea where to look — the message doesn't say which JMAP capability URI is missing (urn:ietf:params:jmap:chat), doesn't reference primaryAccounts, and gives no hint about what the session fix would be. Fix: make the message self-explanatory, e.g. 'no primaryAccounts entry for urn:ietf:params:jmap:chat'.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:05:50Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:31:55Z",
+  "closed_at": "2026-04-27T06:31:55Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-6hp.7",
+      "depends_on_id": "jmap-chat-tui-6hp",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:05:50Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

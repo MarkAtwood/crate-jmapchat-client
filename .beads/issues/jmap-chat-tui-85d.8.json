@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-85d.8",
+  "title": "space_join guard: match on (Option, Option) before network call is correct and complete",
+  "description": "The match (input.invite_code, input.space_id) { (None,None) =\u003e Err, (Some,Some) =\u003e Err, _ =\u003e {} } fires before session_parts and before any network call. This is the correct placement — it avoids the session lookup allocation and any HTTP overhead on bad input. The match is exhaustive at the type level (the _ arm covers both valid cases), which means adding a third field to SpaceJoinInput in the future would NOT silently bypass the guard — the wildcard still correctly allows the one-Some cases. A future contributor might suggest replacing this with an if/else chain; resist it, the match makes the XOR structure explicit and compiler-visible.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T09:10:10Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T09:14:46Z",
+  "closed_at": "2026-04-27T09:14:46Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-85d.8",
+      "depends_on_id": "jmap-chat-tui-85d",
+      "type": "parent-child",
+      "created_at": "2026-04-27T02:10:09Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

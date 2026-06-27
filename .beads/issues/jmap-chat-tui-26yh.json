@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-26yh",
+  "title": "Review: jmap-chat idiomaticity final",
+  "notes": "Maintainer risk: LOW — validation logic is correct, tests are thorough, main risk is copy-paste confusion around the push_subscription_create manual construction path.\nConfidence: 5% chance of missed bug. Uncertainty driven by: (1) url::Url path() behavior for edge-case URL forms (IPv6 literals, percent-encoded hostnames) not explicitly tested; (2) push_subscription_create has_chat_push=true manual construction path not independently verified against USING_CORE+USING_CHAT_PUSH vs a hypothetical USING_CHAT_PUSH const. Would raise confidence if: a test for 'https://100.64.1.1:8008' (the documented IP:port example) is added; a test for IPv6 base_url 'https://[::1]:8008' is added.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T20:23:46Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T20:32:45Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

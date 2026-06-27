@@ -1,0 +1,25 @@
+{
+  "id": "jmap-chat-tui-yh4",
+  "title": "Epic: Blob support (upload, download, sha256, Blob2)",
+  "description": "Why: No blob support exists in the current client. Attachments, avatars, and emoji uploads all require blob upload/download. IMPROVEMENTS.md §10 adds JMAP-BLOBEXT (blob2) with Blob/lookup and Blob/convert (thumbnail generation). The companion spec draft-atwood-jmap-cid-00 defines sha256 verification.\\n\\nWhat:\\n- Blob upload: POST to session.blobUploadUrl, verify sha256 response per JMAP-CID spec\\n- Blob download: GET blob URL, stream to file or memory, verify sha256\\n- Blob2 capability detection: urn:ietf:params:jmap:blob2\\n- Blob/lookup: reverse lookup — given blobId, find all Messages referencing it as attachment\\n- Blob/convert: server-side image conversion for thumbnail previews\\n- VAPID key extraction from session capability for push service registration\\n- Tests: upload round-trip with sha256 verification against known fixture",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:15:44Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T10:00:24Z",
+  "close_reason": "all steps complete",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yh4",
+      "depends_on_id": "jmap-chat-tui-1aq",
+      "type": "blocks",
+      "created_at": "2026-04-26T21:20:50Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

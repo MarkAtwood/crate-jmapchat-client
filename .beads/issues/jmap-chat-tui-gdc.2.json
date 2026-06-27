@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-gdc.2",
+  "title": "AppCommand::MarkRead is handled server-side but never sent from UI",
+  "description": "client_task.rs has a full MarkRead handler (line 295) including retry logic and read_positions map maintenance. However, no code in main.rs (the only call site for tx.send(AppCommand::...)) ever sends MarkRead. The read-position tracking in client_task is therefore dead from the UI's perspective — load_read_positions runs at startup and the map is maintained but never used. A future maintainer adding scroll-to-read behavior will need to wire this up, but the existing server-side code gives a false impression that the feature is already complete. The dead handler also means load_read_positions() is called at startup for no observable effect. Fix: either wire MarkRead from the UI (send it when the last visible message changes on scroll) or, if that feature is deferred, add a comment clearly marking the handler as intentionally unwired and note what UI event should trigger it.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "chore",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:32:12Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:36:13Z",
+  "closed_at": "2026-04-26T09:36:13Z",
+  "close_reason": "Fixed: load_messages_for_chat returns last message ID; SelectChat and SendMessage handlers auto-mark last message as read when messages load",
+  "labels": [
+    "maintenance",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-gdc.2",
+      "depends_on_id": "jmap-chat-tui-gdc",
+      "type": "parent-child",
+      "created_at": "2026-04-26T02:32:11Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

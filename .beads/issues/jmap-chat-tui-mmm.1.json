@@ -1,0 +1,26 @@
+{
+  "id": "jmap-chat-tui-mmm.1",
+  "title": "Add chrono dep to jmap-chat Cargo.toml",
+  "description": "What: Add chrono as a dependency of the jmap-chat library crate.\n\nAlgorithm:\n1. Open /home/mark/PROJECT/jmap-chat-ui/crates/jmap-chat/Cargo.toml\n2. Under [dependencies], add: chrono = { workspace = true }\n3. Confirm /home/mark/PROJECT/jmap-chat-ui/Cargo.toml already has chrono with features=[\"serde\"] -- it does.\n4. Run: cargo check -p jmap-chat to verify it compiles.\n5. Run: cargo test -p jmap-chat to confirm no regressions.\n\nDefensive rules:\n- Do not change any .rs files.\n- Do not add any other deps.\n\nTests: cargo check -p jmap-chat exits 0. No new code changes.",
+  "acceptance_criteria": "cargo check -p jmap-chat succeeds. cargo test -p jmap-chat passes (no regressions). Cargo.lock updated to include chrono in jmap-chat.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T05:42:42Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T05:46:04Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-mmm.1",
+      "depends_on_id": "jmap-chat-tui-mmm",
+      "type": "parent-child",
+      "created_at": "2026-04-26T22:42:42Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "id": "jmap-chat-tui-mph.2",
+  "title": "Message/set update+destroy methods and MessageUpdateInput type",
+  "description": "Why: The library has message_create but no way to edit body, manage reactions, mark read, delete, or destroy messages. These are required for a complete chat experience.\n\nWhat: Add to mod.rs: ReactionChange\u003c'a\u003e enum and MessageUpdateInput\u003c'a\u003e struct. Add to message.rs: message_set_update() and message_set_destroy() methods.\n\nAlgorithm:\n\nStep 1 — Add types to crates/jmap-chat/src/methods/mod.rs, after the MessageCreateInput block:\n\n/// One reaction change in a Message/set patch (JMAP Chat §4.5).\n///\n/// The patch key is \"reactions/\u003csenderReactionId\u003e\" (JSON Pointer).\n/// senderReactionId is a caller-generated ID (ULID) unique per reaction.\n#[derive(Debug)]\npub enum ReactionChange\u003c'a\u003e {\n    /// Add a reaction. Patch value: {emoji, sentAt}.\n    Add {\n        sender_reaction_id: \u0026'a str,\n        emoji: \u0026'a str,\n        sent_at: \u0026'a crate::jmap::UTCDate,\n    },\n    /// Remove a reaction. Patch value: null.\n    Remove {\n        sender_reaction_id: \u0026'a str,\n    },\n}\n\n/// Parameters for Message/set update (JMAP Chat §4.5).\n///\n/// All fields except id are optional; absent fields are not included in the\n/// patch. For deletion use deleted_at (and optionally deleted_for_all).\n/// Body edits are author-only (server enforces). readAt is a read-receipt update.\n#[derive(Debug)]\npub struct MessageUpdateInput\u003c'a\u003e {\n    /// Message.id to update.\n    pub id: \u0026'a str,\n    /// New message body text (author-only edit).\n    pub body: Option\u003c\u0026'a str\u003e,\n    /// MIME type for body (\"text/plain\" or \"text/markdown\").\n    pub body_type: Option\u003c\u0026'a str\u003e,\n    /// Reaction changes to apply in this update.\n    pub reaction_changes: \u0026'a [ReactionChange\u003c'a\u003e],\n    /// Set read-receipt timestamp (Message.readAt).\n    pub read_at: Option\u003c\u0026'a crate::jmap::UTCDate\u003e,\n    /// Soft/hard delete: set to the deletion timestamp.\n    pub deleted_at: Option\u003c\u0026'a crate::jmap::UTCDate\u003e,\n    /// When Some(true) and deleted_at is also set, deletes for all participants.\n    pub deleted_for_all: Option\u003cbool\u003e,\n}\n\nStep 2 — Implement message_set_update in crates/jmap-chat/src/methods/message.rs:\n\npub async fn message_set_update(\n    \u0026self,\n    session: \u0026crate::jmap::Session,\n    input: \u0026MessageUpdateInput\u003c'_\u003e,\n) -\u003e Result\u003cSetResponse, crate::error::ClientError\u003e {\n    let (api_url, account_id) = Self::session_parts(session)?;\n    let mut patch = serde_json::Map::new();\n    if let Some(b) = input.body { patch.insert(\"body\".into(), b.into()); }\n    if let Some(bt) = input.body_type { patch.insert(\"bodyType\".into(), bt.into()); }\n    if let Some(ra) = input.read_at { patch.insert(\"readAt\".into(), ra.as_str().into()); }\n    if let Some(da) = input.deleted_at { patch.insert(\"deletedAt\".into(), da.as_str().into()); }\n    if let Some(dfa) = input.deleted_for_all { patch.insert(\"deletedForAll\".into(), dfa.into()); }\n    for change in input.reaction_changes {\n        match change {\n            ReactionChange::Add { sender_reaction_id, emoji, sent_at } =\u003e {\n                patch.insert(\n                    format!(\"reactions/{sender_reaction_id}\"),\n                    serde_json::json!({\"emoji\": emoji, \"sentAt\": sent_at.as_str()}),\n                );\n            }\n            ReactionChange::Remove { sender_reaction_id } =\u003e {\n                patch.insert(\n                    format!(\"reactions/{sender_reaction_id}\"),\n                    serde_json::Value::Null,\n                );\n            }\n        }\n    }\n    let args = serde_json::json!({\n        \"accountId\": account_id,\n        \"update\": { input.id: serde_json::Value::Object(patch) },\n    });\n    let (call_id, req) = super::build_request(\"Message/set\", args);\n    let resp = self.call(api_url, \u0026req).await?;\n    crate::client::extract_response(resp, call_id)\n}\n\nStep 3 — Implement message_set_destroy in crates/jmap-chat/src/methods/message.rs:\n\npub async fn message_set_destroy(\n    \u0026self,\n    session: \u0026crate::jmap::Session,\n    ids: \u0026[\u0026str],\n) -\u003e Result\u003cSetResponse, crate::error::ClientError\u003e {\n    if ids.is_empty() {\n        return Err(crate::error::ClientError::InvalidArgument(\n            \"message_set_destroy: ids may not be empty\".into(),\n        ));\n    }\n    let (api_url, account_id) = Self::session_parts(session)?;\n    let args = serde_json::json!({\n        \"accountId\": account_id,\n        \"destroy\": ids,\n    });\n    let (call_id, req) = super::build_request(\"Message/set\", args);\n    let resp = self.call(api_url, \u0026req).await?;\n    crate::client::extract_response(resp, call_id)\n}\n\nStep 4 — Update the import in message.rs:\nAdd MessageUpdateInput and ReactionChange to the use super::{ ... } import.\n\nStep 5 — Run cargo check to verify compilation.\n\nDefensive rules: No unwrap(). Never log credentials. Empty ids is guarded. Absent patch fields are omitted (not null). senderReactionId keys use format!() not string concat. Type is non_exhaustive not needed here since ReactionChange is an internal pattern.",
+  "acceptance_criteria": "cargo test -p jmap-chat passes; cargo clippy -- -D warnings passes; cargo fmt --check passes; message_set_update and message_set_destroy compile and are callable",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T08:09:14Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T08:13:50Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-mph.2",
+      "depends_on_id": "jmap-chat-tui-mph.1",
+      "type": "blocks",
+      "created_at": "2026-04-27T01:09:51Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-mph.2",
+      "depends_on_id": "jmap-chat-tui-mph",
+      "type": "parent-child",
+      "created_at": "2026-04-27T01:09:14Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

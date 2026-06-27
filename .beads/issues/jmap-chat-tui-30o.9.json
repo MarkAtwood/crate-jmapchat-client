@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-30o.9",
+  "title": "30o: compute_sha256_hex double-alloc via to_lowercase",
+  "description": "Location: crates/jmap-chat/src/blob.rs, compute_sha256_hex(), lines 191-197.\n\nhex_digit() emits uppercase A-F (b'A' + nibble - 10). The fold builds a 64-char uppercase hex String, then .to_lowercase() allocates a second 64-char String and iterates all 64 bytes again. This is an avoidable allocation and O(n) second pass.\n\nFix: change the nibble-to-char mapping in compute_sha256_hex to emit lowercase directly (b'a' + nibble - 10), eliminating the .to_lowercase() call entirely.\n\nImpact: one extra heap allocation and a second 64-byte scan per SHA-256 verification. Minor in absolute terms, but entirely unnecessary.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T10:02:02Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T10:07:07Z",
+  "closed_at": "2026-04-27T10:07:07Z",
+  "close_reason": "fixed as part of 30o.17: to_lowercase() call removed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-30o.9",
+      "depends_on_id": "jmap-chat-tui-30o",
+      "type": "parent-child",
+      "created_at": "2026-04-27T03:02:01Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

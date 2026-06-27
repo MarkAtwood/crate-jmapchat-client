@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-29i.2",
+  "title": "Patch\u003cT\u003e missing Clone and PartialEq derives",
+  "description": "Patch\u003cT\u003e derives only Debug and Default. As a utility value type used in every patch struct, it should also derive Clone (where T: Clone) and PartialEq (where T: PartialEq). Without PartialEq, tests cannot use assert_eq! on Patch fields. Without Clone, callers cannot duplicate a patch value for use in two places. Fix: add #[derive(Clone, PartialEq)] to the Patch\u003cT\u003e enum — derive handles the T: Clone and T: PartialEq bounds automatically.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T16:46:13Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T16:56:02Z",
+  "closed_at": "2026-04-27T16:56:02Z",
+  "close_reason": "Closed",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-29i.2",
+      "depends_on_id": "jmap-chat-tui-29i",
+      "type": "parent-child",
+      "created_at": "2026-04-27T09:46:12Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

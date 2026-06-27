@@ -1,0 +1,31 @@
+{
+  "id": "jmap-chat-tui-p4w",
+  "title": "api: typed filter structs (Option\u003cChatKind\u003e not Option\u003c\u0026str\u003e)",
+  "description": "chat_query takes filter_kind: Option\u003c\u0026str\u003e — a stringly-typed filter for an enum-valued field. Adding more filter fields as \u0026str will compound the problem. Callers must know the magic strings and cannot rely on the compiler to catch typos.\\n\\nDesign: define filter structs using proper enum types:\\n\\n  #[derive(Default)]\\n  pub struct ChatFilter {\\n      pub kind: Option\u003cChatKind\u003e,\\n      pub muted: Option\u003cbool\u003e,\\n      pub space_id: Option\u003cId\u003e,\\n  }\\n\\n  #[derive(Default)]\\n  pub struct ContactFilter {\\n      pub presence: Option\u003cContactPresence\u003e,\\n      pub search_string: Option\u003cString\u003e,\\n      pub in_chat_id: Option\u003cId\u003e,\\n  }\\n\\nDefine filter structs for: Chat, Message, ChatContact, Space, CustomEmoji.\\n\\nEach filter struct serializes to the correct JMAP filter JSON (serde rename_all = camelCase).\\n\\nTests: assert that ChatFilter { kind: Some(ChatKind::Channel), ..Default::default() } serializes to {\"kind\": \"channel\"}.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T04:32:22Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T05:45:04Z",
+  "closed_at": "2026-04-27T05:45:04Z",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-p4w",
+      "depends_on_id": "jmap-chat-tui-8cl",
+      "type": "blocks",
+      "created_at": "2026-04-26T21:32:56Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-p4w",
+      "depends_on_id": "jmap-chat-tui-mmm.4",
+      "type": "supersedes",
+      "created_at": "2026-04-26T22:45:03Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

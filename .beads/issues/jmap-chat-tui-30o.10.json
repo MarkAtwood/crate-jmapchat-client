@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-30o.10",
+  "title": "30o: hex_digit uppercase/lowercase split",
+  "description": "crates/jmap-chat/src/blob.rs: hex_digit() produces uppercase A-F (correct for percent_encode/RFC 3986), but compute_sha256_hex() calls it then appends .to_lowercase() to satisfy the lowercase-hex validator at line 179. The shared helper serving two callers with opposite case requirements and patching the result after the fact is a design smell. Fix: introduce a lowercase hex helper for the SHA-256 path (or produce lowercase in hex_digit and add a separate uppercase path for percent_encode).",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T10:02:03Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T10:07:10Z",
+  "closed_at": "2026-04-27T10:07:10Z",
+  "close_reason": "fixed as part of 30o.17: hex_digit parameter clarifies uppercase/lowercase purpose",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-30o.10",
+      "depends_on_id": "jmap-chat-tui-30o",
+      "type": "parent-child",
+      "created_at": "2026-04-27T03:02:03Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

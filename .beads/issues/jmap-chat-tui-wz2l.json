@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-wz2l",
+  "title": "Review round 2: jmap-chat enum-wiring epic",
+  "notes": "Confidence: 92% chance of missed bug. Running out of real complaints: yes. P3/P4 remaining: 6 (t6n1.1, t6n1.3, t6n1.5, t6n1.11, t6n1.15, t6n1.18), all opinion-or-valid-but-not-blocking. Round 2 calibration: 4 issues closed (t6n1.8/9/10/13 all fixed by round 1). t6n1.9 was never actually broken — PushUrgency uses Unknown(String) tuple not #[serde(other)], reviewer error. Remaining P3s: naming bikesheds (Other vs Unknown, as_uri vs as_str), missing Display on EndpointType, manual serde impl duplication. P4: doc comment wording on PushUrgency variants and ChatStreamDataType::Unknown. None of these are bugs or API hazards. Epic is effectively done.\nMaintainer risk: LOW — PushUrgency manual serde impl is correct in all cases (serialize, deserialize, round-trip, edge cases). One P1 gap filed: known variants (VeryLow/Low/Normal/High) have no serialization test, leaving as_str() edits unguarded. No P0 correctness bugs found in this round.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:16:08Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T19:19:30Z",
+  "close_reason": "all steps complete",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

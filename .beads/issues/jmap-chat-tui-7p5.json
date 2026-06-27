@@ -1,0 +1,19 @@
+{
+  "id": "jmap-chat-tui-7p5",
+  "title": "Review round 1: Rust API idiomaticity pass",
+  "notes": "Maintainer risk: MEDIUM — One silent type inconsistency (Vec\u003cString\u003e vs Vec\u003cId\u003e in the egui event boundary) will become a correctness bug if Id gains normalization semantics. The OwnerPresence::Unknown filter footgun is a logical error waiting for a caller to hit it. The OnceLock removal is a deliberate but debatable tradeoff. The doc comment issue is cosmetic. No security surface is introduced.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "epic",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T17:32:48Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T17:39:48Z",
+  "close_reason": "all steps complete",
+  "labels": [
+    "my-oss",
+    "review"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-3ph.3",
+  "title": "ClientError variants lack doc comments explaining retry/bug semantics",
+  "description": "ClientError is the only error type callers ever see, but only InvalidArgument has a doc comment. Callers of a library need to know which variants are retriable, which indicate caller bugs, and which indicate server misbehavior. Without docs: Http — is it a timeout (retriable) or a TLS error (not retriable)? AuthFailed — documented as non-retriable in fetch_session/call/subscribe_events prose but not on the variant itself. Parse — caller cannot tell if this is a server bug or their own code passing bad data. Serialize — when does this occur? InvalidSession — is this retriable after re-fetching the session? SseFrameTooLarge — is the stream permanently broken? Each variant should have a doc comment stating: what triggers it, whether it is retriable, and whether it indicates a caller bug vs server behavior.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:43:47Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:46:55Z",
+  "closed_at": "2026-04-26T07:46:55Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-3ph.3",
+      "depends_on_id": "jmap-chat-tui-3ph",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:43:46Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-6hp.9",
+  "title": "Arc/Box AuthProvider blanket impls require manual mirroring — no compiler enforcement",
+  "description": "auth.rs has two blanket impls (Box and Arc) each with a comment warning every method added to AuthProvider must be mirrored here. Adding a new method without updating both impls gives a compile error, which is a build-time catch but recurring friction. The two impls are structurally identical. A macro_rules delegation macro would eliminate duplication. Also: JmapChatClient::new takes impl AuthProvider plus static and wraps in Arc internally, so callers who already hold Arc\u003cdyn AuthProvider\u003e end up double-wrapping. This works due to the blanket impl but is semantically odd and undocumented.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:05:53Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:28:20Z",
+  "closed_at": "2026-04-27T06:28:20Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-6hp.9",
+      "depends_on_id": "jmap-chat-tui-6hp",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:05:53Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

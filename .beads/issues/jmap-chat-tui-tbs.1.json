@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-tbs.1",
+  "title": "push_subscription_set sends push capability when chat_push is None",
+  "description": "When input.chat_push is None, push_subscription_set still includes urn:ietf:params:jmap:chat:push in the using array. RFC 8620 §3.3 says clients MUST only list capabilities they are using. A conformant server MAY return unknownCapability if the capability URI is unknown to it (or simply reject the request). Fix: only include the push capability URI when input.chat_push.is_some().",
+  "status": "closed",
+  "priority": 0,
+  "issue_type": "bug",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T09:27:53Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T09:34:10Z",
+  "closed_at": "2026-04-27T09:34:10Z",
+  "close_reason": "fixed in implementation",
+  "labels": [
+    "correctness",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-tbs.1",
+      "depends_on_id": "jmap-chat-tui-tbs",
+      "type": "parent-child",
+      "created_at": "2026-04-27T02:27:52Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

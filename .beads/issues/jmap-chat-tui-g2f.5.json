@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-g2f.5",
+  "title": "strip_control_chars allocates per message per frame",
+  "description": "main.rs:195 calls strip_control_chars(\u0026msg.body) inside the message rendering loop on every frame at 60fps. With up to 100 messages displayed, this is 100 O(m) char scans and 100 String heap allocations per frame even when no messages changed. The cleaned body string is never cached. Fix: store a pre-cleaned body field in AppState's message representation (or in Message itself), computed once when MessagesLoaded is applied. Eliminates all per-frame allocations for message rendering.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:41:00Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T08:58:31Z",
+  "closed_at": "2026-04-26T08:58:31Z",
+  "close_reason": "Closed",
+  "labels": [
+    "efficiency",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-g2f.5",
+      "depends_on_id": "jmap-chat-tui-g2f",
+      "type": "parent-child",
+      "created_at": "2026-04-26T01:40:59Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

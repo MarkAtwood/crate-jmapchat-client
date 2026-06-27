@@ -1,0 +1,34 @@
+{
+  "id": "jmap-chat-tui-mmm.7",
+  "title": "Input structs for message_query and message_create",
+  "description": "What: Define MessageQueryInput and MessageCreateInput structs for the two highest-argument methods; update signatures and call sites; remove any remaining #[allow(clippy::too_many_arguments)].\n\nAlgorithm:\n\nPART 1 — Define structs in methods.rs (before the impl block):\npub struct MessageQueryInput\u003c'a\u003e {\n    pub chat_id: Option\u003c\u0026'a str\u003e,\n    pub has_mention: Option\u003cbool\u003e,\n    pub has_attachment: Option\u003cbool\u003e,\n    pub position: Option\u003cu64\u003e,\n    pub limit: Option\u003cu64\u003e,\n}\npub struct MessageCreateInput\u003c'a\u003e {\n    pub client_id: \u0026'a str,\n    pub chat_id: \u0026'a str,\n    pub body: \u0026'a str,\n    pub body_type: \u0026'a str,\n    pub sent_at: \u0026'a str,\n    pub reply_to: Option\u003c\u0026'a str\u003e,\n}\n\nPART 2 — Update signatures in methods.rs:\n- message_query(\u0026self, session: \u0026Session, input: \u0026MessageQueryInput\u003c'_\u003e) -\u003e Result\u003cQueryResponse, ClientError\u003e\n- message_create(\u0026self, session: \u0026Session, input: \u0026MessageCreateInput\u003c'_\u003e) -\u003e Result\u003cSetResponse\u003cserde_json::Value\u003e, ClientError\u003e\n  Note: W1B will have already removed api_url and account_id; this bead adds the struct wrappers.\n- Remove #[allow(clippy::too_many_arguments)] from both methods.\n\nPART 3 — Update call sites in client_task.rs:\nEvery client.message_query(\u0026session, ...) call becomes:\n  client.message_query(\u0026session, \u0026MessageQueryInput { chat_id: ..., has_mention: None, has_attachment: None, position: None, limit: Some(100) }).await?\nEvery client.message_create(\u0026session, ...) call becomes:\n  client.message_create(\u0026session, \u0026MessageCreateInput { client_id: \u0026client_id, chat_id: \u0026chat_id, body: \u0026body, body_type: \"text/plain\", sent_at: \u0026sent_at, reply_to: None }).await?\n\nPART 4 — Update call sites in methods_test.rs:\n  Same pattern — replace positional args with struct literals.\n\nPART 5 — Check client_task.rs try_mark_read #[allow(clippy::too_many_arguments)]:\n  After W1B removes api_url/account_id params, count remaining args. If count \u003c= 7, remove the allow. If still \u003e 7, create a MarkReadInput struct.\n\nDefensive rules:\n- Structs use lifetime parameter 'a for borrowed strings — do not allocate.\n- Default is NOT implemented on these structs (no default position/limit — callers must be explicit).\n- All existing behavior is preserved — struct fields map 1:1 to old positional parameters.\n\nTests: cargo test --workspace passes. No #[allow(clippy::too_many_arguments)] remain in methods.rs.",
+  "acceptance_criteria": "cargo test --workspace passes. cargo clippy --workspace -- -D warnings passes with no suppressions in methods.rs. MessageQueryInput and MessageCreateInput structs are public.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T05:44:04Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-27T06:02:37Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-mmm.7",
+      "depends_on_id": "jmap-chat-tui-mmm.6",
+      "type": "blocks",
+      "created_at": "2026-04-26T22:44:13Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-mmm.7",
+      "depends_on_id": "jmap-chat-tui-mmm",
+      "type": "parent-child",
+      "created_at": "2026-04-26T22:44:03Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

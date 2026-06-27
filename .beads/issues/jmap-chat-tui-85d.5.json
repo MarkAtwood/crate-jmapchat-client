@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-85d.5",
+  "title": "SpaceJoinInput struct encodes XOR invariant; callers will construct invalid inputs by accident",
+  "description": "SpaceJoinInput has two Option fields (invite_code, space_id) with the documented invariant that exactly one must be Some. This is not enforced at the type level — the struct can be constructed in three invalid states (both None, both Some, or a valid state where the author just forgot the Other field). The runtime check in space_join is correct but the error only surfaces when the method is called, not at construction. Because the struct is public and derives Debug but not any From/Into, a future contributor writing SpaceJoinInput { invite_code: None, space_id: None } compiles fine and produces a confusing error at call time. The preferred encoding for this invariant is an enum: SpaceJoinBy::InviteCode(\u0026str) | SpaceJoinBy::SpaceId(\u0026str). This is a public API that callers will depend on. Changing it later is a semver-breaking rename.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T09:09:37Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T09:14:39Z",
+  "closed_at": "2026-04-27T09:14:39Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-85d.5",
+      "depends_on_id": "jmap-chat-tui-85d",
+      "type": "parent-child",
+      "created_at": "2026-04-27T02:09:37Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

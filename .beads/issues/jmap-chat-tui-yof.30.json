@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-yof.30",
+  "title": "Arc\u003cdyn AuthProvider\u003e + blanket impls enable JmapChatClient: Clone without exposing concrete auth types",
+  "description": "JmapChatClient stores auth as Arc\u003cdyn AuthProvider\u003e. Blanket impls of AuthProvider are provided for both Box\u003cdyn AuthProvider\u003e and Arc\u003cdyn AuthProvider\u003e, enabling factory functions to return a boxed trait object and pass it directly to JmapChatClient::new. Arc (not Box) is used specifically so JmapChatClient implements Clone, which is required because the client is shared across tasks (the background client_task clones it for each spawned subtask). A future contributor might suggest switching to an enum of concrete auth types to avoid dynamic dispatch and the blanket impl maintenance cost. An enum would require all AuthProvider variants to live in the same crate, preventing external implementations; the blanket impl maintenance cost is O(number of AuthProvider methods), which is currently 2. The clone-via-Arc approach is also tested at compile time in the client_is_clone test.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:41:56Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:01:28Z",
+  "closed_at": "2026-04-27T07:01:28Z",
+  "close_reason": "Decision record — no action needed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yof.30",
+      "depends_on_id": "jmap-chat-tui-yof",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:41:55Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

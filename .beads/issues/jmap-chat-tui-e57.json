@@ -1,0 +1,14 @@
+{
+  "id": "jmap-chat-tui-e57",
+  "title": "Fix message pagination: load newest 100 not oldest",
+  "description": "message_query with ascending sort + position:0,limit:100 loads the OLDEST 100 messages. For chats \u003e100 messages, stick_to_bottom(true) scrolls to message 100 which is not the most recent. Fix: sort descending in message_query so position:0,limit:100 returns the 100 newest IDs; sort ascending in load_messages_for_chat for chronological display.",
+  "status": "closed",
+  "priority": 0,
+  "issue_type": "bug",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T10:12:45Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T10:12:48Z",
+  "closed_at": "2026-04-26T10:12:48Z",
+  "close_reason": "Fixed: sort descending in methods.rs message_query; sort ascending in client_task.rs load_messages_for_chat after fetch. All 89 tests pass."
+}

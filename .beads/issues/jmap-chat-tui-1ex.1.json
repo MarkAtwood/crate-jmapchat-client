@@ -1,0 +1,25 @@
+{
+  "id": "jmap-chat-tui-1ex.1",
+  "title": "Step 1: Cargo workspace scaffold",
+  "description": "Create Cargo.toml workspace root and crates/jmap-chat/Cargo.toml with correct dependencies (reqwest, serde, serde_json, tokio, thiserror, futures, chrono, ulid). No source files yet beyond lib.rs stub.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T06:35:19Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-06-26T19:59:32Z",
+  "closed_at": "2026-04-26T06:37:28Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-1ex.1",
+      "depends_on_id": "jmap-chat-tui-1ex",
+      "type": "parent-child",
+      "created_at": "2026-04-25T23:35:19Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

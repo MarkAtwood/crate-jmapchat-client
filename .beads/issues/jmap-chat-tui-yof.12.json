@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-yof.12",
+  "title": "Message SSE state change only refreshes current chat; other chats never updated",
+  "description": "Trigger: SSE delivers a Message StateChange while the user has any chat other than the target chat open (or no chat open at all). handle_state_change only calls load_messages_for_chat for current_chat. Bad behavior: new messages in non-selected chats are never fetched, so the chat list unread counts (from Chat/changes) may diverge from the actual message list shown when those chats are later opened; users see stale message lists until they switch away and back.",
+  "status": "closed",
+  "priority": 0,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:38:30Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:54:59Z",
+  "closed_at": "2026-04-27T06:54:59Z",
+  "close_reason": "Closed",
+  "labels": [
+    "correctness",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-yof.12",
+      "depends_on_id": "jmap-chat-tui-yof",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:38:30Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

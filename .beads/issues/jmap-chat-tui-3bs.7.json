@@ -1,0 +1,27 @@
+{
+  "id": "jmap-chat-tui-3bs.7",
+  "title": "design: Default not derived for input types with required id",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T08:40:22Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T08:41:58Z",
+  "closed_at": "2026-04-27T08:41:58Z",
+  "close_reason": "Design decision: good design, no action needed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-3bs.7",
+      "depends_on_id": "jmap-chat-tui-3bs",
+      "type": "parent-child",
+      "created_at": "2026-04-27T01:40:22Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

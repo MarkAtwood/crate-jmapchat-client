@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-3ix.3",
+  "title": "Stale test fn names after method renames",
+  "description": "13 test function names (chat_set_update_muted_*, message_set_update_*, message_set_destroy_*, space_set_*, chat_set_destroy_*, chat_create_direct_*, etc.) still reference the old method names after jqa.4+5 renames. Running cargo test --list shows these names; contributors searching for 'chat_update' tests won't find them.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T15:18:31Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T15:20:26Z",
+  "closed_at": "2026-04-27T15:20:26Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-3ix.3",
+      "depends_on_id": "jmap-chat-tui-3ix",
+      "type": "parent-child",
+      "created_at": "2026-04-27T08:18:31Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

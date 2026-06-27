@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-t6n1.17",
+  "title": "#[non_exhaustive] on all spec enums prevents silent match exhaustion on spec additions",
+  "description": "Every enum that mirrors a spec-defined set (ChatKind, DeliveryState, ContactPresence, OwnerPresence, ChatMemberRole, ChannelPermissionTargetType, SpanType, PushUrgency, QuotaScope, ChatStreamDataType) is marked #[non_exhaustive]. This is correct because the spec is a draft and WILL add new values. Without #[non_exhaustive], adding a new spec variant is a breaking change: any downstream crate with a match on these enums would stop compiling. A contributor might argue #[non_exhaustive] is redundant since an Unknown catch-all already handles runtime unknowns. That conflates two separate guarantees: Unknown handles wire values not recognized at runtime; #[non_exhaustive] enforces at compile time that external match arms include a wildcard, making future enum growth non-breaking at the API level.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T19:07:56Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T19:21:12Z",
+  "closed_at": "2026-04-27T19:21:12Z",
+  "close_reason": "Decision recorded",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-t6n1.17",
+      "depends_on_id": "jmap-chat-tui-t6n1",
+      "type": "parent-child",
+      "created_at": "2026-04-27T12:07:56Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

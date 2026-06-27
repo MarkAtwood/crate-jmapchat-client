@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-9vk.7",
+  "title": "AppState cache fields are pub; invariant breakable from outside apply_event",
+  "description": "AppState.chats, messages, chat_display, and message_bodies are all pub. The cache invariant (chat_display must be rebuilt after chats mutates; message_bodies must be rebuilt after messages mutates) is documented in field comments but not enforced by visibility. main.rs already bypasses the full apply_event path to call messages.clear() and message_bodies.clear() directly (lines 142-143). A future contributor who mutates self.state.chats directly without calling rebuild_chat_display() will produce a stale display with no compile-time error. — Maintenance consequence: stale cache bugs that are invisible until runtime; hard to audit as the codebase grows.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:00:56Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:10:53Z",
+  "closed_at": "2026-04-26T09:10:53Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-9vk.7",
+      "depends_on_id": "jmap-chat-tui-9vk",
+      "type": "parent-child",
+      "created_at": "2026-04-26T02:00:55Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

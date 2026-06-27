@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-ixld.16",
+  "title": "two-trait split leaks into every call site as two positional args",
+  "description": "JmapChatClient::new(transport, auth, base_url) requires every call site to pass two separate arguments (transport, auth) in a fixed positional order that has no obvious ergonomic grouping — callers who want 'just the defaults' still write JmapChatClient::new(DefaultTransport, NoneAuth, url) rather than JmapChatClient::new(url). The split is correct conceptually (transport \\!= credentials) but the positional API does not surface that grouping: a reader sees two opaque arguments before the URL and must know their meaning. Three alternatives: (a) introduce a ClientConfig struct with transport and auth fields and a Default implementation so the common case becomes JmapChatClient::new(ClientConfig::default(), url); (b) provide a convenience constructor new_plain(auth, url) that hard-codes DefaultTransport and omits transport from the common-case call site entirely; (c) accept a builder JmapChatClient::builder().transport(t).auth(a).base_url(url).build(). Any of these reduces the cognitive cost of the common case without removing the full-control path.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T01:04:58Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T01:29:48Z",
+  "closed_at": "2026-04-28T01:29:48Z",
+  "close_reason": "Added new_plain(auth, url) convenience constructor to JmapChatClient; DefaultTransport hidden from common-case call sites",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-ixld.16",
+      "depends_on_id": "jmap-chat-tui-ixld",
+      "type": "parent-child",
+      "created_at": "2026-04-27T18:04:58Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

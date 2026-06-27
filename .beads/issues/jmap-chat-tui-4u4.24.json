@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-4u4.24",
+  "title": "Duplicate Id and UTCDate type aliases in jmap.rs and types.rs",
+  "description": "Both jmap.rs and types.rs define: pub type Id = String; pub type UTCDate = String; They are identical and in the same crate. A reader has to check whether they are the same type or carry different constraints. Currently types.rs imports nothing from jmap.rs and vice versa, so there is no compiler-enforced link. Rewrite: define Id and UTCDate exactly once in jmap.rs (the foundational RFC 8620 types module) and use them in types.rs as crate::jmap::Id and crate::jmap::UTCDate. This makes the single source of truth explicit and removes the reader's doubt.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:08:18Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:27:25Z",
+  "closed_at": "2026-04-26T07:27:25Z",
+  "close_reason": "Fixed: FIXTYPES removed duplicate aliases, re-exports from jmap::",
+  "labels": [
+    "elegance",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4u4.24",
+      "depends_on_id": "jmap-chat-tui-4u4",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:08:17Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

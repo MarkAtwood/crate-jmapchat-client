@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-6hp.14",
+  "title": "MessageCreateInput fields have no doc comments; sent_at format is undocumented",
+  "description": "MessageCreateInput (methods.rs lines 99-107) and MessageQueryInput (lines 89-96) have no doc comments on any fields. The problem is most acute on MessageCreateInput: client_id is described only in the method doc, not on the struct; sent_at accepts a \u0026str but nowhere says RFC 3339 is required; body_type has no pointer to the supported MIME types list in ChatCapability. A contributor constructing MessageCreateInput from the struct definition alone must chase the method doc or the spec.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T06:06:09Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T06:32:20Z",
+  "closed_at": "2026-04-27T06:32:20Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-6hp.14",
+      "depends_on_id": "jmap-chat-tui-6hp",
+      "type": "parent-child",
+      "created_at": "2026-04-26T23:06:09Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

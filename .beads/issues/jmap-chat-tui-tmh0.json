@@ -1,0 +1,15 @@
+{
+  "id": "jmap-chat-tui-tmh0",
+  "title": "blob_lookup/blob_convert: add empty-string input guards",
+  "description": "blob_lookup has no guard against empty blob_ids slice (inconsistent with message_get). blob_convert has no guards on empty from_blob_id or empty content_type. Add is_empty() guards consistent with all other method functions.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "bug",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T03:12:51Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T03:16:15Z",
+  "closed_at": "2026-04-28T03:16:15Z",
+  "close_reason": "Closed"
+}

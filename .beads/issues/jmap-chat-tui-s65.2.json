@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-s65.2",
+  "title": "batch: call_batch() silently drops duplicate call_id responses",
+  "description": "If the server (or a buggy caller) produces two responses with the same call_id, the HashMap in call_batch() silently keeps only the last one. RFC 8620 §3.3 prohibits duplicate call_ids, but a defensive impl should document or detect this. Add a note to the docstring, or use entry API to detect duplicates and return an error.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "bug",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T10:50:17Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T10:51:33Z",
+  "closed_at": "2026-04-27T10:51:33Z",
+  "close_reason": "Fixed: to_value() uses json! macro, call_batch() detects duplicate call_ids, new() docstring updated",
+  "labels": [
+    "correctness",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-s65.2",
+      "depends_on_id": "jmap-chat-tui-s65",
+      "type": "parent-child",
+      "created_at": "2026-04-27T03:50:16Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

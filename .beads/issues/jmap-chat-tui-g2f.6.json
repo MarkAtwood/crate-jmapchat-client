@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-g2f.6",
+  "title": "Explain spawn_blocking bridge idiom in client_task.rs",
+  "description": "client_task.rs lines 54-64 spawn a spawn_blocking task to forward std::sync::mpsc commands into a tokio channel. The comment says 'bridge the blocking std receiver to an async tokio channel' but does not explain *why* this is necessary. Without context: egui's App::update() runs on the GUI thread (synchronous), so the UI sender is std::sync::mpsc; but the client task lives inside a tokio Runtime where calling blocking rx.recv() directly in an async context would stall the executor thread. A reader 12 months from now will not know whether this could be replaced with a tokio::sync::mpsc directly, or why the two-channel approach was chosen. Add a comment explaining: (1) why std::sync::mpsc is used on the UI side (egui is not async), and (2) why a spawn_blocking bridge is needed rather than a shared tokio channel.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:41:05Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:23:28Z",
+  "closed_at": "2026-04-26T09:23:28Z",
+  "close_reason": "Already documented in code comments",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-g2f.6",
+      "depends_on_id": "jmap-chat-tui-g2f",
+      "type": "parent-child",
+      "created_at": "2026-04-26T01:41:04Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

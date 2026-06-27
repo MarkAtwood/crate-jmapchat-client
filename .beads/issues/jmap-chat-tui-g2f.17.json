@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-g2f.17",
+  "title": "Make AuthFailed error message actionable",
+  "description": "client_task.rs bootstrap_session() reports 'Authentication failed (HTTP {code})' when the server returns an auth error. This tells the user what happened but not what to do. A first-time user who mistyped their token will stare at this with no guidance. The message should suggest a remediation, e.g.: 'Authentication failed (HTTP {code}) — check --bearer-token or --basic-user/--basic-pass and restart'. Similarly the config.rs error '--bearer-token and --ca-cert cannot be used together; CustomCaAuth does not support injecting an Authorization header' is explanatory but does not say what the user *should* do instead (use no-auth with custom CA, or bearer without custom CA).",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:41:33Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:23:44Z",
+  "closed_at": "2026-04-26T09:23:44Z",
+  "close_reason": "Already implemented: auth error message includes actionable flag hints",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-g2f.17",
+      "depends_on_id": "jmap-chat-tui-g2f",
+      "type": "parent-child",
+      "created_at": "2026-04-26T01:41:33Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

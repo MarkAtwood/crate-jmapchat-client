@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-gdc.13",
+  "title": "no JMAP Chat account error message not actionable",
+  "description": "In client_task.rs run(), when chat_account_id() returns None, the error sent to the UI is 'Server session has no JMAP Chat account'. A user seeing this at 2am cannot determine whether the server URL is wrong, the server does not have the JMAP Chat extension, or their account lacks the capability. The message is transient (5-second auto-dismiss) and the process exits with Disconnected — the user gets no hint of what to check. Fix: expand the message to include the server URL being contacted and suggest verifying that the server supports JMAP Chat (urn:ietf:params:jmap:chat) and that the account has the capability enabled.",
+  "status": "closed",
+  "priority": 4,
+  "issue_type": "chore",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T09:33:30Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T09:42:15Z",
+  "closed_at": "2026-04-26T09:42:15Z",
+  "close_reason": "Closed",
+  "labels": [
+    "my-oss",
+    "readability",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-gdc.13",
+      "depends_on_id": "jmap-chat-tui-gdc",
+      "type": "parent-child",
+      "created_at": "2026-04-26T02:33:30Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

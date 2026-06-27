@@ -1,0 +1,30 @@
+{
+  "id": "jmap-chat-tui-g2f.25",
+  "title": "SyncSender.ok() silently drops events under backpressure with no documentation",
+  "description": "send_event() calls tx.send(event).ok(), discarding the Result. The SyncSender capacity is 256. When the UI is slow to drain (e.g. during a long repaint), the send blocks until space is available — but the .ok() makes it appear non-blocking to reviewers. There is no comment explaining that this is intentional drop-on-full behavior vs. a deliberate backpressure acceptance. A contributor will copy this pattern for new events without understanding that events can be silently lost during bursts.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:42:17Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T08:57:47Z",
+  "closed_at": "2026-04-26T08:57:47Z",
+  "close_reason": "Closed",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-g2f.25",
+      "depends_on_id": "jmap-chat-tui-g2f",
+      "type": "parent-child",
+      "created_at": "2026-04-26T01:42:16Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "id": "jmap-chat-tui-4yc.7",
+  "title": "E2E: cargo build succeeds + clippy clean",
+  "description": "Validate the full build pipeline and code quality for jmap-chat-egui.\n\nWhat: Ensure the binary compiles cleanly with zero warnings under clippy.\n\nAlgorithm:\n1. cargo build -p jmap-chat-egui\n2. cargo clippy --all-features -p jmap-chat-egui -- -D warnings\n3. cargo fmt --check -p jmap-chat-egui (or --all scoped)\n4. cargo test -p jmap-chat-egui (all unit+integration tests pass)\n5. Fix any issues found before closing this bead.\n\nDefensive rules:\n- Do not suppress warnings with #[allow(...)]; fix the root cause.\n- If a clippy lint is a false positive, document why in a comment.\n\nAcceptance: all 4 commands exit 0 with zero errors.",
+  "acceptance_criteria": "cargo build, clippy, fmt, test all exit 0 for jmap-chat-egui",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "assignee": "Mark Atwood",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T08:22:04Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T08:39:03Z",
+  "closed_at": "2026-04-26T08:39:03Z",
+  "close_reason": "cargo build+clippy+fmt+test all pass; 81 tests total",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4yc.7",
+      "depends_on_id": "jmap-chat-tui-4yc",
+      "type": "parent-child",
+      "created_at": "2026-04-26T01:22:04Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    },
+    {
+      "issue_id": "jmap-chat-tui-4yc.7",
+      "depends_on_id": "jmap-chat-tui-4yc.6",
+      "type": "blocks",
+      "created_at": "2026-04-26T01:22:15Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

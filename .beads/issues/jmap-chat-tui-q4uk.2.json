@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-q4uk.2",
+  "title": "Five Unknown(String) enums: hand-written serde boilerplate will drift on spec additions",
+  "description": "SpanType, ContactPresence, ChannelPermissionTargetType, DeliveryState, and QuotaScope now each have a hand-written as_str()/Display/Serialize/Deserialize block following the OwnerPresence pattern. When the spec adds a new variant, all five need updating identically or they silently fall through to Unknown(String). A macro (e.g., jmap_string_enum!) would generate the boilerplate from a list of (Variant, \"wire-string\") pairs and eliminate drift risk.",
+  "status": "deferred",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T22:30:54Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T22:32:20Z",
+  "defer_until": "2026-06-01T00:00:00Z",
+  "labels": [
+    "maintainer-burden",
+    "my-oss",
+    "review",
+    "risk"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-q4uk.2",
+      "depends_on_id": "jmap-chat-tui-q4uk",
+      "type": "parent-child",
+      "created_at": "2026-04-27T15:30:53Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

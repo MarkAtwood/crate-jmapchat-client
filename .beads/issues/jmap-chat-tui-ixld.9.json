@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-ixld.9",
+  "title": "Deref\u003cTarget=str\u003e removed from Id and UTCDate newtypes",
+  "description": "The Deref\u003cTarget=str\u003e impl was removed from Id and UTCDate. With Deref, code like option_id.as_deref() == Some(\"foo\") compiles fine but mixes the newtype with bare \u0026str in ways that defeat the type boundary. Without Deref, callers must write .as_str() or .as_ref().map(|id| id.as_str()) explicitly, making each conversion visible in code review. The change also prevents accidental implicit coercions in match arms, function args, and comparisons. A contributor might suggest adding Deref back for ergonomics — resist: the explicitness is the point.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-28T01:04:05Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-28T01:25:50Z",
+  "closed_at": "2026-04-28T01:25:50Z",
+  "close_reason": "Decision recorded during idfq epic implementation; design intentionally retained as-is.",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-ixld.9",
+      "depends_on_id": "jmap-chat-tui-ixld",
+      "type": "parent-child",
+      "created_at": "2026-04-27T18:04:05Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

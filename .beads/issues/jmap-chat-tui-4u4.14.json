@@ -1,0 +1,28 @@
+{
+  "id": "jmap-chat-tui-4u4.14",
+  "title": "ClientError::AuthFailed distinguished from ClientError::Http before error_for_status()",
+  "description": "In fetch_session(), call(), and subscribe_events(), HTTP 401 and 403 are checked explicitly before the generic error_for_status() call, and mapped to ClientError::AuthFailed(u16) rather than ClientError::Http. A future contributor might 'simplify' by removing the explicit check and relying on error_for_status() alone, collapsing auth failures into the generic Http variant. The distinction is load-bearing: the TUI's client_task needs to distinguish auth failures (which will not resolve on retry and should surface to the user immediately) from transient network errors (which should be retried with exponential backoff). Conflating them means either no retry on any HTTP error, or infinite retry on wrong credentials.",
+  "status": "closed",
+  "priority": 3,
+  "issue_type": "decision",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-26T07:07:56Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-26T07:26:47Z",
+  "closed_at": "2026-04-26T07:26:47Z",
+  "close_reason": "Decision record — current design is correct, no change needed",
+  "labels": [
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-4u4.14",
+      "depends_on_id": "jmap-chat-tui-4u4",
+      "type": "parent-child",
+      "created_at": "2026-04-26T00:07:56Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

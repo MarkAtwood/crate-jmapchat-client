@@ -1,0 +1,29 @@
+{
+  "id": "jmap-chat-tui-k8t.5",
+  "title": "CustomEmojiQueryInput.filter_space_id owns String unnecessarily",
+  "description": "CustomEmojiQueryInput.filter_space_id is Option\u003cString\u003e while every other input struct in methods/mod.rs uses \u0026str borrows via a lifetime parameter (MessageQueryInput, MessageCreateInput, PresenceStatusSetInput, CustomEmojiCreateInput, SpaceInviteCreateInput, SpaceBanCreateInput all take 'a lifetimes). The owned String forces callers to allocate or clone even though the value is consumed in a single serde_json::json\\! call and immediately dropped. Fix: change to Option\u003c\u0026'a str\u003e with a lifetime on the struct, consistent with all sibling input types. Impact: one unnecessary heap allocation per custom_emoji_query call.",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T07:50:11Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T07:59:45Z",
+  "closed_at": "2026-04-27T07:59:45Z",
+  "close_reason": "Closed",
+  "labels": [
+    "efficiency",
+    "my-oss",
+    "review"
+  ],
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-k8t.5",
+      "depends_on_id": "jmap-chat-tui-k8t",
+      "type": "parent-child",
+      "created_at": "2026-04-27T00:50:11Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "jmap-chat-tui-cl8",
+  "title": "Update create-method tests after client_id removal",
+  "description": "Existing body_json matchers hard-code the client_id (e.g. 'client-ch-001'). After auto-generation, the body matcher cannot assert an exact client_id unless the test passes an explicit override. Fix: tests that need to assert body shape should pass client_id: Some('test-id') as override. Tests that only check response deserialization can use None.",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "owner": "mark@reviewcommit.com",
+  "created_at": "2026-04-27T14:31:56Z",
+  "created_by": "Mark Atwood",
+  "updated_at": "2026-04-27T15:10:42Z",
+  "closed_at": "2026-04-27T15:10:42Z",
+  "close_reason": "Closed",
+  "dependencies": [
+    {
+      "issue_id": "jmap-chat-tui-cl8",
+      "depends_on_id": "jmap-chat-tui-n76",
+      "type": "blocks",
+      "created_at": "2026-04-27T07:33:00Z",
+      "created_by": "Mark Atwood",
+      "metadata": "{}"
+    }
+  ]
+}
